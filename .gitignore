@@ -1,0 +1,14 @@
+# Object files
+*.o
+piepan
+
+# Compiled lua files
+piepan_impl.c
+piepan_impl.luac
+
+# Compiled protobuf-c files
+proto/Mumble.pb-c.c
+proto/Mumble.pb-c.h
+
+# Compiled documentation
+readme.html
