@@ -42,43 +42,43 @@ The following section describes the API that is available for script authors.  P
 
 #### `piepan.User`
 
-- **`int session`**: the session ID of the user
-- **`int userId`**: the registered user ID of the user
-- **`string name`**: the username of the user
-- **`string comment`**: the user's comment (FIXME)
-- **`bool isServerMuted`**: is the user muted by the server
-- **`bool isServerDeafened`**: has the user been deafened by the server
-- **`bool isSelfMuted`**: is the user muted by the him/herself
-- **`bool isSelfDeafened`**: has the user been deafened by him/herself
-- **`bool isRecording`**: is the user recording channel audio
-- **`piepan.Channel channel`**: the channel that the user is currently in
-- **`void moveTo(self, piepan.Channel channel)`**: moves the user to the given `channel`
-- **`void send(self, string message)`**: sends a message to the user
-- **`void kick(self [, string reason])`**: kicks the user from the server with an optional reason
-- **`void ban(self [, string reason])`**: bans the user from the server with an optional reason
+- `int session`: the session ID of the user
+- `int userId`: the registered user ID of the user
+- `string name`: the username of the user
+- `string comment`: the user's comment (FIXME)
+- `bool isServerMuted`: is the user muted by the server
+- `bool isServerDeafened`: has the user been deafened by the server
+- `bool isSelfMuted`: is the user muted by the him/herself
+- `bool isSelfDeafened`: has the user been deafened by him/herself
+- `bool isRecording`: is the user recording channel audio
+- `piepan.Channel channel`: the channel that the user is currently in
+- `void moveTo(self, piepan.Channel channel)`: moves the user to the given `channel`
+- `void send(self, string message)`: sends a message to the user
+- `void kick(self [, string reason])`: kicks the user from the server with an optional reason
+- `void ban(self [, string reason])`: bans the user from the server with an optional reason
 
 #### `piepan.Message`
 
-- **`string text`**: the message text
-- **`piepan.User user`**: the user who sent the message (this can be `nil`)
-- **`piepan.Channel channels`**: a table of channels the message was sent to, with the key being the channel ID and the value being the corresponding channel table
-- **`piepan.User users`**: a table of users the message was sent to, with the key being the user name and the value being their corresponding user table
+- `string text`: the message text
+- `piepan.User user`: the user who sent the message (this can be `nil`)
+- `piepan.Channel channels`: a table of channels the message was sent to, with the key being the channel ID and the value being the corresponding channel table
+- `piepan.User users`: a table of users the message was sent to, with the key being the user name and the value being their corresponding user table
 
 #### `piepan.Channel`
 
-- **`int id`**: the unique channel identifier
-- **`string name`**: the channel name
-- **`string description`**: the description of the channel (FIXME)
-- **`piepan.Channel parent`**: the parent channel
-- **`bool isTemporary`**: is the channel temporary
-- **`void send(self, string message)`**: sends a message to the channel
+- `int id`: the unique channel identifier
+- `string name`: the channel name
+- `string description`: the description of the channel (FIXME)
+- `piepan.Channel parent`: the parent channel
+- `bool isTemporary`: is the channel temporary
+- `void send(self, string message)`: sends a message to the channel
 
     Example:
 
         -- sends a message to the channel the bot is currently in
         piepan.me.channel:send("Hello Everyone!")
 
-- **`piepan.Channel __call(self, string path)`**: returns the child at the end of the path. The path items are separated by slashes (`/`).  The path item `.` refers to the current channel, the item `..` refers to the parent channel, and all other items refer to the child channel.
+- `piepan.Channel __call(self, string path)`: returns the child at the end of the path. The path items are separated by slashes (`/`).  The path item `.` refers to the current channel, the item `..` refers to the parent channel, and all other items refer to the child channel.
 
     Example:
 
@@ -88,9 +88,9 @@ The following section describes the API that is available for script authors.  P
 
 #### `piepan.Timer`
 
-- **`piepan.Timer new(func, timeout [, data])`**: Creates a new timer.  After `timeout` seconds elapses, `func` will be called with `data` as its first and only parameter.
+- `piepan.Timer new(func, timeout [, data])`: Creates a new timer.  After `timeout` seconds elapses, `func` will be called with `data` as its first and only parameter.
 
-    The (arbitrary) range of `timeout` is [1, 3600] (1 second to 1 hour).
+    The (arbitrary) range of `timeout` is 1-3600 (1 second to 1 hour).
 
     Once a timer has been fired or canceled, its reference is no longer valid.
 
@@ -98,7 +98,7 @@ The following section describes the API that is available for script authors.  P
 
 #### `piepan.Thread`
 
-- **`void new(worker [, callback, data])`**: Starts executing the global function `worker` in a new thread, with the argument `data`.
+- `void new(worker [, callback, data])`: Starts executing the global function `worker` in a new thread, with the argument `data`.
 
     The worker function should only use local variables.  Any use or modification of global variables is undefined.  Values that this function needs should be passed via the `data` argument.
 
@@ -106,20 +106,20 @@ The following section describes the API that is available for script authors.  P
 
 #### `piepan.UserChange` (hidden)
 
-- **`piepan.User user`**: the user that changed
-- **`bool isConnected`**:  if the user connected to the server
-- **`bool isDisconnected`**: if the user disconnected from the server
-- **`bool isChangedChannel`**:  if the user moved to a new channel
-- **`bool isChangedComment`**: if the user's comment changed
+- `piepan.User user`: the user that changed
+- `bool isConnected`:  if the user connected to the server
+- `bool isDisconnected`: if the user disconnected from the server
+- `bool isChangedChannel`:  if the user moved to a new channel
+- `bool isChangedComment`: if the user's comment changed
 
 #### `piepan.ChannelChange` (hidden)
 
-- **`piepan.Channel channel`**: the channel that was changed
-- **`bool isCreated`**: if the channel was created
-- **`bool isRemoved`**: if the channel was removed
-- **`bool isMoved`**: if the channel moved in the tree
-- **`bool isChangedName`**: if the channel name changed
-- **`bool isChangedDescription`**: if the channel description changed
+- `piepan.Channel channel`: the channel that was changed
+- `bool isCreated`: if the channel was created
+- `bool isRemoved`: if the channel was removed
+- `bool isMoved`: if the channel moved in the tree
+- `bool isChangedName`: if the channel name changed
+- `bool isChangedDescription`: if the channel description changed
 
 ### Variables
 
@@ -152,8 +152,8 @@ The `piepan.User` table that references yourself.
 
 Table containing information about the server.  This table may have the fields:
 
-- **`bool allowHtml`**: are HTML messages allowed to be sent to the server
-- **`string welcomeText`**: the server's welcome text
+- `bool allowHtml`: are HTML messages allowed to be sent to the server
+- `string welcomeText`: the server's welcome text
 
 #### `piepan.args`
 
