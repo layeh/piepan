@@ -203,6 +203,8 @@ Called when a channel changes state (e.g. is added or removed).
 
 ## Changelog
 
+- Next
+    - `sendPacket` now properly accepts a version packet
 - 0.1 (2013-12-11)
     - Initial Release
 

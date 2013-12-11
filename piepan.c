@@ -114,6 +114,9 @@ sendPacket(int type, void *data)
     int payload_size;
     int total_size;
     switch (type) {
+        case PACKET_VERSION:
+            payload_size = mumble_proto__version__get_packed_size(data);
+            break;
         case PACKET_AUTHENTICATE:
             payload_size = mumble_proto__authenticate__get_packed_size(data);
             break;
@@ -138,6 +141,9 @@ sendPacket(int type, void *data)
     total_size = sizeof(uint16_t) + sizeof(uint32_t) + payload_size;
     if (payload_size > 0) {
         switch (type) {
+            case PACKET_VERSION:
+                mumble_proto__version__pack(data, packet_out.buffer + 6);
+                break;
             case PACKET_AUTHENTICATE:
                 mumble_proto__authenticate__pack(data, packet_out.buffer + 6);
                 break;
