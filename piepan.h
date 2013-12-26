@@ -7,7 +7,7 @@
  */
 
 #define PAYLOAD_SIZE_MAX (1024 * 1024 * 8 - 1)
-#define PIEPAN_VERSION "0.1.0"
+#define PIEPAN_VERSION "0.1.1"
 
 enum {
     PACKET_VERSION      = 0,

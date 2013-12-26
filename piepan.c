@@ -217,7 +217,7 @@ socket_read_event(struct ev_loop *loop, ev_io *w, int revents)
         return;
     }
 
-    do {
+    while (total_read < packet_in.length) {
         ret = SSL_read(ssl, packet_in.buffer + total_read,
                        packet_in.length - total_read);
         if (ret <= 0) {
@@ -225,7 +225,7 @@ socket_read_event(struct ev_loop *loop, ev_io *w, int revents)
             return;
         }
         total_read += ret;
-    } while (total_read < packet_in.length);
+    }
 
     if (total_read != packet_in.length) {
         ev_break(loop, EVBREAK_ALL);
