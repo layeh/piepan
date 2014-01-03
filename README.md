@@ -203,6 +203,8 @@ Called when a channel changes state (e.g. is added or removed).
 
 ## Changelog
 
+- Next
+    - Each script is now loaded in its own Lua environment, preventing global variable interference between scripts
 - 0.1.1 (2013-12-15)
     - Fixed bug where event loop would stop when a packet with length zero was received
     - `sendPacket` now properly accepts a version packet
