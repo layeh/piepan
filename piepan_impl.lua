@@ -107,7 +107,7 @@ function piepan._implLoadScript(filename, reload)
     end
 
     piepan.scripts[filename] = {
-        environment = environment.piepan,
+        environment = environment,
         onConnect = environment.piepan.onConnect,
         onDisconnect = environment.piepan.onDisconnect,
         onMessage = environment.piepan.onMessage,
