@@ -9,7 +9,7 @@ piepan is an easy to use bot framework for interacting with a [Mumble](http://mu
 
 The above script can be started from the command line:
 
-    # piepan echo.lua
+    $ piepan echo.lua
 
 ## Usage
 
