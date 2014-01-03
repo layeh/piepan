@@ -228,10 +228,6 @@ function piepan.Thread.new(worker, callback, data)
     }
     piepan.Thread.threads[id] = thread
     native.Thread.new(thread, id)
-
-    --~ for k,v in pairs(thread) do
-        --~ print ( ">>> " .. tostring(k) .. " -> " .. tostring(v))
-    --~ end
 end
 
 function piepan.Thread._implExecute(id)
