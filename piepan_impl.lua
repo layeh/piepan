@@ -21,6 +21,7 @@ piepan.scripts = {}
 piepan.users = {}
 piepan.channels = {}
 piepan.Thread.threads = {}
+piepan.meta = {}
 
 -- Local data
 local functionLock = false
@@ -58,7 +59,45 @@ function piepan._implLoadScript(filename, reload)
     if piepan.scripts[filename] ~= nil and not reload then
         return true
     end
-    local script, message = loadfile(filename)
+    local environment = {
+        print = print,
+        assert = assert,
+        collectgarbage = collectgarbage,
+        dofile = dofile,
+        error = error,
+        getmetatable = getmetatable,
+        ipairs = ipairs,
+        load = load,
+        loadfile = loadfile,
+        next = next,
+        pairs = pairs,
+        pcall = pcall,
+        print = print,
+        rawequal = rawequal,
+        rawget = rawget,
+        rawlen = rawlen,
+        rawset = rawset,
+        require = require,
+        select = select,
+        setmetatable = setmetatable,
+        tonumber = tonumber,
+        tostring = tostring,
+        type = type,
+        xpcall = xpcall,
+
+        bit32 = bit32,
+        coroutine = coroutine,
+        debug = debug,
+        io = io,
+        math = math,
+        os = os,
+        package = package,
+        string = string,
+        table = table,
+
+        piepan = {}
+    }
+    local script, message = loadfile(filename, "bt", environment)
     if script == nil then
         return false, message
     end
@@ -68,17 +107,14 @@ function piepan._implLoadScript(filename, reload)
     end
 
     piepan.scripts[filename] = {
-        onConnect = piepan.onConnect,
-        onDisconnect = piepan.onDisconnect,
-        onMessage = piepan.onMessage,
-        onUserChange = piepan.onUserChange,
-        onChannelChange = piepan.onChannelChange
+        environment = environment.piepan,
+        onConnect = environment.piepan.onConnect,
+        onDisconnect = environment.piepan.onDisconnect,
+        onMessage = environment.piepan.onMessage,
+        onUserChange = environment.piepan.onUserChange,
+        onChannelChange = environment.piepan.onChannelChange
     }
-    piepan.onConnect = nil
-    piepan.onDisconnect = nil
-    piepan.onMessage = nil
-    piepan.onUserChange = nil
-    piepan.onChannelChange = nil
+    setmetatable(environment.piepan, piepan.meta)
 
     return true
 end
@@ -111,6 +147,13 @@ function piepan._implArgument(key, value)
     else
         table.insert(piepan.args[key], value)
     end
+end
+
+--
+-- piepan.meta
+--
+function piepan.meta.__index(table, key)
+    return piepan[key]
 end
 
 --
