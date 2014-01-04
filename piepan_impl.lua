@@ -105,6 +105,9 @@ function piepan._implLoadScript(filename, reload)
     if status == false then
         return false, message
     end
+    if type(environment.piepan) ~= "table" then
+        return false, filename .. ": the piepan global should not be overwritten"
+    end
 
     piepan.scripts[filename] = {
         environment = environment,
