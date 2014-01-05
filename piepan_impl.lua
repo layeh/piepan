@@ -416,6 +416,9 @@ function piepan._implOnUserChange(obj)
     -- TODO: clear hash if data comes in, and vice-versa.  also needs to resume
     --       the coroutine if we were waiting for that data
     --
+    if obj.userId ~= nil then
+        user.userId = obj.userId
+    end
     if obj.name ~= nil then
         user.name = obj.name
     end
