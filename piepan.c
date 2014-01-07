@@ -62,6 +62,7 @@ static Packet packet_in;
 
 typedef struct ScriptStat {
     ev_stat ev;
+    int id;
     char *filename;
     struct ScriptStat *next;
 } ScriptStat;
@@ -274,13 +275,12 @@ script_stat_event(struct ev_loop *loop, ev_stat *w, int revents)
     fprintf(stderr, "%s: reloaded %s\n", progname, stat->filename);
     lua_getglobal(lua, "piepan");
     lua_getfield(lua, -1, "_implLoadScript");
-    lua_pushstring(lua, stat->filename);
-    lua_pushboolean(lua, true);
-    lua_call(lua, 2, 2);
+    lua_pushinteger(lua, stat->id);
+    lua_call(lua, 1, 2);
     if (!lua_toboolean(lua, -2)) {
         fprintf(stderr, "%s: %s\n", progname, lua_tostring(lua, -1));
     }
-    lua_pop(lua, 2);
+    lua_settop(lua, 0);
 }
 
 static void
@@ -453,6 +453,7 @@ main(int argc, char *argv[])
                         fprintf(stderr, "%s: memory allocation error\n", progname);
                         return 1;
                     }
+                    item->id = lua_tointeger(lua, -1);
                     item->filename = argv[i];
                     item->next = scripts;
                     scripts = item;

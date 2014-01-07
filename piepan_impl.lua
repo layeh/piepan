@@ -8,6 +8,7 @@
 
 -- TODO:  coroutines for fetching/returning data we do not yet have (comment/
 --        texture hashes)
+-- TODO:  kill any timers or threads owned by a script when it reloads
 
 -- Global data
 piepan.User.__index = piepan.User
@@ -52,74 +53,77 @@ local native = {
 --
 -- Script manager
 --
-function piepan._implLoadScript(filename, reload)
+function piepan._implLoadScript(argument)
     assert(functionLock == false, "cannot call implementation functions")
-    assert(type(filename) == "string", "filename must be a string")
 
-    if piepan.scripts[filename] ~= nil and not reload then
-        return true
+    local index
+    local entry
+
+    if type(argument) == "string" then
+        index = #piepan.scripts + 1
+        entry = {
+            filename = argument,
+            environment = {
+                print = print,
+                assert = assert,
+                collectgarbage = collectgarbage,
+                dofile = dofile,
+                error = error,
+                getmetatable = getmetatable,
+                ipairs = ipairs,
+                load = load,
+                loadfile = loadfile,
+                next = next,
+                pairs = pairs,
+                pcall = pcall,
+                print = print,
+                rawequal = rawequal,
+                rawget = rawget,
+                rawlen = rawlen,
+                rawset = rawset,
+                require = require,
+                select = select,
+                setmetatable = setmetatable,
+                tonumber = tonumber,
+                tostring = tostring,
+                type = type,
+                xpcall = xpcall,
+
+                bit32 = bit32,
+                coroutine = coroutine,
+                debug = debug,
+                io = io,
+                math = math,
+                os = os,
+                package = package,
+                string = string,
+                table = table
+            }
+        }
+    elseif type(argument) == "number" then
+        index = argument
+        entry = piepan.scripts[index]
+    else
+        return false, "invalid argument"
     end
-    local environment = {
-        print = print,
-        assert = assert,
-        collectgarbage = collectgarbage,
-        dofile = dofile,
-        error = error,
-        getmetatable = getmetatable,
-        ipairs = ipairs,
-        load = load,
-        loadfile = loadfile,
-        next = next,
-        pairs = pairs,
-        pcall = pcall,
-        print = print,
-        rawequal = rawequal,
-        rawget = rawget,
-        rawlen = rawlen,
-        rawset = rawset,
-        require = require,
-        select = select,
-        setmetatable = setmetatable,
-        tonumber = tonumber,
-        tostring = tostring,
-        type = type,
-        xpcall = xpcall,
 
-        bit32 = bit32,
-        coroutine = coroutine,
-        debug = debug,
-        io = io,
-        math = math,
-        os = os,
-        package = package,
-        string = string,
-        table = table,
-
-        piepan = {}
-    }
-    local script, message = loadfile(filename, "bt", environment)
+    local script, message = loadfile(entry.filename, "bt", entry.environment)
     if script == nil then
         return false, message
     end
+    entry.environment.piepan = {}
     local status, message = pcall(script)
     if status == false then
         return false, message
     end
-    if type(environment.piepan) ~= "table" then
-        return false, filename .. ": the piepan global should not be overwritten"
+    if type(entry.environment.piepan) ~= "table" then
+        return false, entry.filename .. ": the piepan global should not be overwritten"
     end
 
-    piepan.scripts[filename] = {
-        environment = environment,
-        onConnect = environment.piepan.onConnect,
-        onDisconnect = environment.piepan.onDisconnect,
-        onMessage = environment.piepan.onMessage,
-        onUserChange = environment.piepan.onUserChange,
-        onChannelChange = environment.piepan.onChannelChange
-    }
-    setmetatable(environment.piepan, piepan.meta)
+    piepan.scripts[index] = entry
+    setmetatable(entry.environment.piepan, piepan.meta)
 
-    return true
+    return true, index
 end
 
 function piepan._implCall(name, arg)
@@ -127,7 +131,7 @@ function piepan._implCall(name, arg)
 
     functionLock = true
     for _,script in pairs(piepan.scripts) do
-        local func = script[name]
+        local func = rawget(script.environment.piepan, name)
         if type(func) == "function" then
             status, message = pcall(func, arg)
             if not status then
