@@ -116,12 +116,11 @@ function piepan._implLoadScript(argument)
     if status == false then
         return false, message
     end
-    if type(entry.environment.piepan) ~= "table" then
-        return false, entry.filename .. ": the piepan global should not be overwritten"
-    end
 
     piepan.scripts[index] = entry
-    setmetatable(entry.environment.piepan, piepan.meta)
+    if type(entry.environment.piepan) == "table" then
+        setmetatable(entry.environment.piepan, piepan.meta)
+    end
 
     return true, index
 end
