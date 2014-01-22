@@ -1,6 +1,6 @@
-CFLAGS = `pkg-config --libs --cflags libssl lua libprotobuf-c` -lev -pthread
+CFLAGS = `pkg-config --libs --cflags libssl lua libprotobuf-c opus vorbis vorbisfile` -lev -pthread
 
-piepan: piepan.c piepan.h handlers.c api.c proto/Mumble.o \
+piepan: piepan.c piepan.h util.c handlers.c api.c proto/Mumble.o \
 		piepan_impl.c
 	$(CC) $(CFLAGS) -o piepan piepan.c proto/Mumble.o
 

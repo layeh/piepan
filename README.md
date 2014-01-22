@@ -38,7 +38,7 @@ The above script can be started from the command line:
 
 The following section describes the API that is available for script authors.  Please note that the current API does not contain all of the features that are defined in the Mumble protocol.
 
-### Prototypes
+### Tables
 
 #### `piepan.User`
 
@@ -71,6 +71,10 @@ The following section describes the API that is available for script authors.  P
 - `string description`: the description of the channel (FIXME)
 - `piepan.Channel parent`: the parent channel
 - `bool isTemporary`: is the channel temporary
+- `bool play(self, string filename[, function callback, data])`: plays the audio file to the channel. `callback` will be executed when the file finishes playing, with `data` passed as its only argument. Returns `true` if no other audio file was playing and the stream started successfully.
+
+    Note: Only Ogg Vorbis files are supported (mono, 48kHz)
+
 - `void send(self, string message)`: sends a message to the channel
 
     Example:
@@ -88,7 +92,7 @@ The following section describes the API that is available for script authors.  P
 
 #### `piepan.Timer`
 
-- `piepan.Timer new(func, timeout [, data])`: Creates a new timer.  After `timeout` seconds elapses, `func` will be called with `data` as its first and only parameter.
+- `piepan.Timer new(function func, int timeout [, data])`: Creates a new timer.  After `timeout` seconds elapses, `func` will be called with `data` as its first and only parameter.
 
     The (arbitrary) range of `timeout` is 1-3600 (1 second to 1 hour).
 
@@ -98,7 +102,7 @@ The following section describes the API that is available for script authors.  P
 
 #### `piepan.Thread`
 
-- `void new(worker [, callback, data])`: Starts executing the global function `worker` in a new thread, with the argument `data`.
+- `void new(function worker [, function callback, data])`: Starts executing the global function `worker` in a new thread, with the argument `data`.
 
     The worker function should only use local variables.  Any use or modification of global variables is undefined.  Values that this function needs should be passed via the `data` argument.
 
@@ -177,6 +181,10 @@ Example:
 
 Disconnects from the server.
 
+#### `piepan.stopAudio()`
+
+Stops the currently playing audio stream.
+
 ### Callbacks
 
 These are functions that can be defined in script files.  They will be called when the corresponding event happens.
@@ -204,6 +212,7 @@ Called when a channel changes state (e.g. is added or removed).
 ## Changelog
 
 - Next
+    - Added audio file support
     - Each script is now loaded in its own Lua environment, preventing global variable interference between scripts
     - Fixed `piepan.User.userId` not being filled
     - Multiple instances of the same script can now be run at the same time
@@ -225,6 +234,8 @@ Called when a channel changes state (e.g. is added or removed).
 - [Lua 5.2](http://www.lua.org/)
 - [libev](http://libev.schmorp.de/)
 - [protobuf-c](https://github.com/protobuf-c/protobuf-c)
+- [Ogg Vorbis](https://xiph.org/vorbis/)
+- [Opus](http://www.opus-codec.org/)
 
 ## License
 

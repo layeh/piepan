@@ -30,9 +30,14 @@
 
 #include <ev.h>
 
+#include <opus/opus.h>
+#include <vorbis/codec.h>
+#include <vorbis/vorbisfile.h>
+
 #include "proto/Mumble.pb-c.h"
 
 #include "piepan.h"
+#include "util.c"
 #include "api.c"
 #include "handlers.c"
 #include "piepan_impl.c"
@@ -59,6 +64,7 @@ static SSL *ssl;
 static lua_State *lua;
 static Packet packet_out;
 static Packet packet_in;
+static OpusEncoder *opus_encoder;
 
 typedef struct ScriptStat {
     ev_stat ev;
@@ -110,13 +116,16 @@ impl_reader(lua_State *L, void *data, size_t *size)
 }
 
 int
-sendPacket(int type, void *data)
+sendPacketEx(int type, void *data, int length)
 {
     int payload_size;
     int total_size;
     switch (type) {
         case PACKET_VERSION:
             payload_size = mumble_proto__version__get_packed_size(data);
+            break;
+        case PACKET_UDPTUNNEL:
+            payload_size = length;
             break;
         case PACKET_AUTHENTICATE:
             payload_size = mumble_proto__authenticate__get_packed_size(data);
@@ -144,6 +153,9 @@ sendPacket(int type, void *data)
         switch (type) {
             case PACKET_VERSION:
                 mumble_proto__version__pack(data, packet_out.buffer + 6);
+                break;
+            case PACKET_UDPTUNNEL:
+                memmove(packet_out.buffer + 6, data, length);
                 break;
             case PACKET_AUTHENTICATE:
                 mumble_proto__authenticate__pack(data, packet_out.buffer + 6);
@@ -184,6 +196,7 @@ user_thread_event(struct ev_loop *loop, ev_io *w, int revents)
     lua_getfield(lua, -1, "userthread");
     user_thread = (UserThread *)lua_touserdata(lua, -1);
     if (user_thread != NULL) {
+        ev_io_stop(loop, w);
         free(user_thread);
     }
     lua_getfield(lua, -4, "_implFinish");
@@ -253,6 +266,50 @@ ping_event(struct ev_loop *loop, ev_timer *w, int revents)
 {
     MumbleProto__Ping ping = MUMBLE_PROTO__PING__INIT;
     sendPacket(PACKET_PING, &ping);
+}
+
+#define OPUS_FRAME_SIZE 480
+void
+audio_transmission_event(struct ev_loop *loop, struct ev_timer *w, int revents)
+{
+    AudioTransmission *at = (AudioTransmission *)w;
+    VoicePacket packet;
+    uint8_t packet_buffer[1024];
+    uint8_t output[1024];
+    opus_int32 byte_count;
+    long long_ret;
+
+    voicepacket_init(&packet, packet_buffer);
+    voicepacket_setheader(&packet, VOICEPACKET_OPUS, VOICEPACKET_NORMAL,
+        at->sequence);
+
+    while (at->buffer.size < OPUS_FRAME_SIZE * sizeof(opus_int16)) {
+        long_ret = ov_read(&at->ogg, at->buffer.pcm + at->buffer.size,
+            PCM_BUFFER - at->buffer.size, 0, 2, 1, NULL);
+        if (long_ret <= 0) {
+            audioTransmission_stop(at, lua, loop);
+            return;
+        }
+        at->buffer.size += long_ret;
+    }
+
+    byte_count = opus_encode(opus_encoder, (opus_int16 *)at->buffer.pcm,
+        OPUS_FRAME_SIZE, output, sizeof(output));
+    if (byte_count < 0) {
+        audioTransmission_stop(at, lua, loop);
+        return;
+    }
+    at->buffer.size -= OPUS_FRAME_SIZE * sizeof(opus_int16);
+    memmove(at->buffer.pcm, at->buffer.pcm + OPUS_FRAME_SIZE * sizeof(opus_int16),
+        at->buffer.size);
+    voicepacket_setframe(&packet, byte_count, output);
+
+    sendPacketEx(PACKET_UDPTUNNEL, packet_buffer, voicepacket_getlength(&packet));
+
+    at->sequence = (at->sequence + 1) % 10000;
+
+    w->repeat = 0.01;
+    ev_timer_again(loop, w);
 }
 
 void
@@ -469,6 +526,22 @@ main(int argc, char *argv[])
     }
 
     /*
+     * Initialize Opus
+     */
+    {
+        int error;
+        opus_encoder = opus_encoder_create(48000, 1, OPUS_APPLICATION_AUDIO, &error);
+        if (error != OPUS_OK) {
+            fprintf(stderr, "%s: could not initialize the Opus encoder: %s\n",
+                    progname, opus_strerror(error));
+            return 1;
+        }
+        opus_encoder_ctl(opus_encoder, OPUS_SET_VBR(0));
+        // TODO: set this to the server's max bitrate
+        opus_encoder_ctl(opus_encoder, OPUS_SET_BITRATE(50000));
+    }
+
+    /*
      * SSL initialization
      */
     SSL_library_init();
@@ -556,6 +629,8 @@ main(int argc, char *argv[])
             char *arr[MAX_TOKENS];
         } tokens = {0};
 
+        auth.has_opus = true;
+        auth.opus = true;
         auth.username = username;
         if (password_file != NULL) {
             file = fopen(password_file, "r");
@@ -641,9 +716,10 @@ main(int argc, char *argv[])
         lua_call(lua, 1, 0);
     }
 
-    SSL_shutdown(ssl);
+    SSL_shutdown(ssl); // TODO:  sigpipe is triggered here if connection breaks
     close(socket_fd);
     lua_close(lua);
+    opus_encoder_destroy(opus_encoder);
 
     if (developement_mode) {
         ScriptStat *item = scripts;

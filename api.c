@@ -70,6 +70,34 @@ api_User_moveTo(lua_State *lua)
 }
 
 int
+api_Channel_play(lua_State *lua)
+{
+    // [string filename]
+    AudioTransmission *at = malloc(sizeof(AudioTransmission));
+    if (at == NULL) {
+        return 0;
+    }
+    at->file = fopen(lua_tostring(lua, -1), "rb");
+    if (at->file == NULL) {
+        free(at);
+        return 0;
+    }
+    if (ov_open_callbacks(at->file, &at->ogg, NULL, 0, OV_CALLBACKS_STREAMONLY_NOCLOSE) != 0) {
+        fclose(at->file);
+        free(at);
+        return 0;
+    }
+
+    at->sequence = 1;
+    at->buffer.size = 0;
+    ev_timer_init(&at->ev, audio_transmission_event, 0., 0.);
+    ev_timer_start(ev_loop_main, &at->ev);
+
+    lua_pushlightuserdata(lua, at);
+    return 1;
+}
+
+int
 api_Channel_send(lua_State *lua)
 {
     // [self, message]
@@ -151,6 +179,13 @@ api_Thread_new(lua_State *lua)
 }
 
 int
+api_stopAudio(lua_State *lua)
+{
+    AudioTransmission *at = (AudioTransmission *)lua_touserdata(lua, -1);
+    audioTransmission_stop(at, lua, ev_loop_main);
+}
+
+int
 api_disconnect(lua_State *lua)
 {
     kill(0, SIGINT);
@@ -165,23 +200,26 @@ api_init(lua_State *lua)
 
     // piepan.User
     lua_newtable(lua);
-    // piepan.User:send(message)
+
     lua_pushcfunction(lua, api_User_send);
     lua_setfield(lua, -2, "send");
-    // piepan.User:kick(reason)
+
     lua_pushcfunction(lua, api_User_kick);
     lua_setfield(lua, -2, "kick");
-    // piepan.User:ban(reason)
+
     lua_pushcfunction(lua, api_User_ban);
     lua_setfield(lua, -2, "ban");
-    // piepan.User:moveTo(channel)
+
     lua_pushcfunction(lua, api_User_moveTo);
     lua_setfield(lua, -2, "moveTo");
     lua_setfield(lua, -2, "User");
 
     // piepan.Channel
     lua_newtable(lua);
-    // piepan.Channel:send(message)
+
+    lua_pushcfunction(lua, api_Channel_play);
+    lua_setfield(lua, -2, "play");
+
     lua_pushcfunction(lua, api_Channel_send);
     lua_setfield(lua, -2, "send");
     lua_setfield(lua, -2, "Channel");
@@ -192,20 +230,24 @@ api_init(lua_State *lua)
 
     // piepan.Timer
     lua_newtable(lua);
-    // piepan.Timer.new()
+
     lua_pushcfunction(lua, api_Timer_new);
     lua_setfield(lua, -2, "new");
-    // piepan.Timer:cancel()
+
     lua_pushcfunction(lua, api_Timer_cancel);
     lua_setfield(lua, -2, "cancel");
     lua_setfield(lua, -2, "Timer");
 
     // piepan.Thread
     lua_newtable(lua);
-    // piepan.Thread.new()
+
     lua_pushcfunction(lua, api_Thread_new);
     lua_setfield(lua, -2, "new");
     lua_setfield(lua, -2, "Thread");
+
+    // piepan.stopAudio
+    lua_pushcfunction(lua, api_stopAudio);
+    lua_setfield(lua, -2, "stopAudio");
 
     // piepan.disconnect
     lua_pushcfunction(lua, api_disconnect);

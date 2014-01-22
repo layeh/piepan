@@ -4,11 +4,10 @@
 -- Author: Tim Cooper <tim.cooper@layeh.com>
 -- License: MIT (see LICENSE)
 --
---
 
 -- TODO:  coroutines for fetching/returning data we do not yet have (comment/
 --        texture hashes)
--- TODO:  kill any timers or threads owned by a script when it reloads
+-- TODO:  kill any timers, threads, callbacks owned by a script when it reloads
 
 -- Global data
 piepan.User.__index = piepan.User
@@ -19,16 +18,17 @@ piepan.Timer.__index = piepan.Timer
 piepan.server = {}
 piepan.args = {}
 piepan.scripts = {}
-piepan.users = {}
-piepan.channels = {}
+piepan.users = {} -- TODO: move to piepan.User?
+piepan.channels = {} -- TODO:  move to piepan.Channel?
 piepan.Thread.threads = {}
 piepan.meta = {}
 
 -- Local data
 local functionLock = false
-local hasSynced = false
+local hasSynced = false -- TODO:  move to piepan.server?
 local localUsers = {} -- table of users with the user's session ID as the key
-local timers = {}
+local timers = {} -- TODO:  move to piepan.Timer.timers?
+local currentAudio
 
 local native = {
     User = {
@@ -38,6 +38,7 @@ local native = {
         send = piepan.User.send
     },
     Channel = {
+        play = piepan.Channel.play,
         send = piepan.Channel.send
     },
     Timer = {
@@ -47,6 +48,7 @@ local native = {
     Thread = {
         new = piepan.Thread.new
     },
+    stopAudio = piepan.stopAudio,
     disconnect = piepan.disconnect
 }
 
@@ -132,7 +134,7 @@ function piepan._implCall(name, arg)
     for _,script in pairs(piepan.scripts) do
         local func = rawget(script.environment.piepan, name)
         if type(func) == "function" then
-            status, message = pcall(func, arg)
+            local status, message = pcall(func, arg)
             if not status then
                 print ("Error: " .. message)
             end
@@ -330,6 +332,39 @@ function piepan.Channel:__call(path)
         channel = current
     end
     return channel
+end
+
+function piepan.Channel:play(filename, callback, data)
+    assert(self ~= nil, "self cannot be nil")
+    assert(type(filename) == "string", "filename must be a string")
+
+    if currentAudio ~= nil then
+        return false
+    end
+
+    local ptr = native.Channel.play(filename)
+    if not ptr then
+        return false
+    end
+    currentAudio = {
+        callback = callback,
+        callbackData = data,
+        audioPtr = ptr
+    }
+    return true
+end
+
+function piepan.Channel._implAudioFinished()
+    assert (currentAudio ~= nil, "audio must be playing")
+
+    if type(currentAudio.callback) == "function" then
+        status, message = pcall(currentAudio.callback, currentAudio.callbackData)
+        if not status then
+            print ("Error: " .. message)
+        end
+    end
+
+    currentAudio = nil
 end
 
 function piepan.Channel:send(message)
@@ -572,6 +607,14 @@ end
 --
 -- Functions
 --
+function piepan.stopAudio()
+    if not currentAudio then
+        return
+    end
+
+    native.stopAudio(currentAudio.audioPtr)
+end
+
 function piepan.disconnect()
     native.disconnect()
 end
