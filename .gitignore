@@ -12,3 +12,6 @@ proto/Mumble.pb-c.h
 
 # Compiled documentation
 readme.html
+
+# Scripts
+scripts/
