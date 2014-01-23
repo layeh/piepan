@@ -1,18 +1,23 @@
 CFLAGS = `pkg-config --libs --cflags libssl lua libprotobuf-c opus vorbis vorbisfile` -lev -pthread
 
-piepan: piepan.c piepan.h util.c handlers.c api.c proto/Mumble.o \
-		piepan_impl.c
-	$(CC) $(CFLAGS) -o piepan piepan.c proto/Mumble.o
+LUAFILES = src/impl/piepan.lua
+
+piepan: src/piepan.c src/piepan.h src/util.c src/handlers.c src/api.c \
+	proto/Mumble.o src/piepan_impl.c
+	$(CC) $(CFLAGS) -o $@ src/piepan.c proto/Mumble.o
 
 proto/Mumble.o: proto/Mumble.proto
 	protoc-c --c_out=. proto/Mumble.proto
 	$(CC) -c -I. -o proto/Mumble.o proto/Mumble.pb-c.c
 
-piepan_impl.c: piepan_impl.luac
-	xxd -i piepan_impl.luac piepan_impl.c
+src/piepan_impl.c: src/piepan_impl.luac
+	xxd -i src/piepan_impl.luac src/piepan_impl.c
 
-piepan_impl.luac: piepan_impl.lua
-	luac -o piepan_impl.luac piepan_impl.lua
+src/piepan_impl.luac: src/piepan_impl.lua
+	luac -o src/piepan_impl.luac src/piepan_impl.lua
+
+src/piepan_impl.lua: $(LUAFILES)
+	cat $(LUAFILES) > $@
 
 readme.html: README.md
 	echo '<!DOCTYPE html>' > readme.html
@@ -32,7 +37,7 @@ readme.html: README.md
 clean:
 	rm -f piepan
 	rm -f proto/Mumble.o proto/Mumble.pb-c.c proto/Mumble.pb-c.h
-	rm -f piepan_impl.c piepan_impl.luac
+	rm -f src/piepan_impl.c src/piepan_impl.luac
 	rm -f readme.html
 
 .PHONY: clean

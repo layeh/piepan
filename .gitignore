@@ -3,8 +3,9 @@
 piepan
 
 # Compiled lua files
-piepan_impl.c
-piepan_impl.luac
+src/piepan_impl.c
+src/piepan_impl.luac
+src/piepan_impl.lua
 
 # Compiled protobuf-c files
 proto/Mumble.pb-c.c

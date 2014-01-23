@@ -34,7 +34,7 @@
 #include <vorbis/codec.h>
 #include <vorbis/vorbisfile.h>
 
-#include "proto/Mumble.pb-c.h"
+#include "../proto/Mumble.pb-c.h"
 
 #include "piepan.h"
 #include "util.c"
@@ -107,8 +107,8 @@ impl_reader(lua_State *L, void *data, size_t *size)
     int *ret = (int *)data;
     if (*ret == 0) {
         *ret = 1;
-        *size = piepan_impl_luac_len;
-        return (const char *)piepan_impl_luac;
+        *size = src_piepan_impl_luac_len;
+        return (const char *)src_piepan_impl_luac;
     } else {
         return NULL;
     }
@@ -534,7 +534,7 @@ main(int argc, char *argv[])
         }
         opus_encoder_ctl(encoder, OPUS_SET_VBR(1));
         // TODO: set this to the server's max bitrate
-        opus_encoder_ctl(opus_encoder, OPUS_SET_BITRATE(50000));
+        opus_encoder_ctl(encoder, OPUS_SET_BITRATE(50000));
 
         lua_settop(lua, 0);
     }
