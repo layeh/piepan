@@ -11,18 +11,18 @@ LUAFILES = src/impl/piepan.lua \
            src/impl/functions.lua
 
 piepan: src/piepan.c src/piepan.h src/util.c src/handlers.c src/api.c \
-	proto/Mumble.o src/piepan_impl.c
+        proto/Mumble.o src/piepan_impl.c
 	$(CC) $(CFLAGS) -o $@ src/piepan.c proto/Mumble.o
 
 proto/Mumble.o: proto/Mumble.proto
-	protoc-c --c_out=. proto/Mumble.proto
-	$(CC) -c -I. -o proto/Mumble.o proto/Mumble.pb-c.c
+	protoc-c --c_out=. $<
+	$(CC) -c -I. -o $@ proto/Mumble.pb-c.c
 
 src/piepan_impl.c: src/piepan_impl.luac
-	xxd -i src/piepan_impl.luac src/piepan_impl.c
+	xxd -i $< $@
 
 src/piepan_impl.luac: src/piepan_impl.lua
-	luac -o src/piepan_impl.luac src/piepan_impl.lua
+	luac -o $@ $<
 
 src/piepan_impl.lua: $(LUAFILES)
 	cat $(LUAFILES) > $@
