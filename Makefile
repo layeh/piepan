@@ -45,7 +45,7 @@ readme.html: README.md
 clean:
 	rm -f piepan
 	rm -f proto/Mumble.o proto/Mumble.pb-c.c proto/Mumble.pb-c.h
-	rm -f src/piepan_impl.c src/piepan_impl.luac
+	rm -f src/piepan_impl.c src/piepan_impl.luac src/piepan_impl.lua
 	rm -f readme.html
 
 .PHONY: clean
