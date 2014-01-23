@@ -40,6 +40,7 @@ typedef struct {
     int id;
 } UserThread;
 
+#define OPUS_FRAME_SIZE 480
 #define PCM_BUFFER 4096
 typedef struct {
     ev_timer ev;

@@ -179,7 +179,8 @@ sendPacketEx(int type, void *data, int length)
     return SSL_write(ssl, packet_out.buffer, total_size) == total_size ? 0 : 3;
 }
 
-static void
+
+void
 user_thread_event(struct ev_loop *loop, ev_io *w, int revents)
 {
     UserThread *user_thread;
@@ -203,7 +204,7 @@ user_thread_event(struct ev_loop *loop, ev_io *w, int revents)
     lua_call(lua, 1, 0);
 }
 
-static void
+void
 socket_read_event(struct ev_loop *loop, ev_io *w, int revents)
 {
     int total_read = 0;
@@ -254,20 +255,19 @@ socket_read_event(struct ev_loop *loop, ev_io *w, int revents)
     }
 }
 
-static void
+void
 signal_event(struct ev_loop *loop, ev_signal *w, int revents)
 {
     ev_break(ev_loop_main, EVBREAK_ALL);
 }
 
-static void
+void
 ping_event(struct ev_loop *loop, ev_timer *w, int revents)
 {
     MumbleProto__Ping ping = MUMBLE_PROTO__PING__INIT;
     sendPacket(PACKET_PING, &ping);
 }
 
-#define OPUS_FRAME_SIZE 480
 void
 audio_transmission_event(struct ev_loop *loop, struct ev_timer *w, int revents)
 {
@@ -321,7 +321,7 @@ user_timer_event(struct ev_loop *loop, struct ev_timer *w, int revents)
     lua_call(lua, 1, 0);
 }
 
-static void
+void
 script_stat_event(struct ev_loop *loop, ev_stat *w, int revents)
 {
     ScriptStat *stat = (ScriptStat *)w;
@@ -337,17 +337,6 @@ script_stat_event(struct ev_loop *loop, ev_stat *w, int revents)
         fprintf(stderr, "%s: %s\n", progname, lua_tostring(lua, -1));
     }
     lua_settop(lua, 0);
-}
-
-static void
-rnltrim(char *str, int length)
-{
-    for (length = length - 1; length >= 0; length--) {
-        if (str[length] != '\r' && str[length] != '\n') {
-            break;
-        }
-        str[length] = '\0';
-    }
 }
 
 static void

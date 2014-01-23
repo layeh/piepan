@@ -169,6 +169,7 @@ api_Thread_new(lua_State *lua)
 int
 api_stopAudio(lua_State *lua)
 {
+    // [AudioTransmission *]
     AudioTransmission *at = (AudioTransmission *)lua_touserdata(lua, -1);
     audioTransmission_stop(at, lua, ev_loop_main);
 }

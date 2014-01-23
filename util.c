@@ -1,3 +1,12 @@
+/*
+ * piepie - bot framework for Mumble
+ *
+ * Author: Tim Cooper <tim.cooper@layeh.com>
+ * License: MIT (see LICENSE)
+ *
+ * This file contains utility functions.
+ */
+
 int
 util_set_varint(uint8_t buffer[], uint64_t value)
 {
@@ -10,6 +19,17 @@ util_set_varint(uint8_t buffer[], uint64_t value)
         return 2;
     }
     return -1;
+}
+
+void
+rnltrim(char *str, int length)
+{
+    for (length = length - 1; length >= 0; length--) {
+        if (str[length] != '\r' && str[length] != '\n') {
+            break;
+        }
+        str[length] = '\0';
+    }
 }
 
 void
