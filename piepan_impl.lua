@@ -15,7 +15,9 @@ piepan.Message.__index = piepan.Message
 piepan.Channel.__index = piepan.Channel
 piepan.Timer.__index = piepan.Timer
 
-piepan.server = {}
+piepan.server = {
+    synced = false
+}
 piepan.args = {}
 piepan.scripts = {}
 piepan.users = {}
@@ -26,7 +28,6 @@ piepan.timers = {}
 
 -- Local data
 local functionLock = false
-local hasSynced = false -- TODO:  move to piepan.server?
 local localUsers = {} -- table of users with the user's session ID as the key
 local currentAudio
 
@@ -394,7 +395,7 @@ function piepan._implOnServerSync(obj)
     if obj.welcomeText ~= nil then
         piepan.server.welcomeText = obj.welcomeText
     end
-    hasSynced = true
+    piepan.server.synced = true
 end
 
 function piepan._implOnMessage(obj)
@@ -484,7 +485,7 @@ function piepan._implOnUserChange(obj)
         user.isSelfDeafened = obj.isSelfDeafened
     end
 
-    if hasSynced then
+    if piepan.server.synced then
         piepan._implCall("onUserChange", event)
     end
 end
@@ -503,7 +504,7 @@ function piepan._implOnUserRemove(obj)
         localUsers[obj.session] = nil
     end
 
-    if hasSynced and event.user ~= nil then
+    if piepan.server.synced and event.user ~= nil then
         event.isDisconnected = true
         piepan._implCall("onUserChange", event)
     end
@@ -532,7 +533,7 @@ function piepan._implOnChannelRemove(obj)
     end
     piepan.channels[channel.id] = nil
 
-    if hasSynced then
+    if piepan.server.synced then
         event.isRemoved = true
         piepan._implCall("onChannelChange", event)
     end
@@ -595,7 +596,7 @@ function piepan._implOnChannelState(obj)
         event.isChangedName = true
     end
 
-    if hasSynced then
+    if piepan.server.synced then
         piepan._implCall("onChannelChange", event)
     end
 end
