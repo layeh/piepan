@@ -167,9 +167,9 @@ script_stat_event(struct ev_loop *loop, ev_stat *w, int revents)
     lua_getglobal(stat->lua, "piepan");
     lua_getfield(stat->lua, -1, "_implLoadScript");
     lua_pushinteger(stat->lua, stat->id);
-    lua_call(stat->lua, 1, 2);
-    if (!lua_toboolean(stat->lua, -2)) {
-        fprintf(stderr, "%s: %s\n", PIEPAN_NAME, lua_tostring(stat->lua, -1));
+    lua_call(stat->lua, 1, 3);
+    if (!lua_toboolean(stat->lua, -3)) {
+        fprintf(stderr, "%s: %s\n", PIEPAN_NAME, lua_tostring(stat->lua, -2));
     }
     lua_settop(stat->lua, 0);
 }

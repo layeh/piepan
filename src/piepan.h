@@ -71,12 +71,11 @@ typedef struct {
     int header_length;
 } VoicePacket;
 
-typedef struct ScriptStat {
+typedef struct {
     ev_stat ev;
     lua_State *lua;
     int id;
     char *filename;
-    struct ScriptStat *next;
 } ScriptStat;
 
 /*

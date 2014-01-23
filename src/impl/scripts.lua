@@ -5,7 +5,7 @@
 -- License: MIT (see LICENSE)
 --
 
-function piepan._implLoadScript(argument)
+function piepan._implLoadScript(argument, ptr)
     assert(functionLock == false, "cannot call implementation functions")
 
     local index
@@ -15,6 +15,7 @@ function piepan._implLoadScript(argument)
         index = #piepan.scripts + 1
         entry = {
             filename = argument,
+            ptr = ptr,
             environment = {
                 print = print,
                 assert = assert,
@@ -74,7 +75,7 @@ function piepan._implLoadScript(argument)
         setmetatable(entry.environment.piepan, piepan.meta)
     end
 
-    return true, index
+    return true, index, ptr
 end
 
 function piepan._implCall(name, arg)

@@ -206,7 +206,6 @@ main(int argc, char *argv[])
     int ret;
     int script_argc = -1;
     int developement_mode = 0;
-    ScriptStat *scripts = NULL;
 
     int socket_fd;
     struct sockaddr_in server_addr;
@@ -291,6 +290,7 @@ main(int argc, char *argv[])
                 return 1;
             }
         }
+        lua_settop(lua, 0);
         if (show_version) {
             printf("%s %s (compiled on " __DATE__ " " __TIME__ ")\n", PIEPAN_NAME,
                    PIEPAN_VERSION);
@@ -301,8 +301,6 @@ main(int argc, char *argv[])
             return 0;
         }
     }
-
-    lua_settop(lua, 0);
 
     /*
      * Load user scripts
@@ -315,26 +313,25 @@ main(int argc, char *argv[])
         for (i = script_argc; i >= 0 && i < argc; i++) {
             lua_pushvalue(lua, -1);
             lua_pushstring(lua, argv[i]);
-            lua_call(lua, 1, 2);
-            if (lua_toboolean(lua, -2)) {
+            if (developement_mode) {
+                lua_newuserdata(lua, sizeof(ScriptStat));
+            } else {
+                lua_pushnil(lua);
+            }
+            lua_call(lua, 2, 3);
+            if (lua_toboolean(lua, -3)) {
                 if (developement_mode) {
-                    ScriptStat *item = malloc(sizeof(ScriptStat));
-                    if (item == NULL) {
-                        fprintf(stderr, "%s: memory allocation error\n", PIEPAN_NAME);
-                        return 1;
-                    }
+                    ScriptStat *item = lua_touserdata(lua, -1);
                     item->lua = lua;
-                    item->id = lua_tointeger(lua, -1);
+                    item->id = lua_tointeger(lua, -2);
                     item->filename = argv[i];
-                    item->next = scripts;
-                    scripts = item;
                     ev_stat_init(&item->ev, script_stat_event, item->filename, 0);
                     ev_stat_start(ev_loop_main, &item->ev);
                 }
             } else {
-                fprintf(stderr, "%s: %s\n", PIEPAN_NAME, lua_tostring(lua, -1));
+                fprintf(stderr, "%s: %s\n", PIEPAN_NAME, lua_tostring(lua, -2));
             }
-            lua_pop(lua, 2);
+            lua_pop(lua, 3);
         }
         lua_settop(lua, 0);
     }
@@ -545,15 +542,6 @@ main(int argc, char *argv[])
     SSL_shutdown(ssl); // TODO:  sigpipe is triggered here if connection breaks
     close(socket_fd);
     lua_close(lua);
-
-    if (developement_mode) {
-        ScriptStat *item = scripts;
-        while (item != NULL) {
-            ScriptStat *next = item->next;
-            free(item);
-            item = next;
-        }
-    }
 
     return 0;
 }
