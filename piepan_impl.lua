@@ -177,24 +177,22 @@ end
 -- Timer
 --
 function piepan.Timer.new(func, timeout, data)
-    timeout = math.floor(tonumber(timeout))
     assert(type(func) == "function", "func must be a function")
-    assert(timeout > 0 and timeout <= 3600, "timeout is out of range")
+    assert(type(timeout) == "number" and timeout > 0 and timeout <= 3600,
+        "timeout is out of range")
 
     local id = #piepan.timers + 1
-    local timer = {
-        func = func,
-        data = data
-    }
-    piepan.timers[id] = timer
-    native.Timer.new(id, timeout, timer)
-    if timer.ev_timer == nil then
-        return nil
-    end
-
     local timerObj = {
         id = id
     }
+    local timer = {
+        func = func,
+        data = data,
+        handle = timerObj,
+        ptr = native.Timer.new(id, timeout)
+    }
+    piepan.timers[id] = timer
+
     setmetatable(timerObj, piepan.Timer)
     return timerObj
 end
@@ -206,7 +204,7 @@ function piepan.Timer:cancel()
     if timer == nil then
         return
     end
-    native.Timer.cancel(timer.ev_timer)
+    native.Timer.cancel(timer.ptr)
     piepan.timers[self.id] = nil
     self.id = nil
 end
@@ -214,12 +212,13 @@ end
 function piepan._implOnUserTimer(id)
     assert(functionLock == false, "cannot call implementation functions")
 
+    print ("User timer trigger")
+
     local timer = piepan.timers[id]
     if timer == nil then
         return
     end
     piepan.timers[id] = nil
-    native.Timer.cancel(timer.ev_timer)
 
     functionLock = true
     status, message = pcall(timer.func, timer.data)
@@ -358,7 +357,7 @@ function piepan.Channel:play(filename, callback, data)
     currentAudio = {
         callback = callback,
         callbackData = data,
-        audioPtr = ptr
+        ptr = ptr
     }
     return true
 end
@@ -624,7 +623,7 @@ function piepan.stopAudio()
         return
     end
 
-    native.stopAudio(currentAudio.audioPtr)
+    native.stopAudio(currentAudio.ptr)
 end
 
 function piepan.disconnect()

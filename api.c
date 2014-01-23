@@ -116,35 +116,22 @@ api_Channel_send(lua_State *lua)
 int
 api_Timer_new(lua_State *lua)
 {
-    // [id, timeout, table]
-    int id;
-    int timeout;
-    UserTimer *timer;
-    id = lua_tonumber(lua, -3);
-    timeout = lua_tonumber(lua, -2);
+    // [id, timeout]
+    UserTimer *timer = lua_newuserdata(lua, sizeof(UserTimer));
+    timer->id = lua_tonumber(lua, -3);
 
-    timer = (UserTimer *)malloc(sizeof(UserTimer));
-    if (timer == NULL) {
-        return 0;
-    }
-    lua_pushlightuserdata(lua, timer);
-    lua_setfield(lua, -2, "ev_timer");
-
-    timer->id = id;
-
-    ev_timer_init(&timer->ev, user_timer_event, timeout, 0.);
+    ev_timer_init(&timer->ev, user_timer_event, lua_tonumber(lua, -2), 0.);
     ev_timer_start(ev_loop_main, &timer->ev);
-    return 0;
+
+    return 1;
 }
 
 int
 api_Timer_cancel(lua_State *lua)
 {
-    // [ev_timer]
-    UserTimer *timer;
-    timer = (UserTimer *)lua_touserdata(lua, -1);
+    // [UserTimer *]
+    UserTimer *timer = lua_touserdata(lua, -1);
     ev_timer_stop(ev_loop_main, &timer->ev);
-    free(timer);
     return 0;
 }
 
