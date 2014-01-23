@@ -1,6 +1,14 @@
 CFLAGS = `pkg-config --libs --cflags libssl lua libprotobuf-c opus vorbis vorbisfile` -lev -pthread
 
-LUAFILES = src/impl/piepan.lua
+LUAFILES = src/impl/piepan.lua \
+           src/impl/meta.lua \
+           src/impl/scripts.lua \
+           src/impl/timer.lua \
+           src/impl/thread.lua \
+           src/impl/user.lua \
+           src/impl/channel.lua \
+           src/impl/events.lua \
+           src/impl/functions.lua
 
 piepan: src/piepan.c src/piepan.h src/util.c src/handlers.c src/api.c \
 	proto/Mumble.o src/piepan_impl.c
