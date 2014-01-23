@@ -395,6 +395,9 @@ function piepan._implOnServerSync(obj)
     if obj.welcomeText ~= nil then
         piepan.server.welcomeText = obj.welcomeText
     end
+    if obj.maxBandwidth ~= nil then
+        piepan.server.maxBandwidth = obj.maxBandwidth
+    end
     piepan.server.synced = true
 end
 

@@ -32,6 +32,10 @@ handler_server_sync(lua_State *lua, Packet *packet)
         lua_pushstring(lua, sync->welcome_text);
         lua_setfield(lua, -2, "welcomeText");
     }
+    if (sync->has_max_bandwidth) {
+        lua_pushinteger(lua, sync->max_bandwidth);
+        lua_setfield(lua, -2, "maxBandwidth");
+    }
     lua_call(lua, 1, 0);
     lua_settop(lua, 0);
     mumble_proto__server_sync__free_unpacked(sync, NULL);

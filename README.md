@@ -156,7 +156,8 @@ The `piepan.User` table that references yourself.
 
 Table containing information about the server.  This table may have the fields:
 
-- `bool allowHtml`: are HTML messages allowed to be sent to the server
+- `bool allowHtml`: if HTML messages are allowed to be sent to the server
+- `int maxBandwidth`: the maximum voice bandwidth a client can use (in bits per second)
 - `string welcomeText`: the server's welcome text
 
 #### `piepan.args`
