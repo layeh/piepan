@@ -38,6 +38,7 @@
 
 #include "piepan.h"
 #include "util.c"
+#include "events.c"
 #include "api.c"
 #include "handlers.c"
 #include "piepan_impl.c"
@@ -253,12 +254,6 @@ socket_read_event(struct ev_loop *loop, ev_io *w, int revents)
     if (SSL_pending(ssl) > 0) {
         ev_feed_fd_event(loop, w->fd, revents);
     }
-}
-
-void
-signal_event(struct ev_loop *loop, ev_signal *w, int revents)
-{
-    ev_break(ev_loop_main, EVBREAK_ALL);
 }
 
 void
