@@ -64,7 +64,6 @@ static SSL *ssl;
 static lua_State *lua;
 static Packet packet_out;
 static Packet packet_in;
-static OpusEncoder *opus_encoder;
 
 typedef struct ScriptStat {
     ev_stat ev;
@@ -293,7 +292,7 @@ audio_transmission_event(struct ev_loop *loop, struct ev_timer *w, int revents)
         at->buffer.size += long_ret;
     }
 
-    byte_count = opus_encode(opus_encoder, (opus_int16 *)at->buffer.pcm,
+    byte_count = opus_encode(at->encoder, (opus_int16 *)at->buffer.pcm,
         OPUS_FRAME_SIZE, output, sizeof(output));
     if (byte_count < 0) {
         audioTransmission_stop(at, lua, loop);
@@ -529,16 +528,26 @@ main(int argc, char *argv[])
      * Initialize Opus
      */
     {
+        OpusEncoder *encoder;
         int error;
-        opus_encoder = opus_encoder_create(48000, 1, OPUS_APPLICATION_AUDIO, &error);
+
+        lua_getglobal(lua, "piepan");
+        lua_getfield(lua, -1, "internal");
+        lua_getfield(lua, -1, "opus");
+        encoder = lua_newuserdata(lua, opus_encoder_get_size(1));
+        lua_setfield(lua, -2, "encoder");
+
+        error = opus_encoder_init(encoder, 48000, 1, OPUS_APPLICATION_AUDIO);
         if (error != OPUS_OK) {
             fprintf(stderr, "%s: could not initialize the Opus encoder: %s\n",
                     progname, opus_strerror(error));
             return 1;
         }
-        opus_encoder_ctl(opus_encoder, OPUS_SET_VBR(0));
+        opus_encoder_ctl(encoder, OPUS_SET_VBR(1));
         // TODO: set this to the server's max bitrate
         opus_encoder_ctl(opus_encoder, OPUS_SET_BITRATE(50000));
+
+        lua_settop(lua, 0);
     }
 
     /*
@@ -719,7 +728,6 @@ main(int argc, char *argv[])
     SSL_shutdown(ssl); // TODO:  sigpipe is triggered here if connection breaks
     close(socket_fd);
     lua_close(lua);
-    opus_encoder_destroy(opus_encoder);
 
     if (developement_mode) {
         ScriptStat *item = scripts;

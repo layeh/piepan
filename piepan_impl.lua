@@ -18,6 +18,11 @@ piepan.Timer.__index = piepan.Timer
 piepan.server = {
     synced = false
 }
+piepan.internal = {
+    opus = {
+        encoder = nil
+    }
+}
 piepan.args = {}
 piepan.scripts = {}
 piepan.users = {}
@@ -162,6 +167,9 @@ end
 -- piepan.meta
 --
 function piepan.meta.__index(table, key)
+    if key == "internal" then
+        return
+    end
     return piepan[key]
 end
 
@@ -343,7 +351,7 @@ function piepan.Channel:play(filename, callback, data)
         return false
     end
 
-    local ptr = native.Channel.play(filename)
+    local ptr = native.Channel.play(piepan.internal.opus.encoder, filename)
     if not ptr then
         return false
     end

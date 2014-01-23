@@ -72,7 +72,7 @@ api_User_moveTo(lua_State *lua)
 int
 api_Channel_play(lua_State *lua)
 {
-    // [string filename]
+    // [OpusEncoder *encoder, string filename]
     AudioTransmission *at = malloc(sizeof(AudioTransmission));
     if (at == NULL) {
         return 0;
@@ -88,6 +88,7 @@ api_Channel_play(lua_State *lua)
         return 0;
     }
 
+    at->encoder = lua_touserdata(lua, -2);
     at->sequence = 1;
     at->buffer.size = 0;
     ev_timer_init(&at->ev, audio_transmission_event, 0., 0.);
