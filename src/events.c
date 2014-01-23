@@ -155,3 +155,21 @@ audio_transmission_event(struct ev_loop *loop, struct ev_timer *w, int revents)
     w->repeat = 0.01;
     ev_timer_again(loop, w);
 }
+
+void
+script_stat_event(struct ev_loop *loop, ev_stat *w, int revents)
+{
+    ScriptStat *stat = (ScriptStat *)w;
+    if (w->attr.st_ino == w->prev.st_ino && w->attr.st_mtime == w->prev.st_mtime) {
+        return;
+    }
+    fprintf(stderr, "%s: reloaded %s\n", PIEPAN_NAME, stat->filename);
+    lua_getglobal(stat->lua, "piepan");
+    lua_getfield(stat->lua, -1, "_implLoadScript");
+    lua_pushinteger(stat->lua, stat->id);
+    lua_call(stat->lua, 1, 2);
+    if (!lua_toboolean(stat->lua, -2)) {
+        fprintf(stderr, "%s: %s\n", PIEPAN_NAME, lua_tostring(stat->lua, -1));
+    }
+    lua_settop(stat->lua, 0);
+}

@@ -6,8 +6,13 @@
  *
  */
 
-#define PAYLOAD_SIZE_MAX (1024 * 1024 * 8 - 1)
+#define PIEPAN_NAME "piepan"
 #define PIEPAN_VERSION "0.1.1"
+
+#define PAYLOAD_SIZE_MAX (1024 * 1024 * 8 - 1)
+
+#define OPUS_FRAME_SIZE 480
+#define PCM_BUFFER 4096
 
 enum {
     PACKET_VERSION      = 0,
@@ -47,8 +52,6 @@ typedef struct {
     int id;
 } UserThread;
 
-#define OPUS_FRAME_SIZE 480
-#define PCM_BUFFER 4096
 typedef struct {
     ev_timer ev;
     FILE *file;
@@ -67,6 +70,14 @@ typedef struct {
     int length;
     int header_length;
 } VoicePacket;
+
+typedef struct ScriptStat {
+    ev_stat ev;
+    lua_State *lua;
+    int id;
+    char *filename;
+    struct ScriptStat *next;
+} ScriptStat;
 
 /*
  * Prototypes

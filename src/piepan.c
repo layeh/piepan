@@ -59,18 +59,10 @@
 int user_thread_pipe[2];
 struct ev_loop *ev_loop_main;
 
-static const char *progname;
 static SSL_CTX *ssl_context;
 static SSL *ssl;
 static lua_State *lua;
 static Packet packet_out;
-
-typedef struct ScriptStat {
-    ev_stat ev;
-    int id;
-    char *filename;
-    struct ScriptStat *next;
-} ScriptStat;
 
 static const char *
 impl_reader(lua_State *L, void *data, size_t *size)
@@ -150,7 +142,6 @@ sendPacketEx(int type, void *data, int length)
     return SSL_write(ssl, packet_out.buffer, total_size) == total_size ? 0 : 3;
 }
 
-
 void
 user_thread_event(struct ev_loop *loop, ev_io *w, int revents)
 {
@@ -173,24 +164,6 @@ user_thread_event(struct ev_loop *loop, ev_io *w, int revents)
     lua_getfield(lua, -1, "_implFinish");
     lua_pushnumber(lua, thread_id);
     lua_call(lua, 1, 0);
-}
-
-void
-script_stat_event(struct ev_loop *loop, ev_stat *w, int revents)
-{
-    ScriptStat *stat = (ScriptStat *)w;
-    if (w->attr.st_ino == w->prev.st_ino && w->attr.st_mtime == w->prev.st_mtime) {
-        return;
-    }
-    fprintf(stderr, "%s: reloaded %s\n", progname, stat->filename);
-    lua_getglobal(lua, "piepan");
-    lua_getfield(lua, -1, "_implLoadScript");
-    lua_pushinteger(lua, stat->id);
-    lua_call(lua, 1, 2);
-    if (!lua_toboolean(lua, -2)) {
-        fprintf(stderr, "%s: %s\n", progname, lua_tostring(lua, -1));
-    }
-    lua_settop(lua, 0);
 }
 
 static void
@@ -216,7 +189,7 @@ usage()
         "  --<name>[=<value>]  a key-value pair that will be accessible from the scripts\n"
         "  -h                  display this help\n"
         "  -v                  show version\n";
-    fprintf(stderr, str, progname);
+    fprintf(stderr, str, PIEPAN_NAME);
 }
 
 int
@@ -244,21 +217,19 @@ main(int argc, char *argv[])
     ev_timer ping_watcher;
     ev_signal signal_watcher;
 
-    progname = argv[0];
-
     /*
      * Lua initialization
      */
     lua = luaL_newstate();
     if (lua == NULL) {
-        fprintf(stderr, "%s: could not initialize Lua\n", progname);
+        fprintf(stderr, "%s: could not initialize Lua\n", PIEPAN_NAME);
         return 1;
     }
     luaL_openlibs(lua);
     api_init(lua);
     ret = 0;
     if (lua_load(lua, impl_reader, &ret, "piepan_impl", NULL) != 0) {
-        fprintf(stderr, "%s: could not load piepan implementation\n", progname);
+        fprintf(stderr, "%s: could not load piepan implementation\n", PIEPAN_NAME);
         return 1;
     }
     lua_call(lua, 0, 0);
@@ -316,12 +287,12 @@ main(int argc, char *argv[])
                 lua_call(lua, 2, 0);
             } else {
                 fprintf(stderr, "%s: unknown or incomplete argument '%s'\n",
-                        progname, argv[i]);
+                        PIEPAN_NAME, argv[i]);
                 return 1;
             }
         }
         if (show_version) {
-            printf("piepan %s (compiled on " __DATE__ " " __TIME__ ")\n",
+            printf("%s %s (compiled on " __DATE__ " " __TIME__ ")\n", PIEPAN_NAME,
                    PIEPAN_VERSION);
             return 0;
         }
@@ -349,9 +320,10 @@ main(int argc, char *argv[])
                 if (developement_mode) {
                     ScriptStat *item = malloc(sizeof(ScriptStat));
                     if (item == NULL) {
-                        fprintf(stderr, "%s: memory allocation error\n", progname);
+                        fprintf(stderr, "%s: memory allocation error\n", PIEPAN_NAME);
                         return 1;
                     }
+                    item->lua = lua;
                     item->id = lua_tointeger(lua, -1);
                     item->filename = argv[i];
                     item->next = scripts;
@@ -360,7 +332,7 @@ main(int argc, char *argv[])
                     ev_stat_start(ev_loop_main, &item->ev);
                 }
             } else {
-                fprintf(stderr, "%s: %s\n", progname, lua_tostring(lua, -1));
+                fprintf(stderr, "%s: %s\n", PIEPAN_NAME, lua_tostring(lua, -1));
             }
             lua_pop(lua, 2);
         }
@@ -383,7 +355,7 @@ main(int argc, char *argv[])
         error = opus_encoder_init(encoder, 48000, 1, OPUS_APPLICATION_AUDIO);
         if (error != OPUS_OK) {
             fprintf(stderr, "%s: could not initialize the Opus encoder: %s\n",
-                    progname, opus_strerror(error));
+                    PIEPAN_NAME, opus_strerror(error));
             return 1;
         }
         opus_encoder_ctl(encoder, OPUS_SET_VBR(1));
@@ -400,7 +372,7 @@ main(int argc, char *argv[])
 
     ssl_context = SSL_CTX_new(SSLv23_client_method());
     if (ssl_context == NULL) {
-        fprintf(stderr, "%s: could not create SSL context\n", progname);
+        fprintf(stderr, "%s: could not create SSL context\n", PIEPAN_NAME);
         return 1;
     }
 
@@ -410,7 +382,7 @@ main(int argc, char *argv[])
                                                 SSL_FILETYPE_PEM) ||
                 !SSL_CTX_check_private_key(ssl_context)) {
             fprintf(stderr, "%s: could not load certificate and/or key file\n",
-                    progname);
+                    PIEPAN_NAME);
             return 1;
         }
     }
@@ -420,7 +392,7 @@ main(int argc, char *argv[])
      */
     socket_fd = socket(AF_INET, SOCK_STREAM, 0);
     if (socket_fd < 0) {
-        fprintf(stderr, "%s: could not create socket\n", progname);
+        fprintf(stderr, "%s: could not create socket\n", PIEPAN_NAME);
         return 1;
     }
 
@@ -431,7 +403,7 @@ main(int argc, char *argv[])
     server_host = gethostbyname(server_host_str);
     if (server_host == NULL || server_host->h_addr_list[0] == NULL ||
             server_host->h_addrtype != AF_INET) {
-        fprintf(stderr, "%s: could not parse server address\n", argv[0]);
+        fprintf(stderr, "%s: could not parse server address\n", PIEPAN_NAME);
         return 1;
     }
     memmove(&server_addr.sin_addr, server_host->h_addr_list[0],
@@ -440,23 +412,23 @@ main(int argc, char *argv[])
     ret = connect(socket_fd, (struct sockaddr *) &server_addr,
                   sizeof(server_addr));
     if (ret != 0) {
-        fprintf(stderr, "%s: could not connect to server\n", progname);
+        fprintf(stderr, "%s: could not connect to server\n", PIEPAN_NAME);
         return 1;
     }
 
     ssl = SSL_new(ssl_context);
     if (ssl == NULL) {
-        fprintf(stderr, "%s: could not create SSL object\n", progname);
+        fprintf(stderr, "%s: could not create SSL object\n", PIEPAN_NAME);
         return 1;
     }
 
     if (SSL_set_fd(ssl, socket_fd) == 0) {
-        fprintf(stderr, "%s: could not set SSL file descriptor\n", progname);
+        fprintf(stderr, "%s: could not set SSL file descriptor\n", PIEPAN_NAME);
         return 1;
     }
 
     if (SSL_connect(ssl) != 1) {
-        fprintf(stderr, "%s: could not create secure connection\n", progname);
+        fprintf(stderr, "%s: could not create secure connection\n", PIEPAN_NAME);
         return 1;
     }
 
@@ -464,7 +436,7 @@ main(int argc, char *argv[])
      * User thread pipe
      */
     if (pipe(user_thread_pipe) != 0) {
-        fprintf(stderr, "%s: could not create user thread pipe\n", progname);
+        fprintf(stderr, "%s: could not create user thread pipe\n", PIEPAN_NAME);
         return 1;
     }
 
@@ -488,12 +460,12 @@ main(int argc, char *argv[])
             file = fopen(password_file, "r");
             if (file == NULL) {
                 fprintf(stderr, "%s: could open password file for reading\n",
-                        progname);
+                        PIEPAN_NAME);
                 return 1;
             }
             if (fgets(buffer, sizeof(buffer), file) == NULL) {
                 fprintf(stderr, "%s: could not read password from file\n",
-                        progname);
+                        PIEPAN_NAME);
                 fclose(file);
                 return 1;
             }
@@ -505,7 +477,7 @@ main(int argc, char *argv[])
             file = fopen(token_file, "r");
             if (file == NULL) {
                 fprintf(stderr, "%s: could open token file for reading\n",
-                        progname);
+                        PIEPAN_NAME);
                 return 1;
             }
             while (tokens.count < MAX_TOKENS) {
