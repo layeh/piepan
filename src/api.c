@@ -88,6 +88,7 @@ api_Channel_play(lua_State *lua)
         return 0;
     }
 
+    at->lua = lua;
     at->encoder = lua_touserdata(lua, -2);
     at->sequence = 1;
     at->buffer.size = 0;

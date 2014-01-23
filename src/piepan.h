@@ -52,6 +52,7 @@ typedef struct {
 typedef struct {
     ev_timer ev;
     FILE *file;
+    lua_State *lua;
     OggVorbis_File ogg;
     uint32_t sequence;
     OpusEncoder *encoder;

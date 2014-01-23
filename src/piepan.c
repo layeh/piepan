@@ -176,49 +176,6 @@ user_thread_event(struct ev_loop *loop, ev_io *w, int revents)
 }
 
 void
-audio_transmission_event(struct ev_loop *loop, struct ev_timer *w, int revents)
-{
-    AudioTransmission *at = (AudioTransmission *)w;
-    VoicePacket packet;
-    uint8_t packet_buffer[1024];
-    uint8_t output[1024];
-    opus_int32 byte_count;
-    long long_ret;
-
-    voicepacket_init(&packet, packet_buffer);
-    voicepacket_setheader(&packet, VOICEPACKET_OPUS, VOICEPACKET_NORMAL,
-        at->sequence);
-
-    while (at->buffer.size < OPUS_FRAME_SIZE * sizeof(opus_int16)) {
-        long_ret = ov_read(&at->ogg, at->buffer.pcm + at->buffer.size,
-            PCM_BUFFER - at->buffer.size, 0, 2, 1, NULL);
-        if (long_ret <= 0) {
-            audioTransmission_stop(at, lua, loop);
-            return;
-        }
-        at->buffer.size += long_ret;
-    }
-
-    byte_count = opus_encode(at->encoder, (opus_int16 *)at->buffer.pcm,
-        OPUS_FRAME_SIZE, output, sizeof(output));
-    if (byte_count < 0) {
-        audioTransmission_stop(at, lua, loop);
-        return;
-    }
-    at->buffer.size -= OPUS_FRAME_SIZE * sizeof(opus_int16);
-    memmove(at->buffer.pcm, at->buffer.pcm + OPUS_FRAME_SIZE * sizeof(opus_int16),
-        at->buffer.size);
-    voicepacket_setframe(&packet, byte_count, output);
-
-    sendPacketEx(PACKET_UDPTUNNEL, packet_buffer, voicepacket_getlength(&packet));
-
-    at->sequence = (at->sequence + 1) % 10000;
-
-    w->repeat = 0.01;
-    ev_timer_again(loop, w);
-}
-
-void
 script_stat_event(struct ev_loop *loop, ev_stat *w, int revents)
 {
     ScriptStat *stat = (ScriptStat *)w;
