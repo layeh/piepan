@@ -300,16 +300,6 @@ audio_transmission_event(struct ev_loop *loop, struct ev_timer *w, int revents)
 }
 
 void
-user_timer_event(struct ev_loop *loop, struct ev_timer *w, int revents)
-{
-    UserTimer *timer = (UserTimer *)w;
-    lua_getglobal(lua, "piepan");
-    lua_getfield(lua, -1, "_implOnUserTimer");
-    lua_pushinteger(lua, timer->id);
-    lua_call(lua, 1, 0);
-}
-
-void
 script_stat_event(struct ev_loop *loop, ev_stat *w, int revents)
 {
     ScriptStat *stat = (ScriptStat *)w;

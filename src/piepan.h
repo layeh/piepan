@@ -31,6 +31,7 @@ typedef struct {
 
 typedef struct {
     ev_timer ev;
+    lua_State *lua;
     int id;
 } UserTimer;
 

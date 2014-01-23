@@ -119,6 +119,7 @@ api_Timer_new(lua_State *lua)
     // [id, timeout]
     UserTimer *timer = lua_newuserdata(lua, sizeof(UserTimer));
     timer->id = lua_tonumber(lua, -3);
+    timer->lua = lua;
 
     ev_timer_init(&timer->ev, user_timer_event, lua_tonumber(lua, -2), 0.);
     ev_timer_start(ev_loop_main, &timer->ev);
