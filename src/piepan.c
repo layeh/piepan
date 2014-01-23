@@ -38,9 +38,9 @@
 
 #include "piepan.h"
 #include "util.c"
+#include "handlers.c"
 #include "events.c"
 #include "api.c"
-#include "handlers.c"
 #include "piepan_impl.c"
 
 
@@ -64,7 +64,6 @@ static SSL_CTX *ssl_context;
 static SSL *ssl;
 static lua_State *lua;
 static Packet packet_out;
-static Packet packet_in;
 
 typedef struct ScriptStat {
     ev_stat ev;
@@ -72,35 +71,6 @@ typedef struct ScriptStat {
     char *filename;
     struct ScriptStat *next;
 } ScriptStat;
-
-static Packet_Handler_Func handlers[26] = {
-    /*  0 */ NULL,
-    /*  1 */ NULL,
-    /*  2 */ NULL,
-    /*  3 */ NULL,
-    /*  4 */ NULL,
-    /*  5 */ handler_server_sync,
-    /*  6 */ handler_channel_remove,
-    /*  7 */ handler_channel_state,
-    /*  8 */ handler_user_remove,
-    /*  9 */ handler_user_state,
-    /* 10 */ NULL,
-    /* 11 */ handler_text_message,
-    /* 12 */ NULL,
-    /* 13 */ NULL,
-    /* 14 */ NULL,
-    /* 15 */ NULL,
-    /* 16 */ NULL,
-    /* 17 */ NULL,
-    /* 18 */ NULL,
-    /* 19 */ NULL,
-    /* 20 */ NULL,
-    /* 21 */ NULL,
-    /* 22 */ NULL,
-    /* 23 */ NULL,
-    /* 24 */ handler_server_config,
-    /* 25 */ NULL,
-};
 
 static const char *
 impl_reader(lua_State *L, void *data, size_t *size)
@@ -203,57 +173,6 @@ user_thread_event(struct ev_loop *loop, ev_io *w, int revents)
     lua_getfield(lua, -1, "_implFinish");
     lua_pushnumber(lua, thread_id);
     lua_call(lua, 1, 0);
-}
-
-void
-socket_read_event(struct ev_loop *loop, ev_io *w, int revents)
-{
-    int total_read = 0;
-    int ret;
-    Packet_Handler_Func handler;
-
-    ret = SSL_read(ssl, packet_in.buffer, 6);
-    if (ret <= 0) {
-        ev_break(loop, EVBREAK_ALL);
-        return;
-    }
-    if (ret != 6) {
-        ev_break(loop, EVBREAK_ALL);
-        return;
-    }
-    packet_in.type = ntohs(*(uint16_t *)packet_in.buffer);
-    if (packet_in.type >= sizeof(handlers) / sizeof(Packet_Handler_Func)) {
-        ev_break(loop, EVBREAK_ALL);
-        return;
-    }
-    packet_in.length = ntohl(*(uint32_t *)(packet_in.buffer + 2));
-    if (packet_in.length > PAYLOAD_SIZE_MAX) {
-        ev_break(loop, EVBREAK_ALL);
-        return;
-    }
-
-    while (total_read < packet_in.length) {
-        ret = SSL_read(ssl, packet_in.buffer + total_read,
-                       packet_in.length - total_read);
-        if (ret <= 0) {
-            ev_break(loop, EVBREAK_ALL);
-            return;
-        }
-        total_read += ret;
-    }
-
-    if (total_read != packet_in.length) {
-        ev_break(loop, EVBREAK_ALL);
-        return;
-    }
-
-    handler = handlers[packet_in.type];
-    if (handler != NULL) {
-        handler(lua, &packet_in);
-    }
-    if (SSL_pending(ssl) > 0) {
-        ev_feed_fd_event(loop, w->fd, revents);
-    }
 }
 
 void
@@ -363,7 +282,7 @@ main(int argc, char *argv[])
     struct sockaddr_in server_addr;
 
     ev_loop_main = EV_DEFAULT;
-    ev_io socket_watcher;
+    SSLRead socket_watcher;
     ev_io user_thread_watcher;
     ev_timer ping_watcher;
     ev_signal signal_watcher;
@@ -670,8 +589,10 @@ main(int argc, char *argv[])
     ev_signal_init(&signal_watcher, signal_event, SIGINT);
     ev_signal_start(ev_loop_main, &signal_watcher);
 
-    ev_io_init(&socket_watcher, socket_read_event, socket_fd, EV_READ);
-    ev_io_start(ev_loop_main, &socket_watcher);
+    ev_io_init(&socket_watcher.ev, socket_read_event, socket_fd, EV_READ);
+    socket_watcher.lua = lua;
+    socket_watcher.ssl = ssl;
+    ev_io_start(ev_loop_main, &socket_watcher.ev);
 
     ev_io_init(&user_thread_watcher, user_thread_event, user_thread_pipe[0],
                EV_READ);

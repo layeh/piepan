@@ -30,6 +30,12 @@ typedef struct {
 } Packet;
 
 typedef struct {
+    ev_io ev;
+    lua_State *lua;
+    SSL *ssl;
+} SSLRead;
+
+typedef struct {
     ev_timer ev;
     lua_State *lua;
     int id;
