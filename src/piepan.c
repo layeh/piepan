@@ -257,13 +257,6 @@ socket_read_event(struct ev_loop *loop, ev_io *w, int revents)
 }
 
 void
-ping_event(struct ev_loop *loop, ev_timer *w, int revents)
-{
-    MumbleProto__Ping ping = MUMBLE_PROTO__PING__INIT;
-    sendPacket(PACKET_PING, &ping);
-}
-
-void
 audio_transmission_event(struct ev_loop *loop, struct ev_timer *w, int revents)
 {
     AudioTransmission *at = (AudioTransmission *)w;

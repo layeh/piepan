@@ -13,3 +13,10 @@ signal_event(struct ev_loop *loop, ev_signal *w, int revents)
 {
     ev_break(ev_loop_main, EVBREAK_ALL);
 }
+
+void
+ping_event(struct ev_loop *loop, ev_timer *w, int revents)
+{
+    MumbleProto__Ping ping = MUMBLE_PROTO__PING__INIT;
+    sendPacket(PACKET_PING, &ping);
+}
