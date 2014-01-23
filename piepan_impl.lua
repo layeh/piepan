@@ -18,16 +18,16 @@ piepan.Timer.__index = piepan.Timer
 piepan.server = {}
 piepan.args = {}
 piepan.scripts = {}
-piepan.users = {} -- TODO: move to piepan.User?
-piepan.channels = {} -- TODO:  move to piepan.Channel?
-piepan.Thread.threads = {}
+piepan.users = {}
+piepan.channels = {}
+piepan.threads = {}
 piepan.meta = {}
+piepan.timers = {}
 
 -- Local data
 local functionLock = false
 local hasSynced = false -- TODO:  move to piepan.server?
 local localUsers = {} -- table of users with the user's session ID as the key
-local timers = {} -- TODO:  move to piepan.Timer.timers?
 local currentAudio
 
 local native = {
@@ -172,12 +172,12 @@ function piepan.Timer.new(func, timeout, data)
     assert(type(func) == "function", "func must be a function")
     assert(timeout > 0 and timeout <= 3600, "timeout is out of range")
 
-    local id = #timers + 1
+    local id = #piepan.timers + 1
     local timer = {
         func = func,
         data = data
     }
-    timers[id] = timer
+    piepan.timers[id] = timer
     native.Timer.new(id, timeout, timer)
     if timer.ev_timer == nil then
         return nil
@@ -193,23 +193,23 @@ end
 function piepan.Timer:cancel()
     assert(self ~= nil, "self cannot be nil")
 
-    local timer = timers[self.id]
+    local timer = piepan.timers[self.id]
     if timer == nil then
         return
     end
     native.Timer.cancel(timer.ev_timer)
-    timers[self.id] = nil
+    piepan.timers[self.id] = nil
     self.id = nil
 end
 
 function piepan._implOnUserTimer(id)
     assert(functionLock == false, "cannot call implementation functions")
 
-    local timer = timers[id]
+    local timer = piepan.timers[id]
     if timer == nil then
         return
     end
-    timers[id] = nil
+    piepan.timers[id] = nil
     native.Timer.cancel(timer.ev_timer)
 
     functionLock = true
@@ -228,18 +228,18 @@ function piepan.Thread.new(worker, callback, data)
     assert(callback == nil or type(callback) == "function",
         "callback needs to be a function or nil")
 
-    local id = #piepan.Thread.threads + 1
+    local id = #piepan.threads + 1
     local thread = {
         worker = worker,
         callback = callback,
         data = data
     }
-    piepan.Thread.threads[id] = thread
+    piepan.threads[id] = thread
     native.Thread.new(thread, id)
 end
 
 function piepan.Thread._implExecute(id)
-    local thread = piepan.Thread.threads[id]
+    local thread = piepan.threads[id]
     if thread == nil then
         return
     end
@@ -250,7 +250,7 @@ function piepan.Thread._implExecute(id)
 end
 
 function piepan.Thread._implFinish(id)
-    local thread = piepan.Thread.threads[id]
+    local thread = piepan.threads[id]
     if thread == nil then
         return
     end
@@ -260,7 +260,7 @@ function piepan.Thread._implFinish(id)
             print ("Error: piepan.Thread.finish: " .. message)
         end
     end
-    piepan.Thread.threads[id] = nil
+    piepan.threads[id] = nil
 end
 
 --
