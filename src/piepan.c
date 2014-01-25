@@ -157,7 +157,6 @@ user_thread_event(struct ev_loop *loop, ev_io *w, int revents)
     lua_getfield(lua, -1, "userthread");
     user_thread = (UserThread *)lua_touserdata(lua, -1);
     if (user_thread != NULL) {
-        ev_io_stop(loop, w);
         free(user_thread);
     }
     lua_getfield(lua, -4, "Thread");
