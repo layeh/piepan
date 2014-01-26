@@ -163,6 +163,7 @@ user_thread_event(struct ev_loop *loop, ev_io *w, int revents)
     lua_getfield(lua, -1, "_implFinish");
     lua_pushnumber(lua, thread_id);
     lua_call(lua, 1, 0);
+    lua_settop(lua, 0);
 }
 
 static void
@@ -497,7 +498,7 @@ main(int argc, char *argv[])
         version.has_version = true;
         version.version = 1 << 16 | 2 << 8 | 4; // 1.2.4
         version.release = "Unknown";
-        version.os = "piepan";
+        version.os = PIEPAN_NAME;
         version.os_version = PIEPAN_VERSION;
 
         sendPacket(PACKET_VERSION, &version);

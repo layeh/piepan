@@ -41,8 +41,6 @@ end
 function piepan._implOnUserTimer(id)
     assert(functionLock == false, "cannot call implementation functions")
 
-    print ("User timer trigger")
-
     local timer = piepan.timers[id]
     if timer == nil then
         return
