@@ -64,19 +64,6 @@ static SSL *ssl;
 static lua_State *lua;
 static Packet packet_out;
 
-static const char *
-impl_reader(lua_State *L, void *data, size_t *size)
-{
-    int *ret = (int *)data;
-    if (*ret == 0) {
-        *ret = 1;
-        *size = src_piepan_impl_luac_len;
-        return (const char *)src_piepan_impl_luac;
-    } else {
-        return NULL;
-    }
-}
-
 int
 sendPacketEx(int type, void *data, int length)
 {
@@ -226,8 +213,8 @@ main(int argc, char *argv[])
     }
     luaL_openlibs(lua);
     api_init(lua);
-    ret = 0;
-    if (lua_load(lua, impl_reader, &ret, "piepan_impl", NULL) != 0) {
+    if (luaL_loadbuffer(lua, src_piepan_impl_luac, src_piepan_impl_luac_len,
+            "piepan_impl") != LUA_OK) {
         fprintf(stderr, "%s: could not load piepan implementation\n", PIEPAN_NAME);
         return 1;
     }
