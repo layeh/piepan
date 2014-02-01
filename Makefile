@@ -34,7 +34,7 @@ readme.html: README.md
 	echo '<meta charset="utf-8" />' >> readme.html
 	echo '<title>piepan: a bot framework for Mumble</title>' >> readme.html
 	echo '<style type="text/css">' >> readme.html
-	echo 'body {font-family:sans-serif;max-width:900px;margin:0 auto;padding:10px}' >> readme.html
+	echo 'body {font-family:sans-serif;margin:0 auto;padding: 0 10px}' >> readme.html
 	echo '</style>' >> readme.html
 	echo '</head>' >> readme.html
 	echo '<body>' >> readme.html
