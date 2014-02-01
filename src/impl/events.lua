@@ -56,6 +56,7 @@ end
 function piepan.internal.events.onUserChange(obj)
     local user
     local event = {}
+    setmetatable(event, piepan.onUserChange)
     if piepan.internal.users[obj.session] == nil then
         if obj.name == nil then
             return
@@ -114,6 +115,7 @@ end
 
 function piepan.internal.events.onUserRemove(obj)
     local event = {}
+    setmetatable(event, piepan.onUserChange)
     if piepan.internal.users[obj.session] ~= nil then
         -- TODO:  remove reference from Channel -> User?
         local name = piepan.internal.users[obj.session].name
@@ -136,6 +138,7 @@ function piepan.internal.events.onChannelRemove(obj)
     if channel == nil then
         return
     end
+    setmetatable(event, piepan.onChannelChange)
     event.channel = channel
 
     if channel.parent ~= nil then
@@ -160,6 +163,7 @@ end
 function piepan.internal.events.onChannelState(obj)
     local channel
     local event = {}
+    setmetatable(event, piepan.onChannelChange)
     if piepan.channels[obj.channelId] == nil then
         channel = {
             id = obj.channelId,

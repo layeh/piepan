@@ -11,8 +11,10 @@
 
 piepan = {
     User = {},
+    UserChange = {},
     Message = {},
     Channel = {},
+    ChannelChange = {},
     Thread = {},
     Timer = {},
 
@@ -39,6 +41,8 @@ piepan = {
 }
 
 piepan.User.__index = piepan.User
+piepan.UserChange.__index = piepan.UserChange
 piepan.Message.__index = piepan.Message
 piepan.Channel.__index = piepan.Channel
+piepan.ChannelChange.__index = piepan.ChannelChange
 piepan.Timer.__index = piepan.Timer

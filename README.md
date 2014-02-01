@@ -108,7 +108,7 @@ The following section describes the API that is available for script authors.  P
 
     An optional `callback` will be executed on the main thread after `worker` completes.  It will be passed the value that `worker` returns.
 
-#### `piepan.UserChange` (hidden)
+#### `piepan.UserChange`
 
 - `piepan.User user`: the user that changed
 - `bool isConnected`:  if the user connected to the server
@@ -116,7 +116,7 @@ The following section describes the API that is available for script authors.  P
 - `bool isChangedChannel`:  if the user moved to a new channel
 - `bool isChangedComment`: if the user's comment changed
 
-#### `piepan.ChannelChange` (hidden)
+#### `piepan.ChannelChange`
 
 - `piepan.Channel channel`: the channel that was changed
 - `bool isCreated`: if the channel was created
@@ -213,6 +213,7 @@ Called when a channel changes state (e.g. is added or removed).
 ## Changelog
 
 - Next
+    - `UserChange` and `ChannelChange` are no longer hidden
     - Added audio file support
     - Each script is now loaded in its own Lua environment, preventing global variable interference between scripts
     - Fixed `piepan.User.userId` not being filled
