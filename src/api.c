@@ -12,6 +12,8 @@
 // TODO:  get rid of selfs and only pass non-tables?
 // TODO:  use Lua user data in place of mallocing it ourselves?
 
+#include <pthread.h>
+
 int
 api_User_send(lua_State *lua)
 {
@@ -175,6 +177,7 @@ api_stopAudio(lua_State *lua)
     // [AudioTransmission *]
     AudioTransmission *at = (AudioTransmission *)lua_touserdata(lua, -1);
     audioTransmission_stop(at, lua, ev_loop_main);
+    return 0;
 }
 
 int
