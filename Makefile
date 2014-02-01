@@ -1,6 +1,7 @@
 CFLAGS = `pkg-config --libs --cflags libssl lua libprotobuf-c opus vorbis vorbisfile` -lev -pthread
 
 LUAFILES = src/impl/piepan.lua \
+           src/impl/internal.lua \
            src/impl/meta.lua \
            src/impl/scripts.lua \
            src/impl/timer.lua \

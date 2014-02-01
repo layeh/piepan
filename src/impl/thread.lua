@@ -17,10 +17,10 @@ function piepan.Thread.new(worker, callback, data)
         data = data
     }
     piepan.threads[id] = thread
-    native.Thread.new(thread, id)
+    piepan.internal.api.threadNew(thread, id)
 end
 
-function piepan.Thread._implExecute(id)
+function piepan.internal.events.onThreadExecute(id)
     local thread = piepan.threads[id]
     if thread == nil then
         return
@@ -31,7 +31,7 @@ function piepan.Thread._implExecute(id)
     end
 end
 
-function piepan.Thread._implFinish(id)
+function piepan.internal.events.onThreadFinish(id)
     local thread = piepan.threads[id]
     if thread == nil then
         return

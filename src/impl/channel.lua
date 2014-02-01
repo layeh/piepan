@@ -43,15 +43,16 @@ function piepan.Channel:play(filename, callback, data)
     assert(self ~= nil, "self cannot be nil")
     assert(type(filename) == "string", "filename must be a string")
 
-    if currentAudio ~= nil then
+    if piepan.internal.currentAudio ~= nil then
         return false
     end
 
-    local ptr = native.Channel.play(piepan.internal.opus.encoder, filename)
+    local ptr = piepan.internal.api.channelPlay(piepan.internal.opus.encoder,
+        filename)
     if not ptr then
         return false
     end
-    currentAudio = {
+    piepan.internal.currentAudio = {
         callback = callback,
         callbackData = data,
         ptr = ptr
@@ -59,21 +60,22 @@ function piepan.Channel:play(filename, callback, data)
     return true
 end
 
-function piepan.Channel._implAudioFinished()
-    assert (currentAudio ~= nil, "audio must be playing")
+function piepan.internal.events.onAudioFinished()
+    assert (piepan.internal.currentAudio ~= nil, "audio must be playing")
 
-    if type(currentAudio.callback) == "function" then
-        status, message = pcall(currentAudio.callback, currentAudio.callbackData)
+    if type(piepan.internal.currentAudio.callback) == "function" then
+        status, message = pcall(piepan.internal.currentAudio.callback,
+            piepan.internal.currentAudio.callbackData)
         if not status then
             print ("Error: " .. message)
         end
     end
 
-    currentAudio = nil
+    piepan.internal.currentAudio = nil
 end
 
 function piepan.Channel:send(message)
     assert(self ~= nil, "self cannot be nil")
 
-    native.Channel.send(self, tostring(message))
+    piepan.internal.api.channelSend(self, tostring(message))
 end

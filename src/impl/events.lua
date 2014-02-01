@@ -5,20 +5,16 @@
 -- License: MIT (see LICENSE)
 --
 
-function piepan._implOnServerConfig(obj)
-    assert(functionLock == false, "cannot call implementation functions")
-
+function piepan.internal.events.onServerConfig(obj)
     if obj.allowHtml ~= nil then
         piepan.server.allowHtml = obj.allowHtml
     end
 
-    piepan._implCall("onConnect")
+    piepan.internal.triggerEvent("onConnect")
 end
 
-function piepan._implOnServerSync(obj)
-    assert(functionLock == false, "cannot call implementation functions")
-
-    piepan.me = localUsers[obj.session]
+function piepan.internal.events.onServerSync(obj)
+    piepan.me = piepan.internal.users[obj.session]
     if obj.welcomeText ~= nil then
         piepan.server.welcomeText = obj.welcomeText
     end
@@ -28,15 +24,13 @@ function piepan._implOnServerSync(obj)
     piepan.server.synced = true
 end
 
-function piepan._implOnMessage(obj)
-    assert(functionLock == false, "cannot call implementation functions")
-
+function piepan.internal.events.onMessage(obj)
     local message = {
         text = obj.message
     }
     setmetatable(message, piepan.Message)
     if obj.actor ~= nil then
-        message.user = localUsers[obj.actor]
+        message.user = piepan.internal.users[obj.actor]
     end
     if obj.channels ~= nil then
         -- TODO:  add __len
@@ -49,22 +43,20 @@ function piepan._implOnMessage(obj)
         -- TODO:  add __len
         message.users = {}
         for _,v in pairs(obj.users) do
-            local user = localUsers[v]
+            local user = piepan.internal.users[v]
             if user ~= nil then
                 message.users[user.name] = user
             end
         end
     end
 
-    piepan._implCall("onMessage", message)
+    piepan.internal.triggerEvent("onMessage", message)
 end
 
-function piepan._implOnUserChange(obj)
-    assert(functionLock == false, "cannot call implementation functions")
-
+function piepan.internal.events.onUserChange(obj)
     local user
     local event = {}
-    if localUsers[obj.session] == nil then
+    if piepan.internal.users[obj.session] == nil then
         if obj.name == nil then
             return
         end
@@ -72,12 +64,12 @@ function piepan._implOnUserChange(obj)
             session = obj.session,
             channel = piepan.channels[0]
         }
-        localUsers[obj.session] = user
+        piepan.internal.users[obj.session] = user
         piepan.users[obj.name] = user
         setmetatable(user, piepan.User)
         event.isConnected = true
     else
-        user = localUsers[obj.session]
+        user = piepan.internal.users[obj.session]
     end
     event.user = user
 
@@ -116,33 +108,29 @@ function piepan._implOnUserChange(obj)
     end
 
     if piepan.server.synced then
-        piepan._implCall("onUserChange", event)
+        piepan.internal.triggerEvent("onUserChange", event)
     end
 end
 
-function piepan._implOnUserRemove(obj)
-    assert(functionLock == false, "cannot call implementation functions")
-
+function piepan.internal.events.onUserRemove(obj)
     local event = {}
-    if localUsers[obj.session] ~= nil then
+    if piepan.internal.users[obj.session] ~= nil then
         -- TODO:  remove reference from Channel -> User?
-        local name = localUsers[obj.session].name
+        local name = piepan.internal.users[obj.session].name
         if name ~= nil and piepan.users[name] ~= nil then
             piepan.users[name] = nil
         end
-        event.user = localUsers[obj.session]
-        localUsers[obj.session] = nil
+        event.user = piepan.internal.users[obj.session]
+        piepan.internal.users[obj.session] = nil
     end
 
     if piepan.server.synced and event.user ~= nil then
         event.isDisconnected = true
-        piepan._implCall("onUserChange", event)
+        piepan.internal.triggerEvent("onUserChange", event)
     end
 end
 
-function piepan._implOnChannelRemove(obj)
-    assert(functionLock == false, "cannot call implementation functions")
-
+function piepan.internal.events.onChannelRemove(obj)
     local channel = piepan.channels[obj.channelId]
     local event = {}
     if channel == nil then
@@ -165,13 +153,11 @@ function piepan._implOnChannelRemove(obj)
 
     if piepan.server.synced then
         event.isRemoved = true
-        piepan._implCall("onChannelChange", event)
+        piepan.internal.triggerEvent("onChannelChange", event)
     end
 end
 
-function piepan._implOnChannelState(obj)
-    assert(functionLock == false, "cannot call implementation functions")
-
+function piepan.internal.events.onChannelState(obj)
     local channel
     local event = {}
     if piepan.channels[obj.channelId] == nil then
@@ -227,10 +213,10 @@ function piepan._implOnChannelState(obj)
     end
 
     if piepan.server.synced then
-        piepan._implCall("onChannelChange", event)
+        piepan.internal.triggerEvent("onChannelChange", event)
     end
 end
 
-function piepan._implOnDisconnect(obj)
-    piepan._implCall("onDisconnect", event)
+function piepan.internal.events.onDisconnect(obj)
+    piepan.internal.triggerEvent("onDisconnect", event)
 end

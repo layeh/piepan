@@ -18,7 +18,7 @@ function piepan.Timer.new(func, timeout, data)
         func = func,
         data = data,
         handle = timerObj,
-        ptr = native.Timer.new(id, timeout)
+        ptr = piepan.internal.api.timerNew(id, timeout)
     }
     piepan.timers[id] = timer
 
@@ -33,24 +33,20 @@ function piepan.Timer:cancel()
     if timer == nil then
         return
     end
-    native.Timer.cancel(timer.ptr)
+    piepan.internal.api.timerCancel(timer.ptr)
     piepan.timers[self.id] = nil
     self.id = nil
 end
 
-function piepan._implOnUserTimer(id)
-    assert(functionLock == false, "cannot call implementation functions")
-
+function piepan.internal.events.onUserTimer(id)
     local timer = piepan.timers[id]
     if timer == nil then
         return
     end
     piepan.timers[id] = nil
 
-    functionLock = true
     status, message = pcall(timer.func, timer.data)
     if not status then
         print ("Error: timer tick: " .. message)
     end
-    functionLock = false
 end

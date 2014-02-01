@@ -17,7 +17,9 @@ handler_server_sync(lua_State *lua, Packet *packet)
         return;
     }
     lua_getglobal(lua, "piepan");
-    lua_getfield(lua, -1, "_implOnServerSync");
+    lua_getfield(lua, -1, "internal");
+    lua_getfield(lua, -1, "events");
+    lua_getfield(lua, -1, "onServerSync");
     if (!lua_isfunction(lua, -1)) {
         mumble_proto__server_sync__free_unpacked(sync, NULL);
         lua_settop(lua, 0);
@@ -50,7 +52,9 @@ handler_channel_remove(lua_State *lua, Packet *packet)
         return;
     }
     lua_getglobal(lua, "piepan");
-    lua_getfield(lua, -1, "_implOnChannelRemove");
+    lua_getfield(lua, -1, "internal");
+    lua_getfield(lua, -1, "events");
+    lua_getfield(lua, -1, "onChannelRemove");
     if (!lua_isfunction(lua, -1)) {
         lua_settop(lua, 0);
         mumble_proto__channel_remove__free_unpacked(channel, NULL);
@@ -77,7 +81,9 @@ handler_channel_state(lua_State *lua, Packet *packet)
         return;
     }
     lua_getglobal(lua, "piepan");
-    lua_getfield(lua, -1, "_implOnChannelState");
+    lua_getfield(lua, -1, "internal");
+    lua_getfield(lua, -1, "events");
+    lua_getfield(lua, -1, "onChannelState");
     if (!lua_isfunction(lua, -1)) {
         lua_settop(lua, 0);
         mumble_proto__channel_state__free_unpacked(channel, NULL);
@@ -116,7 +122,9 @@ handler_server_config(lua_State *lua, Packet *packet)
         return;
     }
     lua_getglobal(lua, "piepan");
-    lua_getfield(lua, -1, "_implOnServerConfig");
+    lua_getfield(lua, -1, "internal");
+    lua_getfield(lua, -1, "events");
+    lua_getfield(lua, -1, "onServerConfig");
     if (!lua_isfunction(lua, -1)) {
         lua_settop(lua, 0);
         mumble_proto__server_config__free_unpacked(config, NULL);
@@ -141,7 +149,9 @@ handler_text_message(lua_State *lua, Packet *packet)
         return;
     }
     lua_getglobal(lua, "piepan");
-    lua_getfield(lua, -1, "_implOnMessage");
+    lua_getfield(lua, -1, "internal");
+    lua_getfield(lua, -1, "events");
+    lua_getfield(lua, -1, "onMessage");
     if (!lua_isfunction(lua, -1)) {
         lua_settop(lua, 0);
         mumble_proto__text_message__free_unpacked(msg, NULL);
@@ -195,7 +205,9 @@ handler_user_state(lua_State *lua, Packet *packet)
     }
 
     lua_getglobal(lua, "piepan");
-    lua_getfield(lua, -1, "_implOnUserChange");
+    lua_getfield(lua, -1, "internal");
+    lua_getfield(lua, -1, "events");
+    lua_getfield(lua, -1, "onUserChange");
     if (!lua_isfunction(lua, -1)) {
         lua_settop(lua, 0);
         mumble_proto__user_state__free_unpacked(user, NULL);
@@ -262,7 +274,9 @@ handler_user_remove(lua_State *lua, Packet *packet)
         return;
     }
     lua_getglobal(lua, "piepan");
-    lua_getfield(lua, -1, "_implOnUserRemove");
+    lua_getfield(lua, -1, "internal");
+    lua_getfield(lua, -1, "events");
+    lua_getfield(lua, -1, "onUserRemove");
     if (!lua_isfunction(lua, -1)) {
         lua_settop(lua, 0);
         mumble_proto__user_remove__free_unpacked(user, NULL);

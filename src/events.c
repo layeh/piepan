@@ -56,7 +56,9 @@ user_timer_event(struct ev_loop *loop, struct ev_timer *w, int revents)
 {
     UserTimer *timer = (UserTimer *)w;
     lua_getglobal(timer->lua, "piepan");
-    lua_getfield(timer->lua, -1, "_implOnUserTimer");
+    lua_getfield(timer->lua, -1, "internal");
+    lua_getfield(timer->lua, -1, "events");
+    lua_getfield(timer->lua, -1, "onUserTimer");
     lua_pushinteger(timer->lua, timer->id);
     lua_call(timer->lua, 1, 0);
 }
@@ -165,7 +167,9 @@ script_stat_event(struct ev_loop *loop, ev_stat *w, int revents)
     }
     fprintf(stderr, "%s: reloaded %s\n", PIEPAN_NAME, stat->filename);
     lua_getglobal(stat->lua, "piepan");
-    lua_getfield(stat->lua, -1, "_implLoadScript");
+    lua_getfield(stat->lua, -1, "internal");
+    lua_getfield(stat->lua, -1, "events");
+    lua_getfield(stat->lua, -1, "onLoadScript");
     lua_pushinteger(stat->lua, stat->id);
     lua_call(stat->lua, 1, 3);
     if (!lua_toboolean(stat->lua, -3)) {

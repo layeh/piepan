@@ -5,9 +5,7 @@
 -- License: MIT (see LICENSE)
 --
 
-function piepan._implLoadScript(argument, ptr)
-    assert(functionLock == false, "cannot call implementation functions")
-
+function piepan.internal.events.onLoadScript(argument, ptr)
     local index
     local entry
 
@@ -78,10 +76,10 @@ function piepan._implLoadScript(argument, ptr)
     return true, index, ptr
 end
 
-function piepan._implCall(name, arg)
-    assert(type(name) == "string", "name must be a string")
-
-    functionLock = true
+--
+-- Callback execution
+--
+function piepan.internal.triggerEvent(name, arg)
     for _,script in pairs(piepan.scripts) do
         local func = rawget(script.environment.piepan, name)
         if type(func) == "function" then
@@ -91,13 +89,12 @@ function piepan._implCall(name, arg)
             end
         end
     end
-    functionLock = false
 end
 
 --
 -- Argument parsing
 --
-function piepan._implArgument(key, value)
+function piepan.internal.events.onArgument(key, value)
     assert(type(key) ~= nil, "key cannot be nil")
 
     value = value or ""

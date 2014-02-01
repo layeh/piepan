@@ -22,17 +22,6 @@ util_set_varint(uint8_t buffer[], uint64_t value)
 }
 
 void
-rnltrim(char *str, int length)
-{
-    for (length = length - 1; length >= 0; length--) {
-        if (str[length] != '\r' && str[length] != '\n') {
-            break;
-        }
-        str[length] = '\0';
-    }
-}
-
-void
 audioTransmission_stop(AudioTransmission *at, lua_State *lua, struct ev_loop *loop)
 {
     if (at == NULL || lua == NULL || loop == NULL) {
@@ -43,9 +32,11 @@ audioTransmission_stop(AudioTransmission *at, lua_State *lua, struct ev_loop *lo
     free(at);
 
     lua_getglobal(lua, "piepan");
-    lua_getfield(lua, -1, "Channel");
-    lua_getfield(lua, -1, "_implAudioFinished");
+    lua_getfield(lua, -1, "internal");
+    lua_getfield(lua, -1, "events");
+    lua_getfield(lua, -1, "onAudioFinished");
     lua_call(lua, 0, 0);
+    lua_settop(lua, 0);
 }
 
 #define VOICEPACKET_NORMAL 0

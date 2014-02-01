@@ -4,8 +4,8 @@
  * Author: Tim Cooper <tim.cooper@layeh.com>
  * License: MIT (see LICENSE)
  *
- * This file contains native functions that are called from the piepan_impl.lua
- * file.
+ * This file contains native functions that are called from the piepan Lua
+ * script.
  */
 
 // TODO:  convert lua_tostring to lua_tolstring?
@@ -142,8 +142,9 @@ api_Thread_worker(void *arg)
 {
     UserThread *user_thread = (UserThread *)arg;
     lua_getglobal(user_thread->lua, "piepan");
-    lua_getfield(user_thread->lua, -1, "Thread");
-    lua_getfield(user_thread->lua, -1, "_implExecute");
+    lua_getfield(user_thread->lua, -1, "internal");
+    lua_getfield(user_thread->lua, -1, "events");
+    lua_getfield(user_thread->lua, -1, "onThreadExecute");
     lua_pushnumber(user_thread->lua, user_thread->id);
     lua_call(user_thread->lua, 1, 0);
     write(user_thread_pipe[1], &user_thread->id, sizeof(int));
@@ -183,66 +184,90 @@ api_disconnect(lua_State *lua)
     return 0;
 }
 
-void
+int
+api_connect(lua_State *lua)
+{
+    // [string username, string password, table tokens]
+    MumbleProto__Version version = MUMBLE_PROTO__VERSION__INIT;
+    MumbleProto__Authenticate auth = MUMBLE_PROTO__AUTHENTICATE__INIT;
+
+    auth.has_opus = true;
+    auth.opus = true;
+    auth.username = (char *)lua_tostring(lua, -3);
+
+    if (!lua_isnil(lua, -2)) {
+        auth.password = (char *)lua_tostring(lua, -2);
+    }
+    if (!lua_isnil(lua, -1)) {
+        lua_len(lua, -1);
+        auth.n_tokens = lua_tointeger(lua, -1);
+        lua_pop(lua, 1);
+
+        if (lua_checkstack(lua, auth.n_tokens)) {
+            int i;
+            int table_index = lua_absindex(lua, -1);
+            auth.tokens = lua_newuserdata(lua, sizeof(char *) * auth.n_tokens);
+            lua_pushnil(lua);
+
+            for (i = 0; i < auth.n_tokens; i++) {
+                if (!lua_next(lua, table_index)) {
+                    break;
+                }
+                auth.tokens[i] = (char *)lua_tostring(lua, -1);
+                lua_insert(lua, -2);
+            }
+
+            auth.n_tokens = i;
+        } else {
+            // TODO:  notify the user of this
+            auth.n_tokens = 0;
+        }
+    }
+    version.has_version = true;
+    version.version = 1 << 16 | 2 << 8 | 4; // 1.2.4
+    version.release = "Unknown";
+    version.os = PIEPAN_NAME;
+    version.os_version = PIEPAN_VERSION;
+
+    sendPacket(PACKET_VERSION, &version);
+    sendPacket(PACKET_AUTHENTICATE, &auth);
+    return 0;
+}
+
+int
 api_init(lua_State *lua)
 {
-    // piepan
-    lua_newtable(lua);
-
-    // piepan.User
-    lua_newtable(lua);
+    // [table]
 
     lua_pushcfunction(lua, api_User_send);
-    lua_setfield(lua, -2, "send");
-
+    lua_setfield(lua, -2, "userSend");
     lua_pushcfunction(lua, api_User_kick);
-    lua_setfield(lua, -2, "kick");
-
+    lua_setfield(lua, -2, "userKick");
     lua_pushcfunction(lua, api_User_ban);
-    lua_setfield(lua, -2, "ban");
-
+    lua_setfield(lua, -2, "userBan");
     lua_pushcfunction(lua, api_User_moveTo);
-    lua_setfield(lua, -2, "moveTo");
-    lua_setfield(lua, -2, "User");
-
-    // piepan.Channel
-    lua_newtable(lua);
+    lua_setfield(lua, -2, "userMoveTo");
 
     lua_pushcfunction(lua, api_Channel_play);
-    lua_setfield(lua, -2, "play");
-
+    lua_setfield(lua, -2, "channelPlay");
     lua_pushcfunction(lua, api_Channel_send);
-    lua_setfield(lua, -2, "send");
-    lua_setfield(lua, -2, "Channel");
-
-    // piepan.Message
-    lua_newtable(lua);
-    lua_setfield(lua, -2, "Message");
-
-    // piepan.Timer
-    lua_newtable(lua);
+    lua_setfield(lua, -2, "channelSend");
 
     lua_pushcfunction(lua, api_Timer_new);
-    lua_setfield(lua, -2, "new");
-
+    lua_setfield(lua, -2, "timerNew");
     lua_pushcfunction(lua, api_Timer_cancel);
-    lua_setfield(lua, -2, "cancel");
-    lua_setfield(lua, -2, "Timer");
-
-    // piepan.Thread
-    lua_newtable(lua);
+    lua_setfield(lua, -2, "timerCancel");
 
     lua_pushcfunction(lua, api_Thread_new);
-    lua_setfield(lua, -2, "new");
-    lua_setfield(lua, -2, "Thread");
+    lua_setfield(lua, -2, "threadNew");
 
-    // piepan.stopAudio
     lua_pushcfunction(lua, api_stopAudio);
     lua_setfield(lua, -2, "stopAudio");
 
-    // piepan.disconnect
+    lua_pushcfunction(lua, api_connect);
+    lua_setfield(lua, -2, "connect");
+
     lua_pushcfunction(lua, api_disconnect);
     lua_setfield(lua, -2, "disconnect");
-
-    lua_setglobal(lua, "piepan");
+    return 0;
 }

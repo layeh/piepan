@@ -6,13 +6,13 @@
 --
 
 function piepan.stopAudio()
-    if not currentAudio then
+    if not piepan.internal.currentAudio then
         return
     end
 
-    native.stopAudio(currentAudio.ptr)
+    piepan.internal.api.stopAudio(piepan.internal.currentAudio.ptr)
 end
 
 function piepan.disconnect()
-    native.disconnect()
+    piepan.internal.api.disconnect()
 end

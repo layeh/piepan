@@ -13,23 +13,23 @@ function piepan.User:moveTo(channel)
     if channel == self.channel then
         return
     end
-    native.User.moveTo(self, channel.id)
+    piepan.internal.api.userMoveTo(self, channel.id)
 end
 
 function piepan.User:kick(message)
     assert(self ~= nil, "self cannot be nil")
 
-    native.User.kick(self, tostring(message))
+    piepan.internal.api.userKick(self, tostring(message))
 end
 
 function piepan.User:ban(message)
     assert(self ~= nil, "self cannot be nil")
 
-    native.User.ban(self, tostring(message))
+    piepan.internal.api.userBan(self, tostring(message))
 end
 
 function piepan.User:send(message)
     assert(self ~= nil, "self cannot be nil")
 
-    native.User.send(self, tostring(message))
+    piepan.internal.api.userSend(self, tostring(message))
 end

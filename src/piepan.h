@@ -11,6 +11,10 @@
 
 #define PAYLOAD_SIZE_MAX (1024 * 1024 * 8 - 1)
 
+#ifndef PING_TIMEOUT
+#define PING_TIMEOUT 15.0
+#endif
+
 #define OPUS_FRAME_SIZE 480
 #define PCM_BUFFER 4096
 

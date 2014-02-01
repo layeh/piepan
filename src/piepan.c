@@ -43,19 +43,6 @@
 #include "api.c"
 #include "piepan_impl.c"
 
-
-#ifndef PING_TIMEOUT
-#define PING_TIMEOUT 15.0
-#endif
-
-#ifndef TOKEN_BUFFER_SIZE
-#define TOKEN_BUFFER_SIZE 1024
-#endif
-
-#ifndef MAX_TOKENS
-#define MAX_TOKENS 32
-#endif
-
 int user_thread_pipe[2];
 struct ev_loop *ev_loop_main;
 
@@ -146,8 +133,9 @@ user_thread_event(struct ev_loop *loop, ev_io *w, int revents)
     if (user_thread != NULL) {
         free(user_thread);
     }
-    lua_getfield(lua, -4, "Thread");
-    lua_getfield(lua, -1, "_implFinish");
+    lua_getfield(lua, -4, "internal");
+    lua_getfield(lua, -1, "events");
+    lua_getfield(lua, -1, "onThreadFinish");
     lua_pushnumber(lua, thread_id);
     lua_call(lua, 1, 0);
     lua_settop(lua, 0);
@@ -212,13 +200,19 @@ main(int argc, char *argv[])
         return 1;
     }
     luaL_openlibs(lua);
-    api_init(lua);
     if (luaL_loadbuffer(lua, src_piepan_impl_luac, src_piepan_impl_luac_len,
             "piepan_impl") != LUA_OK) {
         fprintf(stderr, "%s: could not load piepan implementation\n", PIEPAN_NAME);
         return 1;
     }
     lua_call(lua, 0, 0);
+
+    lua_getglobal(lua, "piepan");
+    lua_getfield(lua, -1, "internal");
+    lua_getfield(lua, -1, "api");
+    lua_pushcfunction(lua, api_init);
+    lua_setfield(lua, -2, "apiInit");
+    lua_settop(lua, 0);
 
     /*
      * Argument parsing
@@ -228,7 +222,9 @@ main(int argc, char *argv[])
         int show_help = 0;
         int show_version = 0;
         lua_getglobal(lua, "piepan");
-        lua_getfield(lua, -1, "_implArgument");
+        lua_getfield(lua, -1, "internal");
+        lua_getfield(lua, -1, "events");
+        lua_getfield(lua, -1, "onArgument");
         for (i = 1; i < argc; i++) {
             int has_next = i + 1 < argc;
             if (argv[i][0] != '-' || !strcmp(argv[i], "--")) {
@@ -296,7 +292,9 @@ main(int argc, char *argv[])
         int i;
         lua_settop(lua, 0);
         lua_getglobal(lua, "piepan");
-        lua_getfield(lua, -1, "_implLoadScript");
+        lua_getfield(lua, -1, "internal");
+        lua_getfield(lua, -1, "events");
+        lua_getfield(lua, -1, "onLoadScript");
         for (i = script_argc; i >= 0 && i < argc; i++) {
             lua_pushvalue(lua, -1);
             lua_pushstring(lua, argv[i]);
@@ -342,9 +340,9 @@ main(int argc, char *argv[])
                     PIEPAN_NAME, opus_strerror(error));
             return 1;
         }
-        opus_encoder_ctl(encoder, OPUS_SET_VBR(1));
+        opus_encoder_ctl(encoder, OPUS_SET_VBR(0));
         // TODO: set this to the server's max bitrate
-        opus_encoder_ctl(encoder, OPUS_SET_BITRATE(50000));
+        opus_encoder_ctl(encoder, OPUS_SET_BITRATE(40000));
 
         lua_settop(lua, 0);
     }
@@ -425,76 +423,23 @@ main(int argc, char *argv[])
     }
 
     /*
-     * Send initial packets
+     * Trigger initial event
      */
-    {
-        MumbleProto__Version version = MUMBLE_PROTO__VERSION__INIT;
-        MumbleProto__Authenticate auth = MUMBLE_PROTO__AUTHENTICATE__INIT;
-        FILE *file;
-        char buffer[TOKEN_BUFFER_SIZE];
-        struct {
-            int count;
-            char *arr[MAX_TOKENS];
-        } tokens = {0};
-
-        auth.has_opus = true;
-        auth.opus = true;
-        auth.username = username;
-        if (password_file != NULL) {
-            file = fopen(password_file, "r");
-            if (file == NULL) {
-                fprintf(stderr, "%s: could open password file for reading\n",
-                        PIEPAN_NAME);
-                return 1;
-            }
-            if (fgets(buffer, sizeof(buffer), file) == NULL) {
-                fprintf(stderr, "%s: could not read password from file\n",
-                        PIEPAN_NAME);
-                fclose(file);
-                return 1;
-            }
-            rnltrim(buffer, strlen(buffer));
-            auth.password = buffer;
-            fclose(file);
-        }
-        if (token_file != NULL) {
-            file = fopen(token_file, "r");
-            if (file == NULL) {
-                fprintf(stderr, "%s: could open token file for reading\n",
-                        PIEPAN_NAME);
-                return 1;
-            }
-            while (tokens.count < MAX_TOKENS) {
-                if (fgets(buffer, sizeof(buffer), file) == NULL) {
-                    break;
-                }
-                if (buffer[0] == '\n') {
-                    continue;
-                }
-                rnltrim(buffer, strlen(buffer));
-                tokens.arr[tokens.count++] = strdup(buffer);
-                tokens.count++;
-            }
-            if (tokens.count > 0) {
-                auth.n_tokens = tokens.count;
-                auth.tokens = tokens.arr;
-            }
-            fclose(file);
-        }
-
-        version.has_version = true;
-        version.version = 1 << 16 | 2 << 8 | 4; // 1.2.4
-        version.release = "Unknown";
-        version.os = PIEPAN_NAME;
-        version.os_version = PIEPAN_VERSION;
-
-        sendPacket(PACKET_VERSION, &version);
-        sendPacket(PACKET_AUTHENTICATE, &auth);
-
-        while (tokens.count > 0) {
-            free(tokens.arr[--tokens.count]);
-        }
+    lua_getglobal(lua, "piepan");
+    lua_getfield(lua, -1, "internal");
+    lua_getfield(lua, -1, "initialize");
+    lua_newtable(lua);
+    lua_pushstring(lua, username);
+    lua_setfield(lua, -2, "username");
+    if (password_file != NULL) {
+        lua_pushstring(lua, password_file);
+        lua_setfield(lua, -2, "passwordFile");
     }
+    if (token_file != NULL) {
+        lua_pushstring(lua, token_file);
+        lua_setfield(lua, -2, "tokenFile");
+    }
+    lua_call(lua, 1, 0);
 
     /*
      * Event loop
@@ -520,7 +465,9 @@ main(int argc, char *argv[])
      * Cleanup
      */
     lua_getglobal(lua, "piepan");
-    lua_getfield(lua, -1, "_implOnDisconnect");
+    lua_getfield(lua, -1, "internal");
+    lua_getfield(lua, -1, "events");
+    lua_getfield(lua, -1, "onDisconnect");
     if (lua_isfunction(lua, -1)) {
         lua_newtable(lua);
         lua_call(lua, 1, 0);
