@@ -125,6 +125,7 @@ user_thread_event(struct ev_loop *loop, ev_io *w, int revents)
         return;
     }
     lua_getglobal(lua, "piepan");
+    lua_getfield(lua, -1, "internal");
     lua_getfield(lua, -1, "threads");
     lua_pushnumber(lua, thread_id);
     lua_gettable(lua, -2);
@@ -133,8 +134,7 @@ user_thread_event(struct ev_loop *loop, ev_io *w, int revents)
     if (user_thread != NULL) {
         free(user_thread);
     }
-    lua_getfield(lua, -4, "internal");
-    lua_getfield(lua, -1, "events");
+    lua_getfield(lua, -4, "events");
     lua_getfield(lua, -1, "onThreadFinish");
     lua_pushnumber(lua, thread_id);
     lua_call(lua, 1, 0);

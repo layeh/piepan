@@ -70,7 +70,7 @@ function piepan.internal.events.onLoadScript(argument, ptr)
 
     piepan.scripts[index] = entry
     if type(entry.environment.piepan) == "table" then
-        setmetatable(entry.environment.piepan, piepan.meta)
+        setmetatable(entry.environment.piepan, piepan.internal.meta)
     end
 
     return true, index, ptr

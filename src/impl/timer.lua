@@ -10,7 +10,7 @@ function piepan.Timer.new(func, timeout, data)
     assert(type(timeout) == "number" and timeout > 0 and timeout <= 3600,
         "timeout is out of range")
 
-    local id = #piepan.timers + 1
+    local id = #piepan.internal.timers + 1
     local timerObj = {
         id = id
     }
@@ -20,7 +20,7 @@ function piepan.Timer.new(func, timeout, data)
         handle = timerObj,
         ptr = piepan.internal.api.timerNew(id, timeout)
     }
-    piepan.timers[id] = timer
+    piepan.internal.timers[id] = timer
 
     setmetatable(timerObj, piepan.Timer)
     return timerObj
@@ -29,21 +29,21 @@ end
 function piepan.Timer:cancel()
     assert(self ~= nil, "self cannot be nil")
 
-    local timer = piepan.timers[self.id]
+    local timer = piepan.internal.timers[self.id]
     if timer == nil then
         return
     end
     piepan.internal.api.timerCancel(timer.ptr)
-    piepan.timers[self.id] = nil
+    piepan.internal.timers[self.id] = nil
     self.id = nil
 end
 
 function piepan.internal.events.onUserTimer(id)
-    local timer = piepan.timers[id]
+    local timer = piepan.internal.timers[id]
     if timer == nil then
         return
     end
-    piepan.timers[id] = nil
+    piepan.internal.timers[id] = nil
 
     status, message = pcall(timer.func, timer.data)
     if not status then

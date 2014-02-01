@@ -10,18 +10,18 @@ function piepan.Thread.new(worker, callback, data)
     assert(callback == nil or type(callback) == "function",
         "callback needs to be a function or nil")
 
-    local id = #piepan.threads + 1
+    local id = #piepan.internal.threads + 1
     local thread = {
         worker = worker,
         callback = callback,
         data = data
     }
-    piepan.threads[id] = thread
+    piepan.internal.threads[id] = thread
     piepan.internal.api.threadNew(thread, id)
 end
 
 function piepan.internal.events.onThreadExecute(id)
-    local thread = piepan.threads[id]
+    local thread = piepan.internal.threads[id]
     if thread == nil then
         return
     end
@@ -32,7 +32,7 @@ function piepan.internal.events.onThreadExecute(id)
 end
 
 function piepan.internal.events.onThreadFinish(id)
-    local thread = piepan.threads[id]
+    local thread = piepan.internal.threads[id]
     if thread == nil then
         return
     end
@@ -42,5 +42,5 @@ function piepan.internal.events.onThreadFinish(id)
             print ("Error: piepan.Thread.finish: " .. message)
         end
     end
-    piepan.threads[id] = nil
+    piepan.internal.threads[id] = nil
 end

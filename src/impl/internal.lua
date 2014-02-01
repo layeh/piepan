@@ -36,3 +36,10 @@ function piepan.internal.initialize(tbl)
     piepan.internal.api.apiInit(piepan.internal.api)
     piepan.internal.api.connect(tbl.username, password, tokens)
 end
+
+function piepan.internal.meta.__index(tbl, key)
+    if key == "internal" then
+        return
+    end
+    return piepan[key]
+end

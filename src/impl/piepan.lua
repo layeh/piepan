@@ -26,6 +26,9 @@ piepan = {
         api = {},
         opus = {},
         events = {},
+        threads = {},
+        timers = {},
+        meta = {},
         -- table of Users with the user's session ID as the key
         users = {},
         currentAudio
@@ -34,10 +37,7 @@ piepan = {
     args = {},
     scripts = {},
     users = {},
-    channels = {},
-    threads = {}, -- TODO:  move to internal?
-    meta = {},
-    timers = {} -- TODO:  move to internal?
+    channels = {}
 }
 
 piepan.User.__index = piepan.User
