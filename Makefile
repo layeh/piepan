@@ -10,8 +10,8 @@ LUAFILES = src/impl/piepan.lua \
            src/impl/events.lua \
            src/impl/functions.lua
 
-piepan: src/piepan.c src/piepan.h src/util.c src/handlers.c src/api.c \
-        proto/Mumble.o src/piepan_impl.c
+piepan: src/piepan.c src/piepan.h src/util.c src/events.c src/handlers.c \
+        src/api.c proto/Mumble.o src/piepan_impl.c
 	$(CC) $(CFLAGS) -o $@ src/piepan.c proto/Mumble.o
 
 proto/Mumble.o: proto/Mumble.proto
