@@ -1,0 +1,31 @@
+# Maintainer: Tim Cooper <tim.cooper@layeh.com>
+
+pkgname=piepan-git
+_gitname=piepan
+pkgver=0.0.0
+pkgrel=1
+pkgdesc="a bot framework for the Mumble voice chat application"
+arch=('x86_64' 'i686')
+url="https://github.com/layeh/piepan"
+license=('MIT')
+depends=('openssl' 'lua' 'libev' 'protobuf-c' 'libvorbis' 'opus')
+source=('git+https://github.com/layeh/piepan.git')
+md5sums=('SKIP')
+
+pkgver() {
+    cd $_gitname
+    echo $(git rev-list --count HEAD).$(git rev-parse --short HEAD)
+}
+
+build() {
+    cd $_gitname
+    make
+    make readme.html
+}
+
+package() {
+    cd $_gitname
+    install -Dm755 "piepan" "$pkgdir/usr/bin/piepan"
+    install -Dm644 "LICENSE" "$pkgdir/usr/share/licenses/piepan-git/LICENSE"
+    install -Dm644 "readme.html" "$pkgdir/usr/share/doc/piepan/readme.html"
+}
