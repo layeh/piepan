@@ -250,7 +250,7 @@ api_connect(lua_State *lua)
         }
     }
     version.has_version = true;
-    version.version = 1 << 16 | 2 << 8 | 4; // 1.2.4
+    version.version = 1 << 16 | 2 << 8 | 5; // 1.2.5
     version.release = "Unknown";
     version.os = PIEPAN_NAME;
     version.os_version = PIEPAN_VERSION;
