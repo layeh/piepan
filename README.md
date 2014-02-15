@@ -56,6 +56,7 @@ The following section describes the API that is available for script authors.  P
 - `void send(self, string message)`: sends a message to the user
 - `void kick(self [, string reason])`: kicks the user from the server with an optional reason
 - `void ban(self [, string reason])`: bans the user from the server with an optional reason
+- `void setComment(self [, string comment])`: sets the user's comment to `comment`
 
 #### `piepan.Message`
 
@@ -213,6 +214,7 @@ Called when a channel changes state (e.g. is added or removed).
 ## Changelog
 
 - Next
+    - Added 'piepan.User.setComment()`
     - `UserChange` and `ChannelChange` are no longer hidden
     - Added audio file support
     - Each script is now loaded in its own Lua environment, preventing global variable interference between scripts

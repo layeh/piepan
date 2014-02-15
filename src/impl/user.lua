@@ -33,3 +33,14 @@ function piepan.User:send(message)
 
     piepan.internal.api.userSend(self, tostring(message))
 end
+
+function piepan.User:setComment(comment)
+    assert(self ~= nil, "self cannot be nil")
+    assert(type(comment) == "string" or comment == nil,
+        "comment must be a string or nil")
+
+    if comment == nil then
+        comment = ""
+    end
+    piepan.internal.api.userSetComment(self, comment)
+end
