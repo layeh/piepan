@@ -9,6 +9,7 @@ arch=('x86_64' 'i686')
 url="https://github.com/layeh/piepan"
 license=('MIT')
 depends=('openssl' 'lua' 'libev' 'protobuf-c' 'libvorbis' 'opus')
+makedepends=('markdown')
 source=('git+https://github.com/layeh/piepan.git')
 md5sums=('SKIP')
 
