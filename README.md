@@ -53,7 +53,7 @@ The following section describes the API that is available for script authors.  P
 - `bool isRecording`: is the user recording channel audio
 - `piepan.Channel channel`: the channel that the user is currently in
 - `void moveTo(self, piepan.Channel channel)`: moves the user to the given `channel`
-- `void send(self, string message)`: sends a message to the user
+- `void send(self, string message)`: sends a text message to the user
 - `void kick(self [, string reason])`: kicks the user from the server with an optional reason
 - `void ban(self [, string reason])`: bans the user from the server with an optional reason
 - `void setComment(self [, string comment])`: sets the user's comment to `comment`
@@ -126,6 +126,41 @@ The following section describes the API that is available for script authors.  P
 - `bool isMoved`: if the channel moved in the tree
 - `bool isChangedName`: if the channel name changed
 - `bool isChangedDescription`: if the channel description changed
+
+#### `piepan.Permissions`
+
+- `piepan.Permissions new(int permissionsMask)`:
+- `bool write`: can change the channel comment and edit the ACL
+- `bool traverse`: can move oneself to the channel and sub-channels
+- `bool enter`: can move oneself into the channel
+- `bool speak`: can transmit audio to a channel
+- `bool muteDeafen`: can mute or deafen another user in the channel
+- `bool move`: can move another user into the channel
+- `bool makeChannel`:  can create a non-temporary channel
+- `bool linkChannel`: can add or remove channel links
+- `bool whisper`: can send audio directly to a user
+- `bool textMessage`: can send a text message to the channel
+- `bool makeTemporaryChannel`: can create a temporary channel on the server
+- `bool kick`: can kick a user from the server
+- `bool ban`: can ban a user from the server
+- `bool register`: can register another user on the server
+- `bool registerSelf`: can register oneself on the server
+
+#### `piepan.PermissionDenied`
+
+- `piepan.User user`: the user who made the request that was denied by the server
+- `piepan.Channel channel`: the channel where the action was denied
+- `piepan.Permissions permissions`: the permissions that the user would have to have in order to perform the action
+- `string reason`: the reason the server gave for denying the action
+- `string name`: the name that was denied by the server
+- `bool isPermission`: denied due to not having the correct permissions
+- `bool isTextTooLong`: denied due to the text message being too long
+- `bool isTemporaryChannel`: denied due to the action being impossible to perform on a temporary channel
+- `bool isMissingCertificate`: denied due to needing a certificate in order to complete the action
+- `bool isChannelName`: denied due to the channel name being invalid
+- `bool isUserName`: denied due to the user name being invalid
+- `bool isChannelFull`: denied due to the channel being full
+- `bool isOther`: denied due to another reason
 
 ### Variables
 
@@ -212,10 +247,14 @@ Called when a user's status changes.
 
 Called when a channel changes state (e.g. is added or removed).
 
+#### `piepan.onPermissionDenied(piepan.PermissionDenied event)`
+
+Called when a requested action could not be performed.
+
 ## Changelog
 
 - Next
-    - Added `piepan.User.setComment()`, `piepan.User.register()`
+    - Added `piepan.onPermissionDenied()`, `piepan.Permissions`, `piepan.PermissionDenied`, `piepan.User.setComment()`, `piepan.User.register()`
     - `UserChange` and `ChannelChange` are no longer hidden
     - Added audio file support
     - Each script is now loaded in its own Lua environment, preventing global variable interference between scripts

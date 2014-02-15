@@ -301,3 +301,50 @@ handler_user_remove(lua_State *lua, Packet *packet)
     lua_settop(lua, 0);
     mumble_proto__user_remove__free_unpacked(user, NULL);
 }
+
+void
+handler_permissiondenied(lua_State *lua, Packet *packet)
+{
+    MumbleProto__PermissionDenied *proto =
+        mumble_proto__permission_denied__unpack(NULL, packet->length, packet->buffer);
+    if (proto == NULL) {
+        return;
+    }
+    lua_getglobal(lua, "piepan");
+    lua_getfield(lua, -1, "internal");
+    lua_getfield(lua, -1, "events");
+    lua_getfield(lua, -1, "onPermissionDenied");
+    if (!lua_isfunction(lua, -1)) {
+        lua_settop(lua, 0);
+        mumble_proto__permission_denied__free_unpacked(proto, NULL);
+        return;
+    }
+    lua_newtable(lua);
+    if (proto->has_type) {
+        lua_pushinteger(lua, proto->type);
+        lua_setfield(lua, -2, "type");
+    }
+    if (proto->has_permission) {
+        lua_pushinteger(lua, proto->permission);
+        lua_setfield(lua, -2, "permission");
+    }
+    if (proto->has_channel_id) {
+        lua_pushinteger(lua, proto->channel_id);
+        lua_setfield(lua, -2, "channelId");
+    }
+    if (proto->has_session) {
+        lua_pushinteger(lua, proto->session);
+        lua_setfield(lua, -2, "session");
+    }
+    if (proto->reason != NULL) {
+        lua_pushstring(lua, proto->reason);
+        lua_setfield(lua, -2, "reason");
+    }
+    if (proto->name != NULL) {
+        lua_pushstring(lua, proto->name);
+        lua_setfield(lua, -2, "name");
+    }
+    lua_call(lua, 1, 0);
+    lua_settop(lua, 0);
+    mumble_proto__permission_denied__free_unpacked(proto, NULL);
+}

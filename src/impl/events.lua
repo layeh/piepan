@@ -224,3 +224,50 @@ end
 function piepan.internal.events.onDisconnect(obj)
     piepan.internal.triggerEvent("onDisconnect", event)
 end
+
+function piepan.internal.events.onPermissionDenied(obj)
+    local event = {}
+    print ("Permission denied")
+    for k,v in pairs(obj) do
+        print (">> " .. tostring(k) .. " => " .. tostring(v))
+    end
+    if obj.type == nil then
+        return
+    end
+    setmetatable(event, piepan.PermissionDenied)
+    if obj.type == 1 then
+        event.isPermission = true
+    elseif obj.type == 3 then
+        event.isChannelName = true
+    elseif obj.type == 4 then
+        event.isTextTooLong = true
+    elseif obj.type == 6 then
+        event.isTemporaryChannel = true
+    elseif obj.type == 7 then
+        event.isMissingCertificate = true
+    elseif obj.type == 8 then
+        event.isUserName = true
+    elseif obj.type == 9 then
+        event.isChannelFull = true
+    else
+        event.isOther = true
+    end
+
+    if obj.session ~= nil then
+        event.user = piepan.internal.users[obj.session]
+    end
+    if obj.channelId ~= nil then
+        event.channel = piepan.channels[obj.channelId]
+    end
+    if obj.permission ~= nil then
+        event.permissions = piepan.Permissions.new(obj.permission)
+    end
+    if obj.reason ~= nil then
+        event.reason = obj.reason
+    end
+    if obj.name ~= nil then
+        event.name = obj.name
+    end
+
+    piepan.internal.triggerEvent("onPermissionDenied", event)
+end
