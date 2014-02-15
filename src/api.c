@@ -84,6 +84,17 @@ api_User_setComment(lua_State *lua)
 }
 
 int
+api_User_register(lua_State *lua)
+{
+    // [self]
+    MumbleProto__UserState msg = MUMBLE_PROTO__USER_STATE__INIT;
+    msg.has_user_id = true;
+    msg.user_id = 0;
+    sendPacket(PACKET_USERSTATE, &msg);
+    return 0;
+}
+
+int
 api_Channel_play(lua_State *lua)
 {
     // [OpusEncoder *encoder, string filename]
@@ -264,6 +275,8 @@ api_init(lua_State *lua)
     lua_setfield(lua, -2, "userMoveTo");
     lua_pushcfunction(lua, api_User_setComment);
     lua_setfield(lua, -2, "userSetComment");
+    lua_pushcfunction(lua, api_User_register);
+    lua_setfield(lua, -2, "userRegister");
 
     lua_pushcfunction(lua, api_Channel_play);
     lua_setfield(lua, -2, "channelPlay");

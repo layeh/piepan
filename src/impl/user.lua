@@ -44,3 +44,9 @@ function piepan.User:setComment(comment)
     end
     piepan.internal.api.userSetComment(self, comment)
 end
+
+function piepan.User:register()
+    assert(self ~= nil, "self cannot be nil")
+
+    piepan.internal.api.userRegister(self)
+end
