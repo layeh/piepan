@@ -22,7 +22,7 @@ static Packet_Handler_Func packet_handler[26] = {
     /*  9 */ handler_user_state,
     /* 10 */ NULL,
     /* 11 */ handler_text_message,
-    /* 12 */ NULL,
+    /* 12 */ handler_permissiondenied,
     /* 13 */ NULL,
     /* 14 */ NULL,
     /* 15 */ NULL,
