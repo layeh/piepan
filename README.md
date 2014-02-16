@@ -129,7 +129,7 @@ The following section describes the API that is available for script authors.  P
 
 #### `piepan.Permissions`
 
-- `piepan.Permissions new(int permissionsMask)`:
+- `piepan.Permissions new(int permissionsMask)`: creates a new `piepan.Permissions` table from a bitmask of permissions
 - `bool write`: can change the channel comment and edit the ACL
 - `bool traverse`: can move oneself to the channel and sub-channels
 - `bool enter`: can move oneself into the channel
