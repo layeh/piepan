@@ -140,6 +140,17 @@ api_Channel_send(lua_State *lua)
 }
 
 int
+api_Channel_remove(lua_State *lua)
+{
+    // [self]
+    MumbleProto__ChannelRemove msg = MUMBLE_PROTO__CHANNEL_REMOVE__INIT;
+    lua_getfield(lua, 1, "id");
+    msg.channel_id = lua_tointeger(lua, -1);
+    sendPacket(PACKET_CHANNELREMOVE, &msg);
+    return 0;
+}
+
+int
 api_Timer_new(lua_State *lua)
 {
     // [id, timeout]
@@ -282,6 +293,8 @@ api_init(lua_State *lua)
     lua_setfield(lua, -2, "channelPlay");
     lua_pushcfunction(lua, api_Channel_send);
     lua_setfield(lua, -2, "channelSend");
+    lua_pushcfunction(lua, api_Channel_remove);
+    lua_setfield(lua, -2, "channelRemove");
 
     lua_pushcfunction(lua, api_Timer_new);
     lua_setfield(lua, -2, "timerNew");

@@ -73,6 +73,7 @@ The following section describes the API that is available for script authors.  P
 - `string description`: the description of the channel (FIXME)
 - `piepan.Channel parent`: the parent channel
 - `bool isTemporary`: is the channel temporary
+- `void remove(self)`: removes the channel from the server's channel tree
 - `bool play(self, string filename[, function callback, data])`: plays the audio file to the channel. `callback` will be executed when the file finishes playing, with `data` passed as its only argument. Returns `true` if no other audio file was playing and the stream started successfully.
 
     Note: Only Ogg Vorbis files are supported (mono, 48kHz)
@@ -254,7 +255,7 @@ Called when a requested action could not be performed.
 ## Changelog
 
 - Next
-    - Added `piepan.onPermissionDenied()`, `piepan.Permissions`, `piepan.PermissionDenied`, `piepan.User.setComment()`, `piepan.User.register()`
+    - Added `piepan.onPermissionDenied()`, `piepan.Permissions`, `piepan.PermissionDenied`, `piepan.User.setComment()`, `piepan.User.register()`, `piepan.Channel.remove()`
     - `UserChange` and `ChannelChange` are no longer hidden
     - Added audio file support
     - Each script is now loaded in its own Lua environment, preventing global variable interference between scripts

@@ -69,6 +69,9 @@ sendPacketEx(int type, void *data, int length)
         case PACKET_PING:
             payload_size = mumble_proto__ping__get_packed_size(data);
             break;
+        case PACKET_CHANNELREMOVE:
+            payload_size = mumble_proto__channel_remove__get_packed_size(data);
+            break;
         case PACKET_TEXTMESSAGE:
             payload_size = mumble_proto__text_message__get_packed_size(data);
             break;
@@ -98,6 +101,9 @@ sendPacketEx(int type, void *data, int length)
                 break;
             case PACKET_PING:
                 mumble_proto__ping__pack(data, packet_out.buffer + 6);
+                break;
+            case PACKET_CHANNELREMOVE:
+                mumble_proto__channel_remove__pack(data, packet_out.buffer + 6);
                 break;
             case PACKET_TEXTMESSAGE:
                 mumble_proto__text_message__pack(data, packet_out.buffer + 6);

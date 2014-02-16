@@ -19,13 +19,15 @@
 #define PCM_BUFFER 4096
 
 enum {
-    PACKET_VERSION      = 0,
-    PACKET_UDPTUNNEL    = 1,
-    PACKET_AUTHENTICATE = 2,
-    PACKET_PING         = 3,
-    PACKET_USERREMOVE   = 8,
-    PACKET_USERSTATE    = 9,
-    PACKET_TEXTMESSAGE  = 11
+    PACKET_VERSION          = 0,
+    PACKET_UDPTUNNEL        = 1,
+    PACKET_AUTHENTICATE     = 2,
+    PACKET_PING             = 3,
+    PACKET_CHANNELREMOVE    = 6,
+    PACKET_CHANNELSTATE     = 7,
+    PACKET_USERREMOVE       = 8,
+    PACKET_USERSTATE        = 9,
+    PACKET_TEXTMESSAGE      = 11
 };
 
 /*

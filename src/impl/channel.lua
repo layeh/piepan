@@ -79,3 +79,9 @@ function piepan.Channel:send(message)
 
     piepan.internal.api.channelSend(self, tostring(message))
 end
+
+function piepan.Channel:remove()
+    assert(self ~= nil, "self cannot be nil")
+
+    piepan.internal.api.channelRemove(self)
+end
