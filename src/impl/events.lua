@@ -107,6 +107,9 @@ function piepan.internal.events.onUserChange(obj)
     if obj.isSelfDeafened ~= nil then
         user.isSelfDeafened = obj.isSelfDeafened
     end
+    if obj.isPrioritySpeaker ~= nil then
+        user.isPrioritySpeaker = obj.isPrioritySpeaker
+    end
 
     if piepan.server.synced then
         piepan.internal.triggerEvent("onUserChange", event)

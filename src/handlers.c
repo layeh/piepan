@@ -260,6 +260,10 @@ handler_user_state(lua_State *lua, Packet *packet)
         lua_pushboolean(lua, user->recording);
         lua_setfield(lua, -2, "isRecording");
     }
+    if (user->has_priority_speaker) {
+        lua_pushboolean(lua, user->priority_speaker);
+        lua_setfield(lua, -2, "isPrioritySpeaker");
+    }
     lua_call(lua, 1, 0);
     lua_settop(lua, 0);
     mumble_proto__user_state__free_unpacked(user, NULL);

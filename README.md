@@ -51,6 +51,7 @@ The following section describes the API that is available for script authors.  P
 - `bool isSelfMuted`: is the user muted by the him/herself
 - `bool isSelfDeafened`: has the user been deafened by him/herself
 - `bool isRecording`: is the user recording channel audio
+- `bool isPrioritySpeaker`: is the user a priority speaker
 - `piepan.Channel channel`: the channel that the user is currently in
 - `void moveTo(self, piepan.Channel channel)`: moves the user to the given `channel`
 - `void send(self, string message)`: sends a text message to the user
@@ -256,7 +257,7 @@ Called when a requested action could not be performed.
 ## Changelog
 
 - Next
-    - Added `piepan.onPermissionDenied()`, `piepan.Permissions`, `piepan.PermissionDenied`, `piepan.User.setComment()`, `piepan.User.register()`, `piepan.Channel.remove()`, `piepan.Channel.setDescription()`
+    - Added `piepan.onPermissionDenied()`, `piepan.Permissions`, `piepan.PermissionDenied`, `piepan.User.setComment()`, `piepan.User.register()`, `piepan.User.isPrioritySpeaker`, `piepan.Channel.remove()`, `piepan.Channel.setDescription()`
     - `UserChange` and `ChannelChange` are no longer hidden
     - Added audio file support
     - Each script is now loaded in its own Lua environment, preventing global variable interference between scripts
