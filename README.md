@@ -101,7 +101,7 @@ The following section describes the API that is available for script authors.  P
 
     Once a timer has been fired or canceled, its reference is no longer valid.
 
-- **`void cancel(self)`**: Cancels a timer.
+- `void cancel(self)`: Cancels a timer.
 
 #### `piepan.Thread`
 
