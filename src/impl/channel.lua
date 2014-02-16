@@ -80,6 +80,17 @@ function piepan.Channel:send(message)
     piepan.internal.api.channelSend(self, tostring(message))
 end
 
+function piepan.Channel:setDescription(description)
+    assert(self ~= nil, "self cannot be nil")
+    assert(type(description) == "string" or description == nil,
+        "description must be a string or nil")
+
+    if description == nil then
+        description = ""
+    end
+    piepan.internal.api.channelSetDescription(self, description)
+end
+
 function piepan.Channel:remove()
     assert(self ~= nil, "self cannot be nil")
 

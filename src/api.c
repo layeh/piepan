@@ -140,6 +140,19 @@ api_Channel_send(lua_State *lua)
 }
 
 int
+api_Channel_setDescription(lua_State *lua)
+{
+    // [self, description]
+    MumbleProto__ChannelState msg = MUMBLE_PROTO__CHANNEL_STATE__INIT;
+    msg.has_channel_id = true;
+    lua_getfield(lua, 1, "id");
+    msg.channel_id = lua_tointeger(lua, -1);
+    msg.description = (char *)lua_tostring(lua, 2);
+    sendPacket(PACKET_CHANNELSTATE, &msg);
+    return 0;
+}
+
+int
 api_Channel_remove(lua_State *lua)
 {
     // [self]
@@ -293,6 +306,8 @@ api_init(lua_State *lua)
     lua_setfield(lua, -2, "channelPlay");
     lua_pushcfunction(lua, api_Channel_send);
     lua_setfield(lua, -2, "channelSend");
+    lua_pushcfunction(lua, api_Channel_setDescription);
+    lua_setfield(lua, -2, "channelSetDescription");
     lua_pushcfunction(lua, api_Channel_remove);
     lua_setfield(lua, -2, "channelRemove");
 
