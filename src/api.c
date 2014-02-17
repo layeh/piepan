@@ -95,6 +95,19 @@ api_User_register(lua_State *lua)
 }
 
 int
+api_User_setTexture(lua_State *lua)
+{
+    // [self, texture]
+    MumbleProto__UserState msg = MUMBLE_PROTO__USER_STATE__INIT;
+    msg.has_texture = true;
+    msg.texture.data = (uint8_t *)lua_tolstring(lua, -1, &msg.texture.len);
+    lua_getfield(lua, 1, "session");
+    msg.session = lua_tointeger(lua, -1);
+    sendPacket(PACKET_USERSTATE, &msg);
+    return 0;
+}
+
+int
 api_Channel_play(lua_State *lua)
 {
     // [OpusEncoder *encoder, string filename]
@@ -355,6 +368,8 @@ api_init(lua_State *lua)
     lua_setfield(lua, -2, "userMoveTo");
     lua_pushcfunction(lua, api_User_setComment);
     lua_setfield(lua, -2, "userSetComment");
+    lua_pushcfunction(lua, api_User_setTexture);
+    lua_setfield(lua, -2, "userSetTexture");
     lua_pushcfunction(lua, api_User_register);
     lua_setfield(lua, -2, "userRegister");
 

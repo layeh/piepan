@@ -59,6 +59,7 @@ The following section describes the API that is available for script authors.  P
 - `void kick(self [, string reason])`: kicks the user from the server with an optional reason
 - `void ban(self [, string reason])`: bans the user from the server with an optional reason
 - `void setComment(self [, string comment])`: sets the user's comment to `comment`
+- `voud setTexture(self, string bytes)`: sets the user's texture to the image stored in `bytes`
 - `void register(self)`: registers the user with the connected server
 - `void resolveHashes(self)`:  resolves the comment and/or texture hash for the user. The execution of the current function will be suspended and will resume after the requested hashes have been received from the server. The function will return instantly if none of the passed resources have properties that need to be resolved.
 
@@ -269,7 +270,7 @@ Called when a requested action could not be performed.
 
 - Next
     - Added support for fetching large channel descriptions, user textures/avatars, and user comments
-    - Added `piepan.onPermissionDenied()`, `piepan.Permissions`, `piepan.PermissionDenied`, `piepan.User.setComment()`, `piepan.User.register()`, `piepan.User.isPrioritySpeaker`, `piepan.Channel.remove()`, `piepan.Channel.setDescription()`
+    - Added `piepan.onPermissionDenied()`, `piepan.Permissions`, `piepan.PermissionDenied`, `piepan.User.setComment()`, `piepan.User.register()`, `piepan.User.setTexture()`, `piepan.User.isPrioritySpeaker`, `piepan.Channel.remove()`, `piepan.Channel.setDescription()`
     - `UserChange` and `ChannelChange` are no longer hidden
     - Added audio file support
     - Each script is now loaded in its own Lua environment, preventing global variable interference between scripts

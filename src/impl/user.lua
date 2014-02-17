@@ -88,3 +88,14 @@ function piepan.User:resolveHashes()
     end
     coroutine.yield()
 end
+
+function piepan.User:setTexture(bytes)
+    assert(self ~= nil, "self cannot be nil")
+    assert(type(bytes) == "string" or bytes == nil, "bytes must be a string or nil")
+
+    if bytes == nil then
+        bytes = ""
+    end
+
+    piepan.internal.api.userSetTexture(bytes)
+end
