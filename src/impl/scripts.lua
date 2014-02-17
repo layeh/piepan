@@ -79,15 +79,28 @@ end
 --
 -- Callback execution
 --
-function piepan.internal.triggerEvent(name, arg)
+function piepan.internal.triggerEvent(name, ...)
     for _,script in pairs(piepan.scripts) do
         local func = rawget(script.environment.piepan, name)
         if type(func) == "function" then
-            local status, message = pcall(func, arg)
-            if not status then
-                print ("Error: " .. message)
-            end
+            piepan.internal.runCallback(func, ...)
         end
+    end
+end
+
+function piepan.internal.runCallback(func, ...)
+    assert(type(func) == "thread" or type(func) == "function",
+        "func should be a coroutine or a function")
+
+    local routine
+    if type(func) == "thread" then
+        routine = func
+    else
+        routine = coroutine.create(func)
+    end
+    local status, message = coroutine.resume(routine, ...)
+    if not status then
+        print ("Error: " .. message)
     end
 end
 

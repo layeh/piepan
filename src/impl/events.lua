@@ -74,10 +74,8 @@ function piepan.internal.events.onUserChange(obj)
     end
     event.user = user
 
-    --
-    -- TODO: clear hash if data comes in, and vice-versa.  also needs to resume
-    --       the coroutine if we were waiting for that data
-    --
+    local resolving = {}
+
     if obj.userId ~= nil then
         user.userId = obj.userId
     end
@@ -90,7 +88,20 @@ function piepan.internal.events.onUserChange(obj)
     end
     if obj.comment ~= nil then
         user.comment = obj.comment
+        user.commentHash = nil
         event.isChangedComment = true
+
+        local tbl = piepan.internal.resolving.users[user.session]
+        if tbl then
+            for k,v in pairs(tbl) do
+                v.count = v.count - 1
+                if v.count <= 0 then
+                    table.insert(resolving, v.routine)
+                    piepan.internal.resolving.users[user.session][k] = nil
+                end
+            end
+        end
+        -- TODO:  add flag which states if the blob was requested?
     end
     if obj.isServerMuted ~= nil then
         user.isServerMuted = obj.isServerMuted
@@ -109,6 +120,35 @@ function piepan.internal.events.onUserChange(obj)
     end
     if obj.isPrioritySpeaker ~= nil then
         user.isPrioritySpeaker = obj.isPrioritySpeaker
+    end
+    if obj.texture ~= nil then
+        user.texture = obj.texture
+        user.textureHash = nil
+
+        local tbl = piepan.internal.resolving.users[user.session]
+        if tbl then
+            for k,v in pairs(tbl) do
+                v.count = v.count - 1
+                if v.count <= 0 then
+                    table.insert(resolving, v.routine)
+                    piepan.internal.resolving.users[user.session][k] = nil
+                end
+            end
+        end
+        -- TODO:  add flag which states if the blob was requested?
+    end
+    if obj.textureHash ~= nil then
+        user.textureHash = obj.textureHash
+        user.texture = nil
+    end
+    if obj.commentHash ~= nil then
+        user.commentHash = obj.commentHash
+        user.comment = nil
+    end
+
+    for k,v in pairs(resolving) do
+        resolving[k] = nil
+        piepan.internal.runCallback(v)
     end
 
     if piepan.server.synced then
@@ -187,7 +227,17 @@ function piepan.internal.events.onChannelState(obj)
     end
     if obj.description ~= nil then
         channel.description = obj.description
+        channel.descriptionHash = nil
         event.isChangedDescription = true
+
+        local tbl = piepan.internal.resolving.channels[channel.id]
+        if tbl then
+            for k,v in pairs(tbl) do
+                piepan.internal.resolving.channels[channel.id][k] = nil
+                piepan.internal.runCallback(v)
+            end
+        end
+        -- TODO:  add flag which states if the blob was requested?
     end
     if obj.parentId ~= nil then
         -- Channel got a new parent
@@ -217,6 +267,10 @@ function piepan.internal.events.onChannelState(obj)
         end
         channel.name = obj.name
         event.isChangedName = true
+    end
+    if obj.descriptionHash ~= nil then
+        channel.descriptionHash = obj.descriptionHash
+        channel.description = nil
     end
 
     if piepan.server.synced then

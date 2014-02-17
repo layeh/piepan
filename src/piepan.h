@@ -27,7 +27,8 @@ enum {
     PACKET_CHANNELSTATE     = 7,
     PACKET_USERREMOVE       = 8,
     PACKET_USERSTATE        = 9,
-    PACKET_TEXTMESSAGE      = 11
+    PACKET_TEXTMESSAGE      = 11,
+    PACKET_REQUESTBLOB      = 23
 };
 
 /*

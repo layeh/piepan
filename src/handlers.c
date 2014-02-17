@@ -108,6 +108,11 @@ handler_channel_state(lua_State *lua, Packet *packet)
         lua_pushboolean(lua, channel->temporary);
         lua_setfield(lua, -2, "temporary");
     }
+    if (channel->has_description_hash) {
+        lua_pushlstring(lua, (char *)channel->description_hash.data,
+            channel->description_hash.len);
+        lua_setfield(lua, -2, "descriptionHash");
+    }
     lua_call(lua, 1, 0);
     lua_settop(lua, 0);
     mumble_proto__channel_state__free_unpacked(channel, NULL);
@@ -263,6 +268,18 @@ handler_user_state(lua_State *lua, Packet *packet)
     if (user->has_priority_speaker) {
         lua_pushboolean(lua, user->priority_speaker);
         lua_setfield(lua, -2, "isPrioritySpeaker");
+    }
+    if (user->has_texture) {
+        lua_pushlstring(lua, (char *)user->texture.data, user->texture.len);
+        lua_setfield(lua, -2, "texture");
+    }
+    if (user->has_comment_hash) {
+        lua_pushlstring(lua, (char *)user->comment_hash.data, user->comment_hash.len);
+        lua_setfield(lua, -2, "commentHash");
+    }
+    if (user->has_texture_hash) {
+        lua_pushlstring(lua, (char *)user->texture_hash.data, user->texture_hash.len);
+        lua_setfield(lua, -2, "textureHash");
     }
     lua_call(lua, 1, 0);
     lua_settop(lua, 0);

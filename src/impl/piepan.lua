@@ -5,8 +5,6 @@
 -- License: MIT (see LICENSE)
 --
 
--- TODO:  coroutines for fetching/returning data we do not yet have (comment/
---        texture hashes)
 -- TODO:  kill any timers, threads, callbacks owned by a script when it reloads
 
 piepan = {
@@ -49,6 +47,10 @@ piepan = {
             ban = 0x20000,
             register = 0x40000,
             registerSelf = 0x80000
+        },
+        resolving = {
+            users = {},
+            channels = {}
         },
         currentAudio
     },

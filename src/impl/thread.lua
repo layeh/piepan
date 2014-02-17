@@ -37,10 +37,7 @@ function piepan.internal.events.onThreadFinish(id)
         return
     end
     if thread.callback ~= nil and type(thread.callback) == "function" then
-        status, message = pcall(thread.callback, thread.rtn)
-        if not status then
-            print ("Error: piepan.Thread.finish: " .. message)
-        end
+        piepan.internal.runCallback(thread.callback, thread.rtn)
     end
     piepan.internal.threads[id] = nil
 end

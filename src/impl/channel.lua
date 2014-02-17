@@ -96,3 +96,27 @@ function piepan.Channel:remove()
 
     piepan.internal.api.channelRemove(self)
 end
+
+function piepan.Channel:resolveHashes()
+    assert(self ~= nil, "self cannot be nil")
+
+    local request
+    if self.descriptionHash == nil then
+        return
+    end
+
+    local running = coroutine.running()
+    if piepan.internal.resolving.channels[self.id] == nil then
+        piepan.internal.resolving.channels[self.id] = {running}
+        request = true
+    else
+        if #piepan.internal.resolving.channels[self.id] <= 0 then
+            request = true
+        end
+        table.insert(piepan.internal.resolving.channels[self.id], running)
+    end
+    if request then
+        piepan.internal.api.resolveHashes(nil, nil, {self.id})
+    end
+    coroutine.yield()
+end

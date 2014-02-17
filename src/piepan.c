@@ -84,6 +84,9 @@ sendPacketEx(int type, void *data, int length)
         case PACKET_USERSTATE:
             payload_size = mumble_proto__user_state__get_packed_size(data);
             break;
+        case PACKET_REQUESTBLOB:
+            payload_size = mumble_proto__request_blob__get_packed_size(data);
+            break;
         default:
             return 1;
     }
@@ -119,6 +122,9 @@ sendPacketEx(int type, void *data, int length)
                 break;
             case PACKET_USERSTATE:
                 mumble_proto__user_state__pack(data, packet_out.buffer + 6);
+                break;
+            case PACKET_REQUESTBLOB:
+                mumble_proto__request_blob__pack(data, packet_out.buffer + 6);
                 break;
         }
     }

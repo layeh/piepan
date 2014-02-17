@@ -285,6 +285,62 @@ api_connect(lua_State *lua)
 }
 
 int
+api_resolveHashes(lua_State *lua)
+{
+    // [sessionTextures, sessionComments, channelDescriptions]
+    MumbleProto__RequestBlob msg = MUMBLE_PROTO__REQUEST_BLOB__INIT;
+    int i;
+
+    if (!lua_isnil(lua, 1) && luaL_len(lua, 1) > 0) {
+        msg.n_session_texture = luaL_len(lua, 1);
+        msg.session_texture = lua_newuserdata(lua,
+            sizeof(uint32_t) * msg.n_session_texture);
+        lua_pushnil(lua);
+        for (i = 0; i < msg.n_session_texture; i++) {
+            if (!lua_next(lua, 1)) {
+                break;
+            }
+            msg.session_texture[i] = lua_tonumber(lua, -1);
+            lua_pop(lua, 1);
+        }
+        lua_pop(lua, 1);
+    }
+
+    if (!lua_isnil(lua, 2) && luaL_len(lua, 2) > 0) {
+        msg.n_session_comment = luaL_len(lua, 2);
+        msg.session_comment = lua_newuserdata(lua,
+            sizeof(uint32_t) * msg.n_session_comment);
+        lua_pushnil(lua);
+        for (i = 0; i < msg.n_session_comment; i++) {
+            if (!lua_next(lua, 2)) {
+                break;
+            }
+            msg.session_comment[i] = lua_tonumber(lua, -1);
+            lua_pop(lua, 1);
+        }
+        lua_pop(lua, 1);
+    }
+
+    if (!lua_isnil(lua, 3) && luaL_len(lua, 3) > 0) {
+        msg.n_channel_description = luaL_len(lua, 3);
+        msg.channel_description = lua_newuserdata(lua,
+            sizeof(uint32_t) * msg.n_channel_description);
+        lua_pushnil(lua);
+        for (i = 0; i < msg.n_channel_description; i++) {
+            if (!lua_next(lua, 3)) {
+                break;
+            }
+            msg.channel_description[i] = lua_tonumber(lua, -1);
+            lua_pop(lua, 1);
+        }
+        lua_pop(lua, 1);
+    }
+
+    sendPacket(PACKET_REQUESTBLOB, &msg);
+    return 0;
+}
+
+int
 api_init(lua_State *lua)
 {
     // [table]
@@ -324,6 +380,9 @@ api_init(lua_State *lua)
 
     lua_pushcfunction(lua, api_connect);
     lua_setfield(lua, -2, "connect");
+
+    lua_pushcfunction(lua, api_resolveHashes);
+    lua_setfield(lua, -2, "resolveHashes");
 
     lua_pushcfunction(lua, api_disconnect);
     lua_setfield(lua, -2, "disconnect");

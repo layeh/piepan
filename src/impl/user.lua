@@ -50,3 +50,41 @@ function piepan.User:register()
 
     piepan.internal.api.userRegister(self)
 end
+
+function piepan.User:resolveHashes()
+    assert(self ~= nil, "self cannot be nil")
+    local comment, texture
+    local request
+    local count = 0
+
+    if self.textureHash ~= nil then
+        texture = {self.session}
+        count = count + 1
+    end
+    if self.commentHash ~= nil then
+        comment = {self.session}
+        count = count + 1
+    end
+    if texture == nil and comment == nil then
+        return
+    end
+
+    local running = coroutine.running()
+    local tbl = {
+        routine = running,
+        count = count
+    }
+    if piepan.internal.resolving.users[self.session] == nil then
+        piepan.internal.resolving.users[self.session] = {tbl}
+        request = true
+    else
+        if #piepan.internal.resolving.users <= 0 then
+            request = true
+        end
+        table.insert(piepan.internal.resolving.users[self.session], tbl)
+    end
+    if request then
+        piepan.internal.api.resolveHashes(texture, comment, nil)
+    end
+    coroutine.yield()
+end

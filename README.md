@@ -45,7 +45,7 @@ The following section describes the API that is available for script authors.  P
 - `int session`: the session ID of the user
 - `int userId`: the registered user ID of the user
 - `string name`: the username of the user
-- `string comment`: the user's comment (FIXME)
+- `string comment`: the user's comment
 - `bool isServerMuted`: is the user muted by the server
 - `bool isServerDeafened`: has the user been deafened by the server
 - `bool isSelfMuted`: is the user muted by the him/herself
@@ -53,12 +53,21 @@ The following section describes the API that is available for script authors.  P
 - `bool isRecording`: is the user recording channel audio
 - `bool isPrioritySpeaker`: is the user a priority speaker
 - `piepan.Channel channel`: the channel that the user is currently in
+- `string texture`: the bytes of the user's texture/avatar
 - `void moveTo(self, piepan.Channel channel)`: moves the user to the given `channel`
 - `void send(self, string message)`: sends a text message to the user
 - `void kick(self [, string reason])`: kicks the user from the server with an optional reason
 - `void ban(self [, string reason])`: bans the user from the server with an optional reason
 - `void setComment(self [, string comment])`: sets the user's comment to `comment`
 - `void register(self)`: registers the user with the connected server
+- `void resolveHashes(self)`:  resolves the comment and/or texture hash for the user. The execution of the current function will be suspended and will resume after the requested hashes have been received from the server. The function will return instantly if none of the passed resources have properties that need to be resolved.
+
+    Example:
+
+        -- Get the comment of a user, where the comment is over 128 bytes
+        local user = piepan.users[username]
+        user:resolveHashes()
+        local comment = user.comment
 
 #### `piepan.Message`
 
@@ -71,7 +80,7 @@ The following section describes the API that is available for script authors.  P
 
 - `int id`: the unique channel identifier
 - `string name`: the channel name
-- `string description`: the description of the channel (FIXME)
+- `string description`: the description of the channel
 - `piepan.Channel parent`: the parent channel
 - `bool isTemporary`: is the channel temporary
 - `void remove(self)`: removes the channel from the server's channel tree
@@ -94,6 +103,8 @@ The following section describes the API that is available for script authors.  P
         -- moves user to the sibling channel named test
         local channel = user.channel("../test")
         user:moveTo(channel)
+
+- `void resolveHashes(self)`: resolves the description hash for the channel (see `piepan.User.resolveHashes()` for details)
 
 #### `piepan.Timer`
 
@@ -257,6 +268,7 @@ Called when a requested action could not be performed.
 ## Changelog
 
 - Next
+    - Added support for fetching large channel descriptions, user textures/avatars, and user comments
     - Added `piepan.onPermissionDenied()`, `piepan.Permissions`, `piepan.PermissionDenied`, `piepan.User.setComment()`, `piepan.User.register()`, `piepan.User.isPrioritySpeaker`, `piepan.Channel.remove()`, `piepan.Channel.setDescription()`
     - `UserChange` and `ChannelChange` are no longer hidden
     - Added audio file support

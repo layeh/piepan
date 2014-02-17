@@ -45,8 +45,5 @@ function piepan.internal.events.onUserTimer(id)
     end
     piepan.internal.timers[id] = nil
 
-    status, message = pcall(timer.func, timer.data)
-    if not status then
-        print ("Error: timer tick: " .. message)
-    end
+    piepan.internal.runCallback(timer.func, timer.data)
 end
