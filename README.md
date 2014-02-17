@@ -61,7 +61,7 @@ The following section describes the API that is available for script authors.  P
 - `void setComment(self [, string comment])`: sets the user's comment to `comment`
 - `voud setTexture(self, string bytes)`: sets the user's texture to the image stored in `bytes`
 - `void register(self)`: registers the user with the connected server
-- `void resolveHashes(self)`:  resolves the comment and/or texture hash for the user. The execution of the current function will be suspended and will resume after the requested hashes have been received from the server. The function will return instantly if none of the passed resources have properties that need to be resolved.
+- `void resolveHashes(self)`:  resolves the comment and/or texture hash for the user. The execution of the current function will be suspended and will resume after the data has been received from the server. The function will return instantly if no data need to be fetched.
 
     Example:
 

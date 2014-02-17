@@ -9,10 +9,17 @@ function piepan.internal.initialize(tbl)
     local password, tokens
 
     if tbl.passwordFile then
-        local file, err = io.open(tbl.passwordFile)
+        local file, err
+        if tbl.passwordFile == "-" then
+            file = io.stdin
+        else
+            file, err = io.open(tbl.passwordFile)
+        end
         if file then
             password = file:read()
-            file:close()
+            if tbl.passwordFile ~= "-" then
+                file:close()
+            end
         else
             print ("Error: " .. err)
         end
