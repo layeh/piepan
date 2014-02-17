@@ -11,7 +11,7 @@ function piepan.internal.initialize(tbl)
     if tbl.passwordFile then
         local file, err
         if tbl.passwordFile == "-" then
-            file = io.stdin
+            file, err = io.stdin, "could not read from stdin"
         else
             file, err = io.open(tbl.passwordFile)
         end
