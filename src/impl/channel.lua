@@ -47,8 +47,8 @@ function piepan.Channel:play(filename, callback, data)
         return false
     end
 
-    local ptr = piepan.internal.api.channelPlay(piepan.internal.opus.encoder,
-        filename)
+    local ptr = piepan.internal.api.channelPlay(piepan.internal.state,
+        piepan.internal.opus.encoder, filename)
     if not ptr then
         return false
     end
@@ -64,11 +64,8 @@ function piepan.internal.events.onAudioFinished()
     assert (piepan.internal.currentAudio ~= nil, "audio must be playing")
 
     if type(piepan.internal.currentAudio.callback) == "function" then
-        status, message = pcall(piepan.internal.currentAudio.callback,
+        piepan.internal.runCallback(piepan.internal.currentAudio.callback,
             piepan.internal.currentAudio.callbackData)
-        if not status then
-            print ("Error: " .. message)
-        end
     end
 
     piepan.internal.currentAudio = nil

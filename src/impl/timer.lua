@@ -14,13 +14,14 @@ function piepan.Timer.new(func, timeout, data)
     local timerObj = {
         id = id
     }
-    local timer = {
+    piepan.internal.timers[id] = {
         func = func,
         data = data,
-        handle = timerObj,
-        ptr = piepan.internal.api.timerNew(id, timeout)
+        ptr = nil,
+        state = nil
     }
-    piepan.internal.timers[id] = timer
+    piepan.internal.api.timerNew(piepan.internal.timers[id], id, timeout,
+        piepan.internal.state)
 
     setmetatable(timerObj, piepan.Timer)
     return timerObj
@@ -43,7 +44,7 @@ function piepan.internal.events.onUserTimer(id)
     if timer == nil then
         return
     end
-    piepan.internal.timers[id] = nil
 
+    piepan.internal.timers[id] = nil
     piepan.internal.runCallback(timer.func, timer.data)
 end

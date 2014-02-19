@@ -308,7 +308,6 @@ main(int argc, char *argv[])
      */
     {
         int i;
-        lua_settop(lua, 0);
         lua_getglobal(lua, "piepan");
         lua_getfield(lua, -1, "internal");
         lua_getfield(lua, -1, "events");
@@ -457,7 +456,10 @@ main(int argc, char *argv[])
         lua_pushstring(lua, token_file);
         lua_setfield(lua, -2, "tokenFile");
     }
+    lua_pushlightuserdata(lua, lua);
+    lua_setfield(lua, -2, "state");
     lua_call(lua, 1, 0);
+    lua_settop(lua, 0);
 
     /*
      * Event loop

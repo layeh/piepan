@@ -53,7 +53,8 @@ piepan = {
             users = {},
             channels = {}
         },
-        currentAudio
+        currentAudio,
+        state
     },
     -- arguments passed to the piepan executable
     args = {},

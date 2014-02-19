@@ -8,6 +8,8 @@
 function piepan.internal.initialize(tbl)
     local password, tokens
 
+    piepan.internal.state = tbl.state
+
     if tbl.passwordFile then
         local file, err
         if tbl.passwordFile == "-" then

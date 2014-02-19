@@ -20,6 +20,8 @@ function piepan.Thread.new(worker, callback, data)
     piepan.internal.api.threadNew(thread, id)
 end
 
+-- TODO:  string.dump the function first so we can prevent it from accessing
+--        certain upvalues
 function piepan.internal.events.onThreadExecute(id)
     local thread = piepan.internal.threads[id]
     if thread == nil then

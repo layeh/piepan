@@ -55,12 +55,15 @@ void
 user_timer_event(struct ev_loop *loop, struct ev_timer *w, int revents)
 {
     UserTimer *timer = (UserTimer *)w;
-    lua_getglobal(timer->lua, "piepan");
-    lua_getfield(timer->lua, -1, "internal");
-    lua_getfield(timer->lua, -1, "events");
-    lua_getfield(timer->lua, -1, "onUserTimer");
-    lua_pushinteger(timer->lua, timer->id);
-    lua_call(timer->lua, 1, 0);
+    lua_State *lua = timer->lua;
+    ev_timer_stop(loop, w);
+    lua_getglobal(lua, "piepan");
+    lua_getfield(lua, -1, "internal");
+    lua_getfield(lua, -1, "events");
+    lua_getfield(lua, -1, "onUserTimer");
+    lua_pushinteger(lua, timer->id);
+    lua_call(lua, 1, 0);
+    lua_settop(lua, 0);
 }
 
 void
@@ -162,16 +165,17 @@ void
 script_stat_event(struct ev_loop *loop, ev_stat *w, int revents)
 {
     ScriptStat *stat = (ScriptStat *)w;
+    lua_State *lua = stat->lua;
     if (w->attr.st_ino == w->prev.st_ino && w->attr.st_mtime == w->prev.st_mtime) {
         return;
     }
     fprintf(stderr, "%s: reloaded %s\n", PIEPAN_NAME, stat->filename);
-    lua_getglobal(stat->lua, "piepan");
-    lua_getfield(stat->lua, -1, "internal");
-    lua_getfield(stat->lua, -1, "events");
-    lua_getfield(stat->lua, -1, "onLoadScript");
-    lua_pushinteger(stat->lua, stat->id);
-    lua_call(stat->lua, 1, 3);
+    lua_getglobal(lua, "piepan");
+    lua_getfield(lua, -1, "internal");
+    lua_getfield(lua, -1, "events");
+    lua_getfield(lua, -1, "onLoadScript");
+    lua_pushinteger(lua, stat->id);
+    lua_call(lua, 1, 3);
     if (!lua_toboolean(stat->lua, -3)) {
         fprintf(stderr, "%s: %s\n", PIEPAN_NAME, lua_tostring(stat->lua, -2));
     }

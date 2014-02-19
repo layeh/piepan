@@ -110,12 +110,12 @@ api_User_setTexture(lua_State *lua)
 int
 api_Channel_play(lua_State *lua)
 {
-    // [OpusEncoder *encoder, string filename]
+    // [lua_State *, OpusEncoder *encoder, string filename]
     AudioTransmission *at = malloc(sizeof(AudioTransmission));
     if (at == NULL) {
         return 0;
     }
-    at->file = fopen(lua_tostring(lua, -1), "rb");
+    at->file = fopen(lua_tostring(lua, 3), "rb");
     if (at->file == NULL) {
         free(at);
         return 0;
@@ -126,8 +126,8 @@ api_Channel_play(lua_State *lua)
         return 0;
     }
 
-    at->lua = lua;
-    at->encoder = lua_touserdata(lua, -2);
+    at->lua = lua_touserdata(lua, 1);
+    at->encoder = lua_touserdata(lua, 2);
     at->sequence = 1;
     at->buffer.size = 0;
     ev_timer_init(&at->ev, audio_transmission_event, 0., 0.);
@@ -179,15 +179,17 @@ api_Channel_remove(lua_State *lua)
 int
 api_Timer_new(lua_State *lua)
 {
-    // [id, timeout]
-    UserTimer *timer = lua_newuserdata(lua, sizeof(UserTimer));
-    timer->id = lua_tonumber(lua, -3);
-    timer->lua = lua;
+    // [table, id, timeout, lua_State]
+    UserTimer *timer;
+    timer = lua_newuserdata(lua, sizeof(UserTimer));
+    lua_setfield(lua, 1, "ptr");
+    timer->id = lua_tonumber(lua, 2);
+    timer->lua = lua_touserdata(lua, 4);
 
-    ev_timer_init(&timer->ev, user_timer_event, lua_tonumber(lua, -2), 0.);
+    ev_timer_init(&timer->ev, user_timer_event, lua_tonumber(lua, 3), 0.);
     ev_timer_start(ev_loop_main, &timer->ev);
 
-    return 1;
+    return 0;
 }
 
 int

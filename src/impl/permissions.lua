@@ -6,7 +6,7 @@
 --
 
 function piepan.Permissions.new(permissionsMask)
-    assert(type(permissionsMask) == "number", "permissionsMask must be an number")
+    assert(type(permissionsMask) == "number", "permissionsMask must be a number")
 
     local permissions = {}
 
