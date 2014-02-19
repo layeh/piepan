@@ -9,6 +9,12 @@ function piepan.internal.events.onServerConfig(obj)
     if obj.allowHtml ~= nil then
         piepan.server.allowHtml = obj.allowHtml
     end
+    if obj.maxMessageLength ~= nil then
+        piepan.server.maxMessageLength = obj.maxMessageLength
+    end
+    if obj.maxImageMessageLength ~= nil then
+        piepan.server.maxImageMessageLength = obj.maxImageMessageLength
+    end
 
     piepan.internal.triggerEvent("onConnect")
 end

@@ -140,6 +140,14 @@ handler_server_config(lua_State *lua, Packet *packet)
         lua_pushboolean(lua, config->allow_html);
         lua_setfield(lua, -2, "allowHtml");
     }
+    if (config->has_message_length) {
+        lua_pushinteger(lua, config->message_length);
+        lua_setfield(lua, -2, "maxMessageLength");
+    }
+    if (config->has_image_message_length) {
+        lua_pushinteger(lua, config->image_message_length);
+        lua_setfield(lua, -2, "maxImageMessageLength");
+    }
     lua_call(lua, 1, 0);
     lua_settop(lua, 0);
     mumble_proto__server_config__free_unpacked(config, NULL);

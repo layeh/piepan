@@ -210,6 +210,8 @@ Table containing information about the server.  This table may have the fields:
 
 - `bool allowHtml`: if HTML messages are allowed to be sent to the server
 - `int maxBandwidth`: the maximum voice bandwidth a client can use (in bits per second)
+- `int maxMessageLength`: the maximum length of a text message that does not contain an image
+- `int maxImageMessageLength`: the maximum length of a text message that contains an image
 - `string welcomeText`: the server's welcome text
 
 #### `piepan.args`
@@ -270,6 +272,7 @@ Called when a requested action could not be performed.
 
 - Next
     - Added support for fetching large channel descriptions, user textures/avatars, and user comments
+    - Added `piepan.server.maxMessageLength`, `piepan.server.maxImageMessageLength`
     - Added `piepan.onPermissionDenied()`, `piepan.Permissions`, `piepan.PermissionDenied`, `piepan.User.setComment()`, `piepan.User.register()`, `piepan.User.setTexture()`, `piepan.User.isPrioritySpeaker`, `piepan.Channel.remove()`, `piepan.Channel.setDescription()`
     - `UserChange` and `ChannelChange` are no longer hidden
     - Added audio file support
