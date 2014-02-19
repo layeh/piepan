@@ -8,6 +8,7 @@
 -- TODO:  kill any timers, threads, callbacks owned by a script when it reloads
 
 piepan = {
+    Audio = {},
     User = {},
     UserChange = {},
     Message = {},
@@ -61,6 +62,7 @@ piepan = {
     channels = {}
 }
 
+piepan.Audio.__index = piepan.Audio
 piepan.User.__index = piepan.User
 piepan.UserChange.__index = piepan.UserChange
 piepan.Message.__index = piepan.Message

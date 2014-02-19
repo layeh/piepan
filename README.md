@@ -107,6 +107,11 @@ The following section describes the API that is available for script authors.  P
 
 - `void resolveHashes(self)`: resolves the description hash for the channel (see `piepan.User.resolveHashes()` for details)
 
+#### `piepan.Audio`
+
+- `void stop()`: stops the currently playing audio stream
+- `bool isPlaying()`: returns true if an audio stream is currently playing
+
 #### `piepan.Timer`
 
 - `piepan.Timer new(function func, int timeout [, data])`: Creates a new timer.  After `timeout` seconds elapses, `func` will be called with `data` as its first and only parameter.
@@ -235,10 +240,6 @@ Example:
 #### `piepan.disconnect()`
 
 Disconnects from the server.
-
-#### `piepan.stopAudio()`
-
-Stops the currently playing audio stream.
 
 ### Callbacks
 

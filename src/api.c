@@ -232,7 +232,7 @@ api_Thread_new(lua_State *lua)
 }
 
 int
-api_stopAudio(lua_State *lua)
+api_Audio_stop(lua_State *lua)
 {
     // [AudioTransmission *]
     AudioTransmission *at = (AudioTransmission *)lua_touserdata(lua, -1);
@@ -390,8 +390,8 @@ api_init(lua_State *lua)
     lua_pushcfunction(lua, api_Thread_new);
     lua_setfield(lua, -2, "threadNew");
 
-    lua_pushcfunction(lua, api_stopAudio);
-    lua_setfield(lua, -2, "stopAudio");
+    lua_pushcfunction(lua, api_Audio_stop);
+    lua_setfield(lua, -2, "audioStop");
 
     lua_pushcfunction(lua, api_connect);
     lua_setfield(lua, -2, "connect");

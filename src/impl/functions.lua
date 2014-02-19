@@ -5,14 +5,6 @@
 -- License: MIT (see LICENSE)
 --
 
-function piepan.stopAudio()
-    if not piepan.internal.currentAudio then
-        return
-    end
-
-    piepan.internal.api.stopAudio(piepan.internal.currentAudio.ptr)
-end
-
 function piepan.disconnect()
     piepan.internal.api.disconnect()
 end

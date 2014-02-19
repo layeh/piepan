@@ -9,6 +9,7 @@ LUAFILES = src/impl/piepan.lua \
            src/impl/channel.lua \
            src/impl/events.lua \
            src/impl/permissions.lua \
+           src/impl/audio.lua \
            src/impl/functions.lua
 
 piepan: src/piepan.c src/piepan.h src/util.c src/events.c src/handlers.c \
