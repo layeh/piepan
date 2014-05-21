@@ -130,7 +130,7 @@ api_Channel_play(lua_State *lua)
     at->encoder = lua_touserdata(lua, 2);
     at->sequence = 1;
     at->buffer.size = 0;
-    ev_timer_init(&at->ev, audio_transmission_event, 0., 0.);
+    ev_timer_init(&at->ev, audio_transmission_event, 0., 0.01);
     ev_timer_start(ev_loop_main, &at->ev);
 
     lua_pushlightuserdata(lua, at);

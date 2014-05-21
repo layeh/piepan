@@ -156,9 +156,6 @@ audio_transmission_event(struct ev_loop *loop, struct ev_timer *w, int revents)
     sendPacketEx(PACKET_UDPTUNNEL, packet_buffer, voicepacket_getlength(&packet));
 
     at->sequence = (at->sequence + 1) % 10000;
-
-    w->repeat = 0.01;
-    ev_timer_again(loop, w);
 }
 
 void
