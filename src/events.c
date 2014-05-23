@@ -8,7 +8,6 @@
  * loop.
  */
 
-static Packet packet_read;
 static Packet_Handler_Func packet_handler[26] = {
     /*  0 */ NULL,
     /*  1 */ NULL,
@@ -69,6 +68,7 @@ user_timer_event(struct ev_loop *loop, struct ev_timer *w, int revents)
 void
 socket_read_event(struct ev_loop *loop, ev_io *w, int revents)
 {
+    static Packet packet_read;
     SSLRead *sslread = (SSLRead *)w;
     int total_read = 0;
     int ret;
