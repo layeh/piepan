@@ -89,7 +89,7 @@ typedef struct {
  * Prototypes
  */
 #define sendPacket(type, message) sendPacketEx(type, message, 0)
-int sendPacketEx(int type, void *message, int length);
+int sendPacketEx(const int type, const void *message, const int length);
 
 typedef void (*Packet_Handler_Func)(lua_State *lua, Packet *packet);
 void user_timer_event(struct ev_loop *loop, struct ev_timer *w, int revents);
