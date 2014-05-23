@@ -94,6 +94,6 @@ int sendPacketEx(const int type, const void *message, const int length);
 typedef void (*Packet_Handler_Func)(lua_State *lua, Packet *packet);
 void user_timer_event(struct ev_loop *loop, struct ev_timer *w, int revents);
 void audio_transmission_event(struct ev_loop *loop, struct ev_timer *w, int revents);
-// TODO:  remove globals -- pass important global data to Lua
+/* TODO:  remove globals -- pass important global data to Lua */
 extern struct ev_loop *ev_loop_main;
 extern int user_thread_pipe[2];
