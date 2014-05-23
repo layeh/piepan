@@ -8,7 +8,6 @@
  * script.
  */
 
-// TODO:  convert lua_tostring to lua_tolstring?
 // TODO:  get rid of selfs and only pass non-tables?
 // TODO:  use Lua user data in place of mallocing it ourselves?
 
