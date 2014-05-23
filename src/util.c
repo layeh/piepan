@@ -8,7 +8,7 @@
  */
 
 int
-util_set_varint(uint8_t buffer[], uint64_t value)
+util_set_varint(uint8_t buffer[], const uint64_t value)
 {
     if (value < 0x80) {
         buffer[0] = value;
@@ -55,8 +55,8 @@ voicepacket_init(VoicePacket *packet, uint8_t *buffer)
 }
 
 int
-voicepacket_setheader(VoicePacket *packet, uint8_t type, uint8_t target,
-    uint32_t sequence)
+voicepacket_setheader(VoicePacket *packet, const uint8_t type,
+        const uint8_t target, const uint32_t sequence)
 {
     int offset;
     if (packet == NULL) {
@@ -72,7 +72,7 @@ voicepacket_setheader(VoicePacket *packet, uint8_t type, uint8_t target,
 }
 
 int
-voicepacket_setframe(VoicePacket *packet, uint16_t length, uint8_t *buffer)
+voicepacket_setframe(VoicePacket *packet, const uint16_t length, uint8_t *buffer)
 {
     int offset;
     if (packet == NULL || buffer == NULL || length <= 0 || length >= 0x2000) {
@@ -91,7 +91,7 @@ voicepacket_setframe(VoicePacket *packet, uint16_t length, uint8_t *buffer)
 }
 
 int
-voicepacket_getlength(VoicePacket *packet)
+voicepacket_getlength(const VoicePacket *packet)
 {
     if (packet == NULL) {
         return -1;

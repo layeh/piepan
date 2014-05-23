@@ -49,43 +49,43 @@ struct ev_loop *ev_loop_main;
 static SSL_CTX *ssl_context;
 static SSL *ssl;
 static lua_State *lua;
-static Packet packet_out;
 
 int
-sendPacketEx(int type, void *data, int length)
+sendPacketEx(const int type, const void *message, const int length)
 {
+    static Packet packet_out;
     int payload_size;
     int total_size;
     switch (type) {
         case PACKET_VERSION:
-            payload_size = mumble_proto__version__get_packed_size(data);
+            payload_size = mumble_proto__version__get_packed_size(message);
             break;
         case PACKET_UDPTUNNEL:
             payload_size = length;
             break;
         case PACKET_AUTHENTICATE:
-            payload_size = mumble_proto__authenticate__get_packed_size(data);
+            payload_size = mumble_proto__authenticate__get_packed_size(message);
             break;
         case PACKET_PING:
-            payload_size = mumble_proto__ping__get_packed_size(data);
+            payload_size = mumble_proto__ping__get_packed_size(message);
             break;
         case PACKET_CHANNELREMOVE:
-            payload_size = mumble_proto__channel_remove__get_packed_size(data);
+            payload_size = mumble_proto__channel_remove__get_packed_size(message);
             break;
         case PACKET_CHANNELSTATE:
-            payload_size = mumble_proto__channel_state__get_packed_size(data);
+            payload_size = mumble_proto__channel_state__get_packed_size(message);
             break;
         case PACKET_TEXTMESSAGE:
-            payload_size = mumble_proto__text_message__get_packed_size(data);
+            payload_size = mumble_proto__text_message__get_packed_size(message);
             break;
         case PACKET_USERREMOVE:
-            payload_size = mumble_proto__user_remove__get_packed_size(data);
+            payload_size = mumble_proto__user_remove__get_packed_size(message);
             break;
         case PACKET_USERSTATE:
-            payload_size = mumble_proto__user_state__get_packed_size(data);
+            payload_size = mumble_proto__user_state__get_packed_size(message);
             break;
         case PACKET_REQUESTBLOB:
-            payload_size = mumble_proto__request_blob__get_packed_size(data);
+            payload_size = mumble_proto__request_blob__get_packed_size(message);
             break;
         default:
             return 1;
@@ -97,34 +97,34 @@ sendPacketEx(int type, void *data, int length)
     if (payload_size > 0) {
         switch (type) {
             case PACKET_VERSION:
-                mumble_proto__version__pack(data, packet_out.buffer + 6);
+                mumble_proto__version__pack(message, packet_out.buffer + 6);
                 break;
             case PACKET_UDPTUNNEL:
-                memmove(packet_out.buffer + 6, data, length);
+                memmove(packet_out.buffer + 6, message, length);
                 break;
             case PACKET_AUTHENTICATE:
-                mumble_proto__authenticate__pack(data, packet_out.buffer + 6);
+                mumble_proto__authenticate__pack(message, packet_out.buffer + 6);
                 break;
             case PACKET_PING:
-                mumble_proto__ping__pack(data, packet_out.buffer + 6);
+                mumble_proto__ping__pack(message, packet_out.buffer + 6);
                 break;
             case PACKET_CHANNELREMOVE:
-                mumble_proto__channel_remove__pack(data, packet_out.buffer + 6);
+                mumble_proto__channel_remove__pack(message, packet_out.buffer + 6);
                 break;
             case PACKET_CHANNELSTATE:
-                mumble_proto__channel_state__pack(data, packet_out.buffer + 6);
+                mumble_proto__channel_state__pack(message, packet_out.buffer + 6);
                 break;
             case PACKET_TEXTMESSAGE:
-                mumble_proto__text_message__pack(data, packet_out.buffer + 6);
+                mumble_proto__text_message__pack(message, packet_out.buffer + 6);
                 break;
             case PACKET_USERREMOVE:
-                mumble_proto__user_remove__pack(data, packet_out.buffer + 6);
+                mumble_proto__user_remove__pack(message, packet_out.buffer + 6);
                 break;
             case PACKET_USERSTATE:
-                mumble_proto__user_state__pack(data, packet_out.buffer + 6);
+                mumble_proto__user_state__pack(message, packet_out.buffer + 6);
                 break;
             case PACKET_REQUESTBLOB:
-                mumble_proto__request_blob__pack(data, packet_out.buffer + 6);
+                mumble_proto__request_blob__pack(message, packet_out.buffer + 6);
                 break;
         }
     }
