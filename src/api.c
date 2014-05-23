@@ -290,10 +290,10 @@ api_connect(lua_State *lua)
         }
     }
     version.has_version = true;
-    version.version = 1 << 16 | 2 << 8 | 5; // 1.2.5
-    version.release = "Unknown";
-    version.os = PIEPAN_NAME;
-    version.os_version = PIEPAN_VERSION;
+    version.version = 1 << 16 | 2 << 8 | 6;
+    version.release = PIEPAN_NAME " " PIEPAN_VERSION;
+    version.os = "Unknown";
+    version.os_version = "Unknown";
 
     sendPacket(PACKET_VERSION, &version);
     sendPacket(PACKET_AUTHENTICATE, &auth);
