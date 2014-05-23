@@ -160,7 +160,7 @@ user_thread_event(struct ev_loop *loop, ev_io *w, int revents)
 }
 
 static void
-usage()
+usage(FILE *stream)
 {
     const char *str =
         "usage: %s [options] [scripts...]\n"
@@ -182,7 +182,7 @@ usage()
         "  --<name>[=<value>]  a key-value pair that will be accessible from the scripts\n"
         "  -h                  display this help\n"
         "  -v                  show version\n";
-    fprintf(stderr, str, PIEPAN_NAME);
+    fprintf(stream, str, PIEPAN_NAME);
 }
 
 int
@@ -298,7 +298,7 @@ main(int argc, char *argv[])
             return 0;
         }
         if (show_help) {
-            usage();
+            usage(stdout);
             return 0;
         }
     }
