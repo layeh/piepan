@@ -5,7 +5,7 @@
  * License: MIT (see LICENSE)
  */
 
-// TODO:  ensure server sent a certificate and also (optionally) verify it
+/* TODO:  ensure server sent a certificate and also (optionally) verify it */
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -203,11 +203,11 @@ main(int argc, char *argv[])
     int socket_fd;
     struct sockaddr_in server_addr;
 
-    ev_loop_main = EV_DEFAULT;
     SSLRead socket_watcher;
     ev_io user_thread_watcher;
     ev_timer ping_watcher;
     ev_signal signal_watcher;
+    ev_loop_main = EV_DEFAULT;
 
     /*
      * Lua initialization
@@ -358,7 +358,7 @@ main(int argc, char *argv[])
             return 1;
         }
         opus_encoder_ctl(encoder, OPUS_SET_VBR(0));
-        // TODO: set this to the server's max bitrate
+        /* TODO: set this to the server's max bitrate */
         opus_encoder_ctl(encoder, OPUS_SET_BITRATE(40000));
 
         lua_settop(lua, 0);
@@ -493,7 +493,7 @@ main(int argc, char *argv[])
         lua_call(lua, 1, 0);
     }
 
-    SSL_shutdown(ssl); // TODO:  sigpipe is triggered here if connection breaks
+    SSL_shutdown(ssl); /* TODO:  sigpipe is triggered here if connection breaks */
     close(socket_fd);
     lua_close(lua);
 
