@@ -27,6 +27,6 @@ build() {
 package() {
     cd $_gitname
     install -Dm755 "piepan" "$pkgdir/usr/bin/piepan"
-    install -Dm644 "LICENSE" "$pkgdir/usr/share/licenses/piepan-git/LICENSE"
-    install -Dm644 "readme.html" "$pkgdir/usr/share/doc/piepan/readme.html"
+    install -Dm644 "LICENSE" "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+    install -Dm644 "readme.html" "$pkgdir/usr/share/doc/$pkgname/readme.html"
 }
