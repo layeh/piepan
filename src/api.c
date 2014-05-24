@@ -118,12 +118,10 @@ api_Channel_play(lua_State *lua)
     }
     at->file = fopen(lua_tostring(lua, 3), "rb");
     if (at->file == NULL) {
-        free(at);
         return 0;
     }
     if (ov_open_callbacks(at->file, &at->ogg, NULL, 0, OV_CALLBACKS_STREAMONLY_NOCLOSE) != 0) {
         fclose(at->file);
-        free(at);
         return 0;
     }
 
