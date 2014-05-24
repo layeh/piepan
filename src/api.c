@@ -112,7 +112,7 @@ int
 api_Channel_play(lua_State *lua)
 {
     /* [lua_State *, OpusEncoder *encoder, string filename] */
-    AudioTransmission *at = malloc(sizeof(AudioTransmission));
+    AudioTransmission *at = lua_newuserdata(lua, sizeof(AudioTransmission));
     if (at == NULL) {
         return 0;
     }
@@ -133,8 +133,6 @@ api_Channel_play(lua_State *lua)
     at->buffer.size = 0;
     ev_timer_init(&at->ev, audio_transmission_event, 0., 0.01);
     ev_timer_start(ev_loop_main, &at->ev);
-
-    lua_pushlightuserdata(lua, at);
     return 1;
 }
 
