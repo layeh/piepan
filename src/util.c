@@ -29,7 +29,6 @@ audioTransmission_stop(AudioTransmission *at, lua_State *lua, struct ev_loop *lo
     }
     fclose(at->file);
     ev_timer_stop(loop, &at->ev);
-    free(at);
 
     lua_getglobal(lua, "piepan");
     lua_getfield(lua, -1, "internal");
