@@ -8,16 +8,17 @@
  * script.
  */
 
-// TODO:  convert lua_tostring to lua_tolstring?
-// TODO:  get rid of selfs and only pass non-tables?
-// TODO:  use Lua user data in place of mallocing it ourselves?
+/*
+ * TODO:  get rid of selfs and only pass non-tables?
+ * TODO:  use Lua user data in place of mallocing it ourselves?
+ */
 
 #include <pthread.h>
 
 int
 api_User_send(lua_State *lua)
 {
-    // [self, message]
+    /* [self, message] */
     MumbleProto__TextMessage msg = MUMBLE_PROTO__TEXT_MESSAGE__INIT;
     uint32_t session;
     lua_getfield(lua, -2, "session");
@@ -32,7 +33,7 @@ api_User_send(lua_State *lua)
 int
 api_User_kick(lua_State *lua)
 {
-    // [self, string reason]
+    /* [self, string reason] */
     MumbleProto__UserRemove msg = MUMBLE_PROTO__USER_REMOVE__INIT;
     lua_getfield(lua, -2, "session");
     msg.session = lua_tointeger(lua, -1);
@@ -46,7 +47,7 @@ api_User_kick(lua_State *lua)
 int
 api_User_ban(lua_State *lua)
 {
-    // [self, string reason]
+    /* [self, string reason] */
     MumbleProto__UserRemove msg = MUMBLE_PROTO__USER_REMOVE__INIT;
     lua_getfield(lua, -2, "session");
     msg.session = lua_tointeger(lua, -1);
@@ -62,7 +63,7 @@ api_User_ban(lua_State *lua)
 int
 api_User_moveTo(lua_State *lua)
 {
-    // [self, int channel_id]
+    /* [self, int channel_id] */
     MumbleProto__UserState msg = MUMBLE_PROTO__USER_STATE__INIT;
     msg.channel_id = lua_tointeger(lua, -1);
     lua_getfield(lua, -2, "session");
@@ -74,7 +75,7 @@ api_User_moveTo(lua_State *lua)
 int
 api_User_setComment(lua_State *lua)
 {
-    // [self, string comment]
+    /* [self, string comment] */
     MumbleProto__UserState msg = MUMBLE_PROTO__USER_STATE__INIT;
     msg.comment = (char *)lua_tostring(lua, -1);
     lua_getfield(lua, -2, "session");
@@ -86,7 +87,7 @@ api_User_setComment(lua_State *lua)
 int
 api_User_register(lua_State *lua)
 {
-    // [self]
+    /* [self] */
     MumbleProto__UserState msg = MUMBLE_PROTO__USER_STATE__INIT;
     msg.has_user_id = true;
     msg.user_id = 0;
@@ -97,7 +98,7 @@ api_User_register(lua_State *lua)
 int
 api_User_setTexture(lua_State *lua)
 {
-    // [self, texture]
+    /* [self, texture] */
     MumbleProto__UserState msg = MUMBLE_PROTO__USER_STATE__INIT;
     msg.has_texture = true;
     msg.texture.data = (uint8_t *)lua_tolstring(lua, -1, &msg.texture.len);
@@ -110,8 +111,8 @@ api_User_setTexture(lua_State *lua)
 int
 api_Channel_play(lua_State *lua)
 {
-    // [lua_State *, OpusEncoder *encoder, string filename]
-    AudioTransmission *at = malloc(sizeof(AudioTransmission));
+    /* [lua_State *, OpusEncoder *encoder, string filename] */
+    AudioTransmission *at = lua_newuserdata(lua, sizeof(AudioTransmission));
     if (at == NULL) {
         return 0;
     }
@@ -132,15 +133,13 @@ api_Channel_play(lua_State *lua)
     at->buffer.size = 0;
     ev_timer_init(&at->ev, audio_transmission_event, 0., 0.01);
     ev_timer_start(ev_loop_main, &at->ev);
-
-    lua_pushlightuserdata(lua, at);
     return 1;
 }
 
 int
 api_Channel_send(lua_State *lua)
 {
-    // [self, message]
+    /* [self, message] */
     MumbleProto__TextMessage msg = MUMBLE_PROTO__TEXT_MESSAGE__INIT;
     uint32_t channel;
     lua_getfield(lua, 1, "id");
@@ -155,7 +154,7 @@ api_Channel_send(lua_State *lua)
 int
 api_Channel_setDescription(lua_State *lua)
 {
-    // [self, description]
+    /* [self, description] */
     MumbleProto__ChannelState msg = MUMBLE_PROTO__CHANNEL_STATE__INIT;
     msg.has_channel_id = true;
     lua_getfield(lua, 1, "id");
@@ -168,7 +167,7 @@ api_Channel_setDescription(lua_State *lua)
 int
 api_Channel_remove(lua_State *lua)
 {
-    // [self]
+    /* [self] */
     MumbleProto__ChannelRemove msg = MUMBLE_PROTO__CHANNEL_REMOVE__INIT;
     lua_getfield(lua, 1, "id");
     msg.channel_id = lua_tointeger(lua, -1);
@@ -179,7 +178,7 @@ api_Channel_remove(lua_State *lua)
 int
 api_Timer_new(lua_State *lua)
 {
-    // [table, id, timeout, lua_State]
+    /* [table, id, timeout, lua_State] */
     UserTimer *timer;
     timer = lua_newuserdata(lua, sizeof(UserTimer));
     lua_setfield(lua, 1, "ptr");
@@ -195,7 +194,7 @@ api_Timer_new(lua_State *lua)
 int
 api_Timer_cancel(lua_State *lua)
 {
-    // [UserTimer *]
+    /* [UserTimer *] */
     UserTimer *timer = lua_touserdata(lua, -1);
     ev_timer_stop(ev_loop_main, &timer->ev);
     return 0;
@@ -218,7 +217,7 @@ api_Thread_worker(void *arg)
 int
 api_Thread_new(lua_State *lua)
 {
-    // [Thread, id]
+    /* [Thread, id] */
     UserThread *user_thread;
     user_thread = (UserThread *)malloc(sizeof(UserThread));
     if (user_thread == NULL) {
@@ -236,7 +235,7 @@ api_Thread_new(lua_State *lua)
 int
 api_Audio_stop(lua_State *lua)
 {
-    // [AudioTransmission *]
+    /* [AudioTransmission *] */
     AudioTransmission *at = (AudioTransmission *)lua_touserdata(lua, -1);
     audioTransmission_stop(at, lua, ev_loop_main);
     return 0;
@@ -252,7 +251,7 @@ api_disconnect(lua_State *lua)
 int
 api_connect(lua_State *lua)
 {
-    // [string username, string password, table tokens]
+    /* [string username, string password, table tokens] */
     MumbleProto__Version version = MUMBLE_PROTO__VERSION__INIT;
     MumbleProto__Authenticate auth = MUMBLE_PROTO__AUTHENTICATE__INIT;
 
@@ -284,15 +283,15 @@ api_connect(lua_State *lua)
 
             auth.n_tokens = i;
         } else {
-            // TODO:  notify the user of this
+            /* TODO:  notify the user of this */
             auth.n_tokens = 0;
         }
     }
     version.has_version = true;
-    version.version = 1 << 16 | 2 << 8 | 5; // 1.2.5
-    version.release = "Unknown";
-    version.os = PIEPAN_NAME;
-    version.os_version = PIEPAN_VERSION;
+    version.version = 1 << 16 | 2 << 8 | 6;
+    version.release = PIEPAN_NAME " " PIEPAN_VERSION;
+    version.os = "Unknown";
+    version.os_version = "Unknown";
 
     sendPacket(PACKET_VERSION, &version);
     sendPacket(PACKET_AUTHENTICATE, &auth);
@@ -302,7 +301,7 @@ api_connect(lua_State *lua)
 int
 api_resolveHashes(lua_State *lua)
 {
-    // [sessionTextures, sessionComments, channelDescriptions]
+    /* [sessionTextures, sessionComments, channelDescriptions] */
     MumbleProto__RequestBlob msg = MUMBLE_PROTO__REQUEST_BLOB__INIT;
     int i;
 
@@ -358,7 +357,7 @@ api_resolveHashes(lua_State *lua)
 int
 api_init(lua_State *lua)
 {
-    // [table]
+    /* [table] */
 
     lua_pushcfunction(lua, api_User_send);
     lua_setfield(lua, -2, "userSend");
