@@ -127,6 +127,9 @@ function piepan.internal.events.onUserChange(obj)
     if obj.isPrioritySpeaker ~= nil then
         user.isPrioritySpeaker = obj.isPrioritySpeaker
     end
+    if obj.hash ~= nil then
+        user.hash = obj.hash
+    end
     if obj.texture ~= nil then
         user.texture = obj.texture
         user.textureHash = nil

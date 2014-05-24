@@ -281,6 +281,10 @@ handler_user_state(lua_State *lua, Packet *packet)
         lua_pushlstring(lua, (char *)user->texture.data, user->texture.len);
         lua_setfield(lua, -2, "texture");
     }
+    if (user->hash != NULL) {
+        lua_pushstring(lua, user->hash);
+        lua_setfield(lua, -2, "hash");
+    }
     if (user->has_comment_hash) {
         lua_pushlstring(lua, (char *)user->comment_hash.data, user->comment_hash.len);
         lua_setfield(lua, -2, "commentHash");

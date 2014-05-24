@@ -54,6 +54,7 @@ The following section describes the API that is available for script authors.  P
 - `bool isPrioritySpeaker`: is the user a priority speaker
 - `piepan.Channel channel`: the channel that the user is currently in
 - `string texture`: the bytes of the user's texture/avatar
+- `string hash`: the hexadecimal string representation of the user's certificate hash. This will be nil if the user did not connect to the server with a certificate
 - `void moveTo(self, piepan.Channel channel)`: moves the user to the given `channel`
 - `void send(self, string message)`: sends a text message to the user
 - `void kick(self [, string reason])`: kicks the user from the server with an optional reason
@@ -274,7 +275,7 @@ Called when a requested action could not be performed.
 - Next
     - Added support for fetching large channel descriptions, user textures/avatars, and user comments
     - Added `piepan.server.maxMessageLength`, `piepan.server.maxImageMessageLength`
-    - Added `piepan.onPermissionDenied()`, `piepan.Permissions`, `piepan.PermissionDenied`, `piepan.User.setComment()`, `piepan.User.register()`, `piepan.User.setTexture()`, `piepan.User.isPrioritySpeaker`, `piepan.Channel.remove()`, `piepan.Channel.setDescription()`
+    - Added `piepan.onPermissionDenied()`, `piepan.Permissions`, `piepan.PermissionDenied`, `piepan.User.hash`, `piepan.User.setComment()`, `piepan.User.register()`, `piepan.User.setTexture()`, `piepan.User.isPrioritySpeaker`, `piepan.Channel.remove()`, `piepan.Channel.setDescription()`
     - `UserChange` and `ChannelChange` are no longer hidden
     - Added audio file support
     - Each script is now loaded in its own Lua environment, preventing global variable interference between scripts
