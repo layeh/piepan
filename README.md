@@ -42,26 +42,26 @@ The following section describes the API that is available for script authors.  P
 
 #### `piepan.User`
 
-- `int session`: the session ID of the user
-- `int userId`: the registered user ID of the user
-- `string name`: the username of the user
-- `string comment`: the user's comment
-- `bool isServerMuted`: is the user muted by the server
-- `bool isServerDeafened`: has the user been deafened by the server
-- `bool isSelfMuted`: is the user muted by the him/herself
-- `bool isSelfDeafened`: has the user been deafened by him/herself
-- `bool isRecording`: is the user recording channel audio
-- `bool isPrioritySpeaker`: is the user a priority speaker
-- `piepan.Channel channel`: the channel that the user is currently in
-- `string texture`: the bytes of the user's texture/avatar
-- `string hash`: the hexadecimal string representation of the user's certificate hash. This will be nil if the user did not connect to the server with a certificate
-- `void moveTo(self, piepan.Channel channel)`: moves the user to the given `channel`
-- `void send(self, string message)`: sends a text message to the user
-- `void kick(self [, string reason])`: kicks the user from the server with an optional reason
-- `void ban(self [, string reason])`: bans the user from the server with an optional reason
-- `void setComment(self [, string comment])`: sets the user's comment to `comment`
-- `void setTexture(self, string bytes)`: sets the user's texture to the image stored in `bytes`
-- `void register(self)`: registers the user with the connected server
+- `int session`: the session ID of the user.
+- `int userId`: the registered user ID of the user.
+- `string name`: the username of the user.
+- `string comment`: the user's comment.
+- `bool isServerMuted`: is the user muted by the server.
+- `bool isServerDeafened`: has the user been deafened by the server.
+- `bool isSelfMuted`: is the user muted by the him/herself.
+- `bool isSelfDeafened`: has the user been deafened by him/herself.
+- `bool isRecording`: is the user recording channel audio.
+- `bool isPrioritySpeaker`: is the user a priority speaker.
+- `piepan.Channel channel`: the channel that the user is currently in.
+- `string texture`: the bytes of the user's texture/avatar.
+- `string hash`: the hexadecimal string representation of the user's certificate hash. This will be nil if the user did not connect to the server with a certificate.
+- `void moveTo(self, piepan.Channel channel)`: moves the user to the given `channel`.
+- `void send(self, string message)`: sends a text message to the user.
+- `void kick(self [, string reason])`: kicks the user from the server with an optional reason.
+- `void ban(self [, string reason])`: bans the user from the server with an optional reason.
+- `void setComment(self [, string comment])`: sets the user's comment to `comment`.
+- `void setTexture(self, string bytes)`: sets the user's texture to the image stored in `bytes`.
+- `void register(self)`: registers the user with the connected server.
 - `void resolveHashes(self)`:  resolves the comment and/or texture hash for the user. The execution of the current function will be suspended and will resume after the data has been received from the server. The function will return instantly if no data needs to be fetched.
 
     Example:
@@ -73,25 +73,25 @@ The following section describes the API that is available for script authors.  P
 
 #### `piepan.Message`
 
-- `string text`: the message text
-- `piepan.User user`: the user who sent the message (this can be `nil`)
-- `piepan.Channel channels`: a table of channels the message was sent to, with the key being the channel ID and the value being the corresponding channel table
-- `piepan.User users`: a table of users the message was sent to, with the key being the user name and the value being their corresponding user table
+- `string text`: the message text.
+- `piepan.User user`: the user who sent the message (this can be `nil`).
+- `piepan.Channel channels`: a table of channels the message was sent to, with the key being the channel ID and the value being the corresponding channel table.
+- `piepan.User users`: a table of users the message was sent to, with the key being the user name and the value being their corresponding user table.
 
 #### `piepan.Channel`
 
-- `int id`: the unique channel identifier
-- `string name`: the channel name
-- `string description`: the description of the channel
-- `piepan.Channel parent`: the parent channel
-- `bool isTemporary`: is the channel temporary
-- `void remove(self)`: removes the channel from the server's channel tree
-- `void setDescription(self [, string description])`: sets the channel's description
+- `int id`: the unique channel identifier.
+- `string name`: the channel name.
+- `string description`: the description of the channel.
+- `piepan.Channel parent`: the parent channel.
+- `bool isTemporary`: is the channel temporary.
+- `void remove(self)`: removes the channel from the server's channel tree.
+- `void setDescription(self [, string description])`: sets the channel's description.
 - `bool play(self, string filename [, function callback, data])`: plays the audio file to the channel. `callback` will be executed when the file finishes playing, with `data` passed as its only argument. Returns `true` if no other audio file was playing and the stream started successfully.
 
     Note: Only Ogg Vorbis files are supported (mono, 48kHz)
 
-- `void send(self, string message)`: sends a message to the channel
+- `void send(self, string message)`: sends a message to the channel.
 
     Example:
 
@@ -106,12 +106,12 @@ The following section describes the API that is available for script authors.  P
         local channel = user.channel("../test")
         user:moveTo(channel)
 
-- `void resolveHashes(self)`: resolves the description hash for the channel (see `piepan.User.resolveHashes()` for details)
+- `void resolveHashes(self)`: resolves the description hash for the channel (see `piepan.User.resolveHashes()` for details).
 
 #### `piepan.Audio`
 
-- `void stop()`: stops the currently playing audio stream
-- `bool isPlaying()`: returns true if an audio stream is currently playing
+- `void stop()`: stops the currently playing audio stream.
+- `bool isPlaying()`: returns true if an audio stream is currently playing.
 
 #### `piepan.Timer`
 
@@ -133,55 +133,55 @@ The following section describes the API that is available for script authors.  P
 
 #### `piepan.UserChange`
 
-- `piepan.User user`: the user that changed
-- `bool isConnected`:  if the user connected to the server
-- `bool isDisconnected`: if the user disconnected from the server
-- `bool isChangedChannel`:  if the user moved to a new channel
-- `bool isChangedComment`: if the user's comment changed
+- `piepan.User user`: the user that changed.
+- `bool isConnected`:  if the user connected to the server.
+- `bool isDisconnected`: if the user disconnected from the server.
+- `bool isChangedChannel`:  if the user moved to a new channel.
+- `bool isChangedComment`: if the user's comment changed.
 
 #### `piepan.ChannelChange`
 
-- `piepan.Channel channel`: the channel that was changed
-- `bool isCreated`: if the channel was created
-- `bool isRemoved`: if the channel was removed
-- `bool isMoved`: if the channel moved in the tree
-- `bool isChangedName`: if the channel name changed
-- `bool isChangedDescription`: if the channel description changed
+- `piepan.Channel channel`: the channel that was changed.
+- `bool isCreated`: if the channel was created.
+- `bool isRemoved`: if the channel was removed.
+- `bool isMoved`: if the channel moved in the tree.
+- `bool isChangedName`: if the channel name changed.
+- `bool isChangedDescription`: if the channel description changed.
 
 #### `piepan.Permissions`
 
-- `piepan.Permissions new(int permissionsMask)`: creates a new `piepan.Permissions` table from a bitmask of permissions
-- `bool write`: can change the channel comment and edit the ACL
-- `bool traverse`: can move oneself to the channel and sub-channels
-- `bool enter`: can move oneself into the channel
-- `bool speak`: can transmit audio to a channel
-- `bool muteDeafen`: can mute or deafen another user in the channel
-- `bool move`: can move another user into the channel
-- `bool makeChannel`:  can create a non-temporary channel
-- `bool linkChannel`: can add or remove channel links
-- `bool whisper`: can send audio directly to a user
-- `bool textMessage`: can send a text message to the channel
-- `bool makeTemporaryChannel`: can create a temporary channel on the server
-- `bool kick`: can kick a user from the server
-- `bool ban`: can ban a user from the server
-- `bool register`: can register another user on the server
-- `bool registerSelf`: can register oneself on the server
+- `piepan.Permissions new(int permissionsMask)`: creates a new `piepan.Permissions` table from a bitmask of permissions.
+- `bool write`: can change the channel comment and edit the ACL.
+- `bool traverse`: can move oneself to the channel and sub-channels.
+- `bool enter`: can move oneself into the channel.
+- `bool speak`: can transmit audio to a channel.
+- `bool muteDeafen`: can mute or deafen another user in the channel.
+- `bool move`: can move another user into the channel.
+- `bool makeChannel`:  can create a non-temporary channel.
+- `bool linkChannel`: can add or remove channel links.
+- `bool whisper`: can send audio directly to a user.
+- `bool textMessage`: can send a text message to the channel.
+- `bool makeTemporaryChannel`: can create a temporary channel on the server.
+- `bool kick`: can kick a user from the server.
+- `bool ban`: can ban a user from the server.
+- `bool register`: can register another user on the server.
+- `bool registerSelf`: can register oneself on the server.
 
 #### `piepan.PermissionDenied`
 
-- `piepan.User user`: the user who made the request that was denied by the server
-- `piepan.Channel channel`: the channel where the action was denied
-- `piepan.Permissions permissions`: the permissions that the user would have to have in order to perform the action
-- `string reason`: the reason the server gave for denying the action
-- `string name`: the name that was denied by the server
-- `bool isPermission`: denied due to not having the correct permissions
-- `bool isTextTooLong`: denied due to the text message being too long
-- `bool isTemporaryChannel`: denied due to the action being impossible to perform on a temporary channel
-- `bool isMissingCertificate`: denied due to needing a certificate in order to complete the action
-- `bool isChannelName`: denied due to the channel name being invalid
-- `bool isUserName`: denied due to the user name being invalid
-- `bool isChannelFull`: denied due to the channel being full
-- `bool isOther`: denied due to another reason
+- `piepan.User user`: the user who made the request that was denied by the server.
+- `piepan.Channel channel`: the channel where the action was denied.
+- `piepan.Permissions permissions`: the permissions that the user would have to have in order to perform the action.
+- `string reason`: the reason the server gave for denying the action.
+- `string name`: the name that was denied by the server.
+- `bool isPermission`: denied due to not having the correct permissions.
+- `bool isTextTooLong`: denied due to the text message being too long.
+- `bool isTemporaryChannel`: denied due to the action being impossible to perform on a temporary channel.
+- `bool isMissingCertificate`: denied due to needing a certificate in order to complete the action.
+- `bool isChannelName`: denied due to the channel name being invalid.
+- `bool isUserName`: denied due to the user name being invalid.
+- `bool isChannelFull`: denied due to the channel being full.
+- `bool isOther`: denied due to another reason.
 
 ### Variables
 
@@ -214,11 +214,11 @@ The `piepan.User` table that references yourself.
 
 Table containing information about the server.  This table may have the fields:
 
-- `bool allowHtml`: if HTML messages are allowed to be sent to the server
-- `int maxBandwidth`: the maximum voice bandwidth a client can use (in bits per second)
-- `int maxMessageLength`: the maximum length of a text message that does not contain an image
-- `int maxImageMessageLength`: the maximum length of a text message that contains an image
-- `string welcomeText`: the server's welcome text
+- `bool allowHtml`: if HTML messages are allowed to be sent to the server.
+- `int maxBandwidth`: the maximum voice bandwidth a client can use (in bits per second).
+- `int maxMessageLength`: the maximum length of a text message that does not contain an image.
+- `int maxImageMessageLength`: the maximum length of a text message that contains an image.
+- `string welcomeText`: the server's welcome text.
 
 #### `piepan.args`
 
