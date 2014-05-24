@@ -1,18 +1,18 @@
 # Object files
 *.o
-piepan
+/piepan
 
 # Compiled lua files
-src/piepan_impl.c
-src/piepan_impl.luac
-src/piepan_impl.lua
+/src/piepan_impl.c
+/src/piepan_impl.luac
+/src/piepan_impl.lua
 
 # Compiled protobuf-c files
-proto/Mumble.pb-c.c
-proto/Mumble.pb-c.h
+/proto/Mumble.pb-c.c
+/proto/Mumble.pb-c.h
 
 # Compiled documentation
-readme.html
+/readme.html
 
 # Scripts
-scripts/
+/scripts/
