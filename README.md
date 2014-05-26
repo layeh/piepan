@@ -1,4 +1,4 @@
-# piepan: a bot framework for Mumble
+# [piepan][1]: a bot framework for Mumble
 
 piepan is an easy to use bot framework for interacting with a [Mumble](http://mumble.sourceforge.net/) server.  Here is a simple script that will echo back any chat message that is sent to it:
 
@@ -309,3 +309,5 @@ This software is released under the MIT license (see LICENSE).
 ---
 
 Author: Tim Cooper <<tim.cooper@layeh.com>>
+
+[1]: https://github.com/layeh/piepan
