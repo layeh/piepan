@@ -65,7 +65,9 @@ api_User_moveTo(lua_State *lua)
 {
     /* [self, int channel_id] */
     MumbleProto__UserState msg = MUMBLE_PROTO__USER_STATE__INIT;
+    msg.has_channel_id = true;
     msg.channel_id = lua_tointeger(lua, -1);
+    msg.has_session = true;
     lua_getfield(lua, -2, "session");
     msg.session = lua_tointeger(lua, -1);
     sendPacket(PACKET_USERSTATE, &msg);
@@ -78,6 +80,7 @@ api_User_setComment(lua_State *lua)
     /* [self, string comment] */
     MumbleProto__UserState msg = MUMBLE_PROTO__USER_STATE__INIT;
     msg.comment = (char *)lua_tostring(lua, -1);
+    msg.has_session = true;
     lua_getfield(lua, -2, "session");
     msg.session = lua_tointeger(lua, -1);
     sendPacket(PACKET_USERSTATE, &msg);
@@ -102,6 +105,7 @@ api_User_setTexture(lua_State *lua)
     MumbleProto__UserState msg = MUMBLE_PROTO__USER_STATE__INIT;
     msg.has_texture = true;
     msg.texture.data = (uint8_t *)lua_tolstring(lua, -1, &msg.texture.len);
+    msg.has_session = true;
     lua_getfield(lua, 1, "session");
     msg.session = lua_tointeger(lua, -1);
     sendPacket(PACKET_USERSTATE, &msg);
