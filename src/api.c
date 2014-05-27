@@ -8,11 +8,6 @@
  * script.
  */
 
-/*
- * TODO:  get rid of selfs and only pass non-tables?
- * TODO:  use Lua user data in place of mallocing it ourselves?
- */
-
 #include <pthread.h>
 
 int
@@ -124,7 +119,8 @@ api_Channel_play(lua_State *lua)
     if (at->file == NULL) {
         return 0;
     }
-    if (ov_open_callbacks(at->file, &at->ogg, NULL, 0, OV_CALLBACKS_STREAMONLY_NOCLOSE) != 0) {
+    if (ov_open_callbacks(at->file, &at->ogg, NULL, 0,
+            OV_CALLBACKS_STREAMONLY_NOCLOSE) != 0) {
         fclose(at->file);
         return 0;
     }
@@ -205,7 +201,7 @@ api_Timer_cancel(lua_State *lua)
 static void *
 api_Thread_worker(void *arg)
 {
-    UserThread *user_thread = (UserThread *)arg;
+    UserThread *user_thread = arg;
     lua_getglobal(user_thread->lua, "piepan");
     lua_getfield(user_thread->lua, -1, "internal");
     lua_getfield(user_thread->lua, -1, "events");
@@ -220,16 +216,15 @@ int
 api_Thread_new(lua_State *lua)
 {
     /* [Thread, id] */
-    UserThread *user_thread;
-    user_thread = (UserThread *)malloc(sizeof(UserThread));
+    UserThread *user_thread = lua_newuserdata(lua, sizeof(UserThread));
     if (user_thread == NULL) {
         return 0;
     }
-    user_thread->id = lua_tonumber(lua, -1);
+    user_thread->id = lua_tonumber(lua, 2);
     user_thread->lua = lua_newthread(lua);
-    lua_setfield(lua, -3, "lua");
+    lua_setfield(lua, 1, "lua");
     lua_pushlightuserdata(lua, user_thread);
-    lua_setfield(lua, -3, "userthread");
+    lua_setfield(lua, 1, "userthread");
     pthread_create(&user_thread->thread, NULL, api_Thread_worker, user_thread);
     return 0;
 }

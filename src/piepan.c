@@ -137,22 +137,13 @@ sendPacketEx(const int type, const void *message, const int length)
 void
 user_thread_event(struct ev_loop *loop, ev_io *w, int revents)
 {
-    UserThread *user_thread;
     int thread_id;
     if (read(w->fd, &thread_id, sizeof(int)) != sizeof(int)) {
         return;
     }
     lua_getglobal(lua, "piepan");
     lua_getfield(lua, -1, "internal");
-    lua_getfield(lua, -1, "threads");
-    lua_pushnumber(lua, thread_id);
-    lua_gettable(lua, -2);
-    lua_getfield(lua, -1, "userthread");
-    user_thread = (UserThread *)lua_touserdata(lua, -1);
-    if (user_thread != NULL) {
-        free(user_thread);
-    }
-    lua_getfield(lua, -4, "events");
+    lua_getfield(lua, -1, "events");
     lua_getfield(lua, -1, "onThreadFinish");
     lua_pushnumber(lua, thread_id);
     lua_call(lua, 1, 0);
