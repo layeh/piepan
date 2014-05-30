@@ -188,7 +188,7 @@ main(int argc, char *argv[])
     char *username = "piepan-bot";
     int port = 64738;
     int ret;
-    int developement_mode = 0;
+    int development_mode = 0;
 
     int socket_fd;
     struct sockaddr_in server_addr;
@@ -281,7 +281,7 @@ main(int argc, char *argv[])
                     break;
                 }
                 case 'd':
-                    developement_mode = 1;
+                    development_mode = 1;
                     break;
                 case 'h':
                     usage(stdout);
@@ -311,14 +311,14 @@ main(int argc, char *argv[])
         for (i = optind; i < argc; i++) {
             lua_pushvalue(lua, -1);
             lua_pushstring(lua, argv[i]);
-            if (developement_mode) {
+            if (development_mode) {
                 lua_newuserdata(lua, sizeof(ScriptStat));
             } else {
                 lua_pushnil(lua);
             }
             lua_call(lua, 2, 3);
             if (lua_toboolean(lua, -3)) {
-                if (developement_mode) {
+                if (development_mode) {
                     ScriptStat *item = lua_touserdata(lua, -1);
                     item->lua = lua;
                     item->id = lua_tointeger(lua, -2);
