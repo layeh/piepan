@@ -154,25 +154,25 @@ static void
 usage(FILE *stream)
 {
     const char *str =
-        "usage: %s [options] [scripts...]\n"
+        "usage: %s [options] [[--] scripts...]\n"
         "a bot framework for Mumble\n"
         "\n"
-        "  -u <username>       username of the bot (has no effect if the certificate\n"
-        "                      has been registered with the server under a different\n"
-        "                      name)\n"
-        "  -s <server>         address of the server (default: localhost)\n"
-        "  -p <port>           port of the server (default: 64738)\n"
-        "  -pw <file>          read server password from the given file (when file is -,\n"
-        "                      standard input will be read)\n"
-        "  -t <file>           read access tokens (one per line) from the given file\n"
-        "  -c <certificate>    certificate to use for the connection\n"
-        "  -k <keyfile>        key file to use for the connection (defaults to the\n"
-        "                      certificate file)\n"
-        "  -d                  enable development mode, which automatically reloads\n"
-        "                      scripts when they are modified\n"
-        "  --<name>[=<value>]  a key-value pair that will be accessible from the scripts\n"
-        "  -h                  display this help\n"
-        "  -v                  show version\n";
+        "  -u <username>        username of the bot (has no effect if the certificate\n"
+        "                       has been registered with the server under a different\n"
+        "                       name)\n"
+        "  -s <server>[:<port>] address of the server (default: localhost), and port\n"
+        "                       of the server (default: 64738)\n"
+        "  -p <file>            read server password from the given file (when file is -,\n"
+        "                       standard input will be read)\n"
+        "  -t <file>            read access tokens (one per line) from the given file\n"
+        "  -c <certificate>     certificate to use for the connection\n"
+        "  -k <keyfile>         key file to use for the connection (defaults to the\n"
+        "                       certificate file)\n"
+        "  -d                   enable development mode, which automatically reloads\n"
+        "                       scripts when they are modified\n"
+        "  --<name>[=<value>]   a key-value pair that will be accessible from the scripts\n"
+        "  -h                   display this help\n"
+        "  -v                   show version\n";
     fprintf(stream, str, PIEPAN_NAME);
 }
 
@@ -188,7 +188,6 @@ main(int argc, char *argv[])
     char *username = "piepan-bot";
     int port = 64738;
     int ret;
-    int script_argc = -1;
     int developement_mode = 0;
 
     int socket_fd;
@@ -227,6 +226,7 @@ main(int argc, char *argv[])
      * Argument parsing
      */
     {
+        int opt;
         int i;
         int show_help = 0;
         int show_version = 0;
@@ -234,64 +234,69 @@ main(int argc, char *argv[])
         lua_getfield(lua, -1, "internal");
         lua_getfield(lua, -1, "events");
         lua_getfield(lua, -1, "onArgument");
-        for (i = 1; i < argc; i++) {
-            int has_next = i + 1 < argc;
-            if (argv[i][0] != '-' || !strcmp(argv[i], "--")) {
-                script_argc = i;
-                break;
-            }
-            if (!strcmp(argv[i], "-u") && has_next) {
-                username = argv[++i];
-            } else if (!strcmp(argv[i], "-c") && has_next) {
-                certificate_file = argv[++i];
-                if (key_file == NULL) {
-                    key_file = certificate_file;
+        opterr = 0;
+        while ((opt = getopt(argc, argv, "u:c:k:s:t:p:-:dhv")) != -1) {
+            switch (opt) {
+                case 'u':
+                    username = optarg;
+                    break;
+                case 'c':
+                    certificate_file = optarg;
+                    if (key_file == NULL) {
+                        key_file = certificate_file;
+                    }
+                    break;
+                case 'k':
+                    key_file = optarg;
+                    break;
+                case 's': {
+                    char *port_str;
+                    server_host_str = optarg;
+                    port_str = strrchr(server_host_str, ':');
+                    if (port_str != NULL) {
+                        *port_str = '\0';
+                        port = atoi(++port_str);
+                    }
+                    break;
                 }
-            } else if (!strcmp(argv[i], "-k") && has_next) {
-                key_file = argv[++i];
-            } else if (!strcmp(argv[i], "-p") && has_next) {
-                port = atoi(argv[++i]);
-            } else if (!strcmp(argv[i], "-s") && has_next) {
-                server_host_str = argv[++i];
-            } else if (!strcmp(argv[i], "-h")) {
-                show_help = 1;
-            } else if (!strcmp(argv[i], "-pw") && has_next) {
-                password_file = argv[++i];
-            } else if (!strcmp(argv[i], "-t") && has_next) {
-                token_file = argv[++i];
-            } else if (!strcmp(argv[i], "-d")) {
-                developement_mode = 1;
-            } else if (!strcmp(argv[i], "-v")) {
-                show_version = 1;
-            } else if (!strncmp(argv[i], "--", 2) && argv[i][2] != '\0') {
-                char *key = argv[i] + 2;
-                char *value = strchr(key, '=');
-                if (key == value) {
-                    continue;
+                case 't':
+                    token_file = optarg;
+                    break;
+                case 'p':
+                    password_file = optarg;
+                    break;
+                case '-': {
+                    char *key = optarg;
+                    char *value = strchr(key, '=');
+                    if (key == value) {
+                        break;
+                    }
+                    if (value != NULL) {
+                        *value++ = 0;
+                    }
+                    lua_pushvalue(lua, -1);
+                    lua_pushstring(lua, key);
+                    lua_pushstring(lua, value);
+                    lua_call(lua, 2, 0);
+                    break;
                 }
-                if (value != NULL) {
-                    *value++ = 0;
-                }
-                lua_pushvalue(lua, -1);
-                lua_pushstring(lua, key);
-                lua_pushstring(lua, value);
-                lua_call(lua, 2, 0);
-            } else {
-                fprintf(stderr, "%s: unknown or incomplete argument '%s'\n",
-                        PIEPAN_NAME, argv[i]);
-                return 1;
+                case 'd':
+                    developement_mode = 1;
+                    break;
+                case 'h':
+                    usage(stdout);
+                    return 0;
+                case 'v':
+                    printf("%s %s (compiled on " __DATE__ " " __TIME__ ")\n",
+                           PIEPAN_NAME, PIEPAN_VERSION);
+                    return 0;
+                default:
+                    fprintf(stderr, "%s: unknown or incomplete option '%c'\n",
+                            PIEPAN_NAME, optopt);
+                    return 1;
             }
         }
         lua_settop(lua, 0);
-        if (show_version) {
-            printf("%s %s (compiled on " __DATE__ " " __TIME__ ")\n", PIEPAN_NAME,
-                   PIEPAN_VERSION);
-            return 0;
-        }
-        if (show_help) {
-            usage(stdout);
-            return 0;
-        }
     }
 
     /*
@@ -303,7 +308,7 @@ main(int argc, char *argv[])
         lua_getfield(lua, -1, "internal");
         lua_getfield(lua, -1, "events");
         lua_getfield(lua, -1, "onLoadScript");
-        for (i = script_argc; i >= 0 && i < argc; i++) {
+        for (i = optind; i < argc; i++) {
             lua_pushvalue(lua, -1);
             lua_pushstring(lua, argv[i]);
             if (developement_mode) {

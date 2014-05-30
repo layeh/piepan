@@ -222,9 +222,9 @@ Table containing information about the server.  This table may have the fields:
 
 #### `piepan.args`
 
-Table that is populated with the command line arguments that are in the form: `--key=value` or `--key` (in the latter case, `value` is an empty string).
+A table that is populated with the command line arguments that are in the form: `--key=value` or `--key` (in the latter case, `value` is assumed to be an empty string).
 
-The values are stored in the array `piepan.args[key]`, which allows multiple arguments with the same key.
+The values are stored in the table `piepan.args[key]`, which allows multiple arguments to share the same key.
 
 Example:
 
@@ -281,6 +281,7 @@ Called when a requested action could not be performed.
     - Each script is now loaded in its own Lua environment, preventing global variable interference between scripts
     - Fixed `piepan.User.userId` not being filled
     - Multiple instances of the same script can now be run at the same time
+    - Command line option `-pw` was renamed to `-p`. The old functionality of `-p` was moved to the `-h` option, by using the new `host:port` syntax
 - 0.1.1 (2013-12-15)
     - Fixed bug where event loop would stop when a packet with length zero was received
     - `sendPacket` now properly accepts a version packet
