@@ -13,26 +13,25 @@ The above script can be started from the command line:
 
 ## Usage
 
-    usage: piepan [options] [scripts...]
+    usage: piepan [options] [[--] scripts...]
     a bot framework for Mumble
 
-      -u <username>       username of the bot (has no effect if the certificate
-                          has been registered with the server under a different
-                          name)
-      -s <server>         address of the server (default: localhost)
-      -p <port>           port of the server (default: 64738)
-      -pw <file>          read server password from the given file (when file is -,
-                          standard input will be read)
-      -t <file>           read access tokens (one per line) from the given file
-      -c <certificate>    certificate to use for the connection
-      -k <keyfile>        key file to use for the connection (defaults to the
-                          certificate file)
-      -d                  enable development mode, which automatically reloads
-                          scripts when they are modified
-      --<name>[=<value>]  a key-value pair that will be accessible from the scripts
-      -h                  display this help
-      -v                  show version
-
+      -u <username>        username of the bot (has no effect if the certificate
+                           has been registered with the server under a different
+                           name)
+      -s <server>[:<port>] address of the server (default: localhost), and port
+                           of the server (default: 64738)
+      -p <file>            read server password from the given file (when file is -,
+                           standard input will be read)
+      -t <file>            read access tokens (one per line) from the given file
+      -c <certificate>     certificate to use for the connection
+      -k <keyfile>         key file to use for the connection (defaults to the
+                           certificate file)
+      -d                   enable development mode, which automatically reloads
+                           scripts when they are modified
+      --<name>[=<value>]   a key-value pair that will be accessible from the scripts
+      -h                   display this help
+      -v                   show version
 
 ## Programming reference
 
