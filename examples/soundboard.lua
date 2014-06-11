@@ -32,7 +32,7 @@ local prefix = "examples/sounds/"
 
 function piepan.onConnect()
     if piepan.args.soundboard then
-        prefix = piepan.args.soundboard
+        prefix = piepan.args.soundboard[1]
     end
     print ("Soundboard loaded!")
 end
