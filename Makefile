@@ -14,7 +14,7 @@ LUAFILES = src/impl/piepan.lua \
 
 piepan: src/piepan.c src/piepan.h src/util.c src/events.c src/handlers.c \
         src/api.c proto/Mumble.o src/piepan_impl.c
-	$(CC) $(CFLAGS) -o $@ src/piepan.c proto/Mumble.o
+	$(CC) -o $@ $< proto/Mumble.o $(CFLAGS)
 
 proto/Mumble.o: proto/Mumble.proto
 	protoc-c --c_out=. $<
