@@ -88,8 +88,6 @@ The following section describes the API that is available for script authors.  P
 - `void setDescription(self [, string description])`: sets the channel's description.
 - `bool play(self, string filename [, function callback, data])`: plays the audio file to the channel. `callback` will be executed when the file finishes playing, with `data` passed as its only argument. Returns `true` if no other audio file was playing and the stream started successfully.
 
-    Note: Only Ogg Vorbis files are supported (mono, 48kHz)
-
 - `void send(self, string message)`: sends a message to the channel.
 
     Example:
@@ -111,6 +109,8 @@ The following section describes the API that is available for script authors.  P
 
 - `void stop()`: stops the currently playing audio stream.
 - `bool isPlaying()`: returns true if an audio stream is currently playing.
+
+*Note: Only Ogg Vorbis files are supported (mono, 48kHz)*
 
 #### `piepan.Timer`
 
