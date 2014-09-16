@@ -39,16 +39,27 @@ function piepan.Channel:__call(path)
     return channel
 end
 
-function piepan.Channel:play(filename, callback, data)
+function piepan.Channel:play(info, callback, data)
     assert(self ~= nil, "self cannot be nil")
-    assert(type(filename) == "string", "filename must be a string")
+    assert(type(info) == "string" or type(info) == "table", "info must be a string or table")
 
     if piepan.internal.currentAudio ~= nil then
         return false
     end
 
+    local filename
+    local volume = 1.0
+    if type(info) == "table" then
+        filename = info.filename
+        if info.volume ~= nil then
+            volume = info.volume
+        end
+    else
+        filename = info
+    end
+
     local ptr = piepan.internal.api.channelPlay(piepan.internal.state,
-        piepan.internal.opus.encoder, filename)
+        piepan.internal.opus.encoder, filename, volume)
     if not ptr then
         return false
     end

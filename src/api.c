@@ -110,7 +110,7 @@ api_User_setTexture(lua_State *lua)
 int
 api_Channel_play(lua_State *lua)
 {
-    /* [lua_State *, OpusEncoder *encoder, string filename] */
+    /* [lua_State *, OpusEncoder *encoder, string filename, number volume] */
     AudioTransmission *at = lua_newuserdata(lua, sizeof(AudioTransmission));
     if (at == NULL) {
         return 0;
@@ -129,6 +129,7 @@ api_Channel_play(lua_State *lua)
     at->encoder = lua_touserdata(lua, 2);
     at->sequence = 1;
     at->buffer.size = 0;
+    at->volume = (float)lua_tonumber(lua, 4);
     ev_timer_init(&at->ev, audio_transmission_event, 0., 0.01);
     ev_timer_start(ev_loop_main, &at->ev);
     return 1;

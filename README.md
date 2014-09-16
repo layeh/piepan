@@ -86,7 +86,11 @@ The following section describes the API that is available for script authors.  P
 - `bool isTemporary`: is the channel temporary.
 - `void remove(self)`: removes the channel from the server's channel tree.
 - `void setDescription(self [, string description])`: sets the channel's description.
-- `bool play(self, string filename [, function callback, data])`: plays the audio file to the channel. `callback` will be executed when the file finishes playing, with `data` passed as its only argument. Returns `true` if no other audio file was playing and the stream started successfully.
+- `bool play(self, table info [, function callback, data])`: plays an audio file to the channel. `callback` will be executed when the file finishes playing, with `data` passed as its only argument. Returns `true` if no other audio file was playing and the stream started successfully.
+    - The following fields are supported in the `info` table:
+        - `string filename`: the filename of the file which will be played
+        - `number volume`: the volume at which the audio will be played (default: 1.0)
+- `bool play(self, string filename [, function callback, data])`: alias for: `bool play(self, {filename = filename, volume = 1}, callback, data)`
 
 - `void send(self, string message)`: sends a message to the channel.
 

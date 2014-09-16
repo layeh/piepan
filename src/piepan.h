@@ -66,6 +66,7 @@ typedef struct {
     OggVorbis_File ogg;
     uint32_t sequence;
     OpusEncoder *encoder;
+    float volume;
     struct {
         char pcm[PCM_BUFFER];
         int size;

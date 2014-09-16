@@ -118,6 +118,17 @@ socket_read_event(struct ev_loop *loop, ev_io *w, int revents)
     }
 }
 
+static void
+audio_transmission_event_filter(float **pcm, long channels, long samples, void *param) {
+    AudioTransmission *at = (AudioTransmission *)param;
+    int channel, sample;
+    for (channel = 0; channel < channels; channel++) {
+        for (sample = 0; sample < samples; sample++) {
+            pcm[channel][sample] *= at->volume;
+        }
+    }
+}
+
 void
 audio_transmission_event(struct ev_loop *loop, struct ev_timer *w, int revents)
 {
@@ -133,8 +144,9 @@ audio_transmission_event(struct ev_loop *loop, struct ev_timer *w, int revents)
         at->sequence);
 
     while (at->buffer.size < OPUS_FRAME_SIZE * sizeof(opus_int16)) {
-        long_ret = ov_read(&at->ogg, at->buffer.pcm + at->buffer.size,
-            PCM_BUFFER - at->buffer.size, 0, 2, 1, NULL);
+        long_ret = ov_read_filter(&at->ogg, at->buffer.pcm + at->buffer.size,
+            PCM_BUFFER - at->buffer.size, 0, 2, 1, NULL,
+            audio_transmission_event_filter, at);
         if (long_ret <= 0) {
             audioTransmission_stop(at, at->lua, loop);
             return;
