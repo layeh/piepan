@@ -275,7 +275,7 @@ Called when a requested action could not be performed.
 
 ## Changelog
 
-- Next
+- 0.2.0 (2014-09-15)
     - Added support for fetching large channel descriptions, user textures/avatars, and user comments
     - Added `piepan.server.maxMessageLength`, `piepan.server.maxImageMessageLength`
     - Added `piepan.onPermissionDenied()`, `piepan.Permissions`, `piepan.PermissionDenied`, `piepan.User.hash`, `piepan.User.setComment()`, `piepan.User.register()`, `piepan.User.setTexture()`, `piepan.User.isPrioritySpeaker`, `piepan.Channel.remove()`, `piepan.Channel.setDescription()`
