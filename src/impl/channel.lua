@@ -74,12 +74,15 @@ end
 function piepan.internal.events.onAudioFinished()
     assert (piepan.internal.currentAudio ~= nil, "audio must be playing")
 
-    if type(piepan.internal.currentAudio.callback) == "function" then
-        piepan.internal.runCallback(piepan.internal.currentAudio.callback,
-            piepan.internal.currentAudio.callbackData)
-    end
+    local callback = piepan.internal.currentAudio.callback
 
-    piepan.internal.currentAudio = nil
+    if type(callback) == "function" then
+        local data = piepan.internal.currentAudio.callbackData
+        piepan.internal.currentAudio = nil
+        piepan.internal.runCallback(callback, data)
+    else
+        piepan.internal.currentAudio = nil
+    end
 end
 
 function piepan.Channel:send(message)
