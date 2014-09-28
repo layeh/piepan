@@ -39,7 +39,7 @@ function piepan.Channel:__call(path)
     return channel
 end
 
-function piepan.Channel:play(info, callback, data)
+function piepan.Channel:play(info, callback)
     assert(self ~= nil, "self cannot be nil")
     assert(type(info) == "string" or type(info) == "table", "info must be a string or table")
 
@@ -65,7 +65,6 @@ function piepan.Channel:play(info, callback, data)
     end
     piepan.internal.currentAudio = {
         callback = callback,
-        callbackData = data,
         ptr = ptr
     }
     return true
@@ -77,9 +76,8 @@ function piepan.internal.events.onAudioFinished()
     local callback = piepan.internal.currentAudio.callback
 
     if type(callback) == "function" then
-        local data = piepan.internal.currentAudio.callbackData
         piepan.internal.currentAudio = nil
-        piepan.internal.runCallback(callback, data)
+        piepan.internal.runCallback(callback)
     else
         piepan.internal.currentAudio = nil
     end

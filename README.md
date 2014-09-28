@@ -86,11 +86,11 @@ The following section describes the API that is available for script authors.  P
 - `bool isTemporary`: is the channel temporary.
 - `void remove(self)`: removes the channel from the server's channel tree.
 - `void setDescription(self [, string description])`: sets the channel's description.
-- `bool play(self, table info [, function callback, data])`: plays an audio file to the channel. `callback` will be executed when the file finishes playing, with `data` passed as its only argument. Returns `true` if no other audio file was playing and the stream started successfully.
+- `bool play(self, table info [, function callback])`: plays an audio file to the channel. `callback` will be executed when the file finishes playing. Returns `true` if no other audio file was playing and the stream started successfully.
     - The following fields are supported in the `info` table:
         - `string filename`: the filename of the file which will be played
         - `number volume`: the volume at which the audio will be played (default: 1.0)
-- `bool play(self, string filename [, function callback, data])`: alias for: `bool play(self, {filename = filename, volume = 1}, callback, data)`
+- `bool play(self, string filename [, function callback])`: alias for: `bool play(self, {filename = filename, volume = 1}, callback)`
 
 - `void send(self, string message)`: sends a message to the channel.
 
@@ -118,7 +118,7 @@ The following section describes the API that is available for script authors.  P
 
 #### `piepan.Timer`
 
-- `piepan.Timer new(function func, int timeout [, data])`: Creates a new timer.  After `timeout` seconds elapses, `func` will be called with `data` as its first and only parameter.
+- `piepan.Timer new(function func, int timeout)`: Creates a new timer.  After `timeout` seconds elapses, `func` will be executed.
 
     The (arbitrary) range of `timeout` is 1-3600 (1 second to 1 hour).
 
@@ -276,6 +276,7 @@ Called when a requested action could not be performed.
 ## Changelog
 
 - Next
+    - Removed `data` argument from `Channel.play` and `Timer.new`
     - Fixed inability to start playing audio from inside of an audio completion callback
 - 0.2.0 (2014-09-15)
     - Added support for fetching large channel descriptions, user textures/avatars, and user comments

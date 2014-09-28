@@ -5,7 +5,7 @@
 -- License: MIT (see LICENSE)
 --
 
-function piepan.Timer.new(func, timeout, data)
+function piepan.Timer.new(func, timeout)
     assert(type(func) == "function", "func must be a function")
     assert(type(timeout) == "number" and timeout > 0 and timeout <= 3600,
         "timeout is out of range")
@@ -16,7 +16,6 @@ function piepan.Timer.new(func, timeout, data)
     }
     piepan.internal.timers[id] = {
         func = func,
-        data = data,
         ptr = nil,
         state = nil
     }
@@ -46,5 +45,5 @@ function piepan.internal.events.onUserTimer(id)
     end
 
     piepan.internal.timers[id] = nil
-    piepan.internal.runCallback(timer.func, timer.data)
+    piepan.internal.runCallback(timer.func)
 end
