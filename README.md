@@ -275,7 +275,7 @@ Called when a requested action could not be performed.
 
 ## Changelog
 
-- Next
+- 0.3.0 (2014-10-01)
     - Removed `data` argument from `Channel.play` and `Timer.new`
     - Fixed inability to start playing audio from inside of an audio completion callback
 - 0.2.0 (2014-09-15)
