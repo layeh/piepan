@@ -3,6 +3,9 @@ compiler:
   - gcc
 before_install:
   - sudo apt-get update
-  - sudo apt-get install -y protobuf-c-compiler lua5.2 liblua5.2-dev libopus-dev libvorbis-dev libssl-dev libev-dev
+  - wget http://downloads.xiph.org/releases/opus/opus-1.1.tar.gz
+  - tar xzf opus-1.1.tar.gz
+  - (cd opus-1.1/ && ./configure && make && make install)
+  - sudo apt-get install -y protobuf-c-compiler libprotobuf-c0-dev lua5.2 liblua5.2-dev libvorbis-dev libssl-dev libev-dev
   - sed -i -e 1s/lua/lua5.2/ -e 1s/libprotobuf-c// -e 1s/$/\ -lprotobuf-c/ Makefile
 script: make piepan
