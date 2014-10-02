@@ -1,28 +1,22 @@
-CFLAGS = `pkg-config --libs --cflags libssl lua opus vorbis vorbisfile` -lev -pthread
+LUAFILES = impl/piepan.lua \
+           impl/internal.lua \
+           impl/scripts.lua \
+           impl/timer.lua \
+           impl/thread.lua \
+           impl/user.lua \
+           impl/channel.lua \
+           impl/events.lua \
+           impl/permissions.lua \
+           impl/audio.lua \
+           impl/functions.lua
 
-LUAFILES = src/impl/piepan.lua \
-           src/impl/internal.lua \
-           src/impl/scripts.lua \
-           src/impl/timer.lua \
-           src/impl/thread.lua \
-           src/impl/user.lua \
-           src/impl/channel.lua \
-           src/impl/events.lua \
-           src/impl/permissions.lua \
-           src/impl/audio.lua \
-           src/impl/functions.lua
+impl/piepan_impl.go: impl/piepan_impl.lua
+	echo 'package impl' > $@
+	echo 'const Piepan = `' >> $@
+	cat $< >> $@
+	echo '`' >> $@
 
-piepan: src/piepan.c src/piepan.h src/util.c src/events.c src/handlers.c \
-        src/api.c src/piepan_impl.c
-	$(CC) -o $@ $< $(CFLAGS)
-
-src/piepan_impl.c: src/piepan_impl.luac
-	xxd -i $< $@
-
-src/piepan_impl.luac: src/piepan_impl.lua
-	luac -o $@ $<
-
-src/piepan_impl.lua: $(LUAFILES)
+impl/piepan_impl.lua: $(LUAFILES)
 	cat $(LUAFILES) > $@
 
 readme.html: README.md
@@ -42,7 +36,7 @@ readme.html: README.md
 
 clean:
 	rm -f piepan
-	rm -f src/piepan_impl.c src/piepan_impl.luac src/piepan_impl.lua
+	rm -f impl/piepan_impl.lua impl/piepan_impl.go
 	rm -f readme.html
 
 .PHONY: clean

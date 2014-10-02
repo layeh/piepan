@@ -2,10 +2,9 @@
 *.o
 /piepan
 
-# Compiled lua files
-/src/piepan_impl.c
-/src/piepan_impl.luac
-/src/piepan_impl.lua
+# Compiled Lua files
+/impl/piepan_impl.go
+/impl/piepan_impl.lua
 
 # Compiled documentation
 /readme.html
