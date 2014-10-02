@@ -1,4 +1,4 @@
-CFLAGS = `pkg-config --libs --cflags libssl lua libprotobuf-c opus vorbis vorbisfile` -lev -pthread
+CFLAGS = `pkg-config --libs --cflags libssl lua opus vorbis vorbisfile` -lev -pthread
 
 LUAFILES = src/impl/piepan.lua \
            src/impl/internal.lua \
@@ -13,12 +13,8 @@ LUAFILES = src/impl/piepan.lua \
            src/impl/functions.lua
 
 piepan: src/piepan.c src/piepan.h src/util.c src/events.c src/handlers.c \
-        src/api.c proto/Mumble.o src/piepan_impl.c
-	$(CC) -o $@ $< proto/Mumble.o $(CFLAGS)
-
-proto/Mumble.o: proto/Mumble.proto
-	protoc-c --c_out=. $<
-	$(CC) -c -I. -o $@ proto/Mumble.pb-c.c
+        src/api.c src/piepan_impl.c
+	$(CC) -o $@ $< $(CFLAGS)
 
 src/piepan_impl.c: src/piepan_impl.luac
 	xxd -i $< $@
@@ -46,7 +42,6 @@ readme.html: README.md
 
 clean:
 	rm -f piepan
-	rm -f proto/Mumble.o proto/Mumble.pb-c.c proto/Mumble.pb-c.h
 	rm -f src/piepan_impl.c src/piepan_impl.luac src/piepan_impl.lua
 	rm -f readme.html
 

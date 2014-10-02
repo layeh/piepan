@@ -7,10 +7,6 @@
 /src/piepan_impl.luac
 /src/piepan_impl.lua
 
-# Compiled protobuf-c files
-/proto/Mumble.pb-c.c
-/proto/Mumble.pb-c.h
-
 # Compiled documentation
 /readme.html
 
