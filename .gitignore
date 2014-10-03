@@ -1,10 +1,5 @@
 # Object files
-*.o
 /piepan
-
-# Compiled Lua files
-/impl/piepan_impl.go
-/impl/piepan_impl.lua
 
 # Compiled documentation
 /readme.html
