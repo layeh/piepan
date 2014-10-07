@@ -27,6 +27,7 @@ audioTransmission_stop(AudioTransmission *at, lua_State *lua, struct ev_loop *lo
     if (at == NULL || lua == NULL || loop == NULL) {
         return;
     }
+    ov_clear(&at->ogg);
     fclose(at->file);
     ev_timer_stop(loop, &at->ev);
 
