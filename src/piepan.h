@@ -7,7 +7,7 @@
  */
 
 #define PIEPAN_NAME "piepan"
-#define PIEPAN_VERSION "0.3.0"
+#define PIEPAN_VERSION "0.3.1"
 
 #define PAYLOAD_SIZE_MAX (1024 * 1024 * 8 - 1)
 

@@ -275,6 +275,8 @@ Called when a requested action could not be performed.
 
 ## Changelog
 
+- 0.3.1 (2014-10-06)
+    - Fixed audio transmission memory leak
 - 0.3.0 (2014-10-01)
     - Removed `data` argument from `Channel.play` and `Timer.new`
     - Fixed inability to start playing audio from inside of an audio completion callback
