@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/aarzilli/golua/lua"
+	"github.com/layeh/gumble/gumble"
 	"github.com/stevedonovan/luar"
 )
 
@@ -33,6 +34,32 @@ func (in *Instance) audioPlay(l *lua.State) int {
 	}
 
 	in.audio.Play(filename)
+	return 0
+}
+
+func (in *Instance) audioSetTarget(l *lua.State) int {
+	if l.GetTop() == 0 {
+		in.client.SetVoiceTarget(nil)
+		return 0
+	}
+
+	vt := gumble.VoiceTarget{}
+	vt.SetID(1)
+
+	argCount := l.GetTop()
+	for i := 1; i <= argCount; i++ {
+		value := luar.LuaToGo(l, nil, i)
+		switch val := value.(type) {
+		case *gumble.User:
+			vt.AddUser(val)
+		case *gumble.Channel:
+			vt.AddChannel(val, false, false)
+		}
+	}
+
+	in.client.Send(&vt)
+	in.client.SetVoiceTarget(&vt)
+
 	return 0
 }
 

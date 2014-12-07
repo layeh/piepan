@@ -39,6 +39,7 @@ func New(client *gumble.Client) *Instance {
 		"Play":      instance.audioPlay,
 		"IsPlaying": instance.audioIsPlaying,
 		"Stop":      instance.audioStop,
+		"SetTarget": instance.audioSetTarget,
 	})
 	instance.state.SetField(-2, "Audio")
 
