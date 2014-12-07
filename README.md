@@ -1,6 +1,6 @@
 # [piepan][1]: a bot framework for Mumble
 
-piepan is an easy to use bot framework for interacting with a [Mumble](http://mumble.sourceforge.net/) server.  Here is a simple script that will echo back any chat message that is sent to it:
+piepan is an easy to use bot framework for interacting with a [Mumble](http://mumble.sourceforge.net/) server using Lua scripts.  Here is a simple script that will echo back any chat message that is sent to it:
 
     -- echo.lua
     piepan.On('message', function(e)
