@@ -22,6 +22,33 @@ The above script can be started from the command line:
       -server="localhost:64738": address of the server
       -username="piepan-bot": username of the bot
 
+## Building
+
+### Ubuntu 14.04
+
+    # 1. Install dependencies
+    # 1.a. Base dependencies
+    sudo apt-get install -y liblua5.1-0-dev git libopus-dev mercurial wget python-software-properties software-properties-common
+
+    # 1.b. Latest Go version (https://golang.org/dl/)
+    wget https://storage.googleapis.com/golang/go1.3.3.linux-amd64.tar.gz
+    tar -C /usr/local -xzf go1.3.3.linux-amd64.tar.gz
+    export PATH="/usr/local/go/bin:$PATH"
+
+    # 1.c. ffmpeg, if you would like to play media files
+    sudo add-apt-repository -y ppa:jon-severinsson/ffmpeg
+    sudo apt-get update
+    sudo apt-get install -y ffmpeg
+
+    # 2. Create a GOPATH (skip if you already have a GOPATH you want to use)
+    export GOPATH=$(mktemp -d)
+
+    # 3. Build piepan
+    go get -u github.com/layeh/piepan/cmd/piepan
+
+    # 4. Copy binary to current directory
+    cp "$GOPATH/bin/piepan" .
+
 ## Programming reference
 
 The following section describes the API that is available for piepan scripts.
