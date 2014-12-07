@@ -111,7 +111,7 @@ Registers an event listener for a given event type. The follow events are curren
 - `connect` (Arguments: [`ConnectEvent event`](https://godoc.org/github.com/layeh/gumble/gumble#ConnectEvent))
     - Called when connection to the server has been made. This is where a script should perform its initialization.
 - `disconnect`
-    - Called when connection to the server has been lost or after `piepan.disconnect()` is called.
+    - Called when connection to the server has been lost or after `piepan.Disconnect()` is called.
 - `message` (Arguments: [`TextMessageEvent event`](https://godoc.org/github.com/layeh/gumble/gumble#TextMessageEvent))
     - Called when a text message is received.
 - `userChange` (Arguments: [`UserChangeEvent event`](https://godoc.org/github.com/layeh/gumble/gumble#UserChangeEvent))
