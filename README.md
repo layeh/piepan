@@ -53,58 +53,24 @@ The above script can be started from the command line:
 
 The following section describes the API that is available for piepan Lua scripts.
 
-piepan is built using the gumble library. Documentation for types not part of piepan itself (e.g. User and Channel) can be found in the [gumble documentation](https://godoc.org/github.com/layeh/gumble/gumble).
+piepan is built using the [gumble](https://github.com/layeh/gumble) library. Documentation for types not part of piepan itself (including User and Channel) can be found in the [gumble documentation](https://godoc.org/github.com/layeh/gumble/gumble).
 
-### Types
-
-#### `piepan.Audio`
+### `piepan.Audio`
 
 - `void Play(table obj)`: Plays the media file `obj.filename`. `obj.callback` can be defined as a function that is called after the playback has completed.
 - `void SetTarget(Channel|User targets...)` sets the target of subsequent `piepan.Audio.Play()` calls. Call this function with no arguments to remove any voice targeting.
 - `void Stop()`: Stops the currently playing stream.
 - `bool IsPlaying()`: Returns true if an stream is currently playing, false otherwise.
 
-#### `piepan.Timer`
-
-- `piepan.Timer New(function callback, int timeout)`: Creates a new timer.  After `timeout` seconds elapses, `callback` will be executed.
-
-- `void Cancel()`: Cancels the timer.
-
-#### `piepan.Process`
-
-- `piepan.Process New(function callback, string command, string arguments...)`: Executes `command` in a new process with the given arguments. The function `callback` is executed once the process has completed, passing if the execution was successful and the contents of standard output.
-
-- `void Kill()`: Kills the process.
-
-### Variables
-
-#### [`Users`](https://godoc.org/github.com/layeh/gumble/gumble#Users) `piepan.Users`
-
-Table containing each connected user on the server, with the keys being the session ID of the user and the value being their corresponding `piepan.User` table.
-
-Example:
-
-    -- prints the usernames of all the users connected to the server to standard
-    -- output
-    for _, user in pairs(piepan.Users) do
-        print (user.Name())
-    end
-
-#### [`Channels`](https://godoc.org/github.com/layeh/gumble/gumble#Channels) `piepan.Channels`
+### [`Channels`](https://godoc.org/github.com/layeh/gumble/gumble#Channels) `piepan.Channels`
 
 Table that contains all of the channels that are on the server. The channels are mapped by their channel IDs. `piepan.Channels[0]` is the server's root channel.
 
-#### [`User`](https://godoc.org/github.com/layeh/gumble/gumble#User) `piepan.Self`
-
-The `User` table that references yourself.
-
-### Functions
-
-#### `piepan.Disconnect()`
+### `piepan.Disconnect()`
 
 Disconnects from the server.
 
-#### `piepan.On(string event, function callback)`
+### `piepan.On(string event, function callback)`
 
 Registers an event listener for a given event type. The follow events are currently supported:
 
@@ -121,11 +87,39 @@ Registers an event listener for a given event type. The follow events are curren
 - `permissionDenied` (Arguments: [`PermissionDenied event`](https://godoc.org/github.com/layeh/gumble/gumble#PermissionDeniedEvent))
     - Called when a requested action could not be performed.
 
-Events with a `Type` field have slight changes than what is documented in gumble:
+Note: events with a `Type` field have slight changes than what is documented in gumble:
 
 1. The `Type` field is changed to a number.
 2. Individual bit flag values are added to the event as booleans prefixed with `Is`
     - Example: When a user connects to the server, `UserChangeEvent.IsConnected` will be true.
+
+### `piepan.Process`
+
+- `piepan.Process New(function callback, string command, string arguments...)`: Executes `command` in a new process with the given arguments. The function `callback` is executed once the process has completed, passing if the execution was successful and the contents of standard output.
+
+- `void Kill()`: Kills the process.
+
+### [`User`](https://godoc.org/github.com/layeh/gumble/gumble#User) `piepan.Self`
+
+The `User` table that references yourself.
+
+### `piepan.Timer`
+
+- `piepan.Timer New(function callback, int timeout)`: Creates a new timer.  After `timeout` seconds elapses, `callback` will be executed.
+
+- `void Cancel()`: Cancels the timer.
+
+### [`Users`](https://godoc.org/github.com/layeh/gumble/gumble#Users) `piepan.Users`
+
+Table containing each connected user on the server, with the keys being the session ID of the user and the value being their corresponding `piepan.User` table.
+
+Example:
+
+    -- prints the usernames of all the users connected to the server to standard
+    -- output
+    for _, user in pairs(piepan.Users) do
+        print (user.Name())
+    end
 
 ## Changelog
 
