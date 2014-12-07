@@ -51,11 +51,11 @@ The above script can be started from the command line:
 
 ## Programming reference
 
-The following section describes the API that is available for piepan scripts.
+The following section describes the API that is available for piepan Lua scripts.
+
+piepan is built using the gumble library. Documentation for types not part of piepan itself (e.g. User and Channel) can be found in the [gumble documentation](https://godoc.org/github.com/layeh/gumble/gumble).
 
 ### Types
-
-Documentation for types not part of piepan itself (e.g. User and Channel) can be found in the [gumble documentation](https://godoc.org/github.com/layeh/gumble/gumble).
 
 #### `piepan.Audio`
 
@@ -110,7 +110,7 @@ Registers an event listener for a given event type. The follow events are curren
 
 - `connect` (Arguments: [`ConnectEvent event`](https://godoc.org/github.com/layeh/gumble/gumble#ConnectEvent))
     - Called when connection to the server has been made. This is where a script should perform its initialization.
-- `disconnect` (Arguments: [`DisconnectEvent`](https://godoc.org/github.com/layeh/gumble/gumble#DisconnectEvent))
+- `disconnect` (Arguments: [`DisconnectEvent event`](https://godoc.org/github.com/layeh/gumble/gumble#DisconnectEvent))
     - Called when connection to the server has been lost or after `piepan.Disconnect()` is called.
 - `message` (Arguments: [`TextMessageEvent event`](https://godoc.org/github.com/layeh/gumble/gumble#TextMessageEvent))
     - Called when a text message is received.
