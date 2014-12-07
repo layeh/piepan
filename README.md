@@ -60,7 +60,7 @@ Documentation for types not part of piepan itself (e.g. User and Channel) can be
 #### `piepan.Audio`
 
 - `void Play(table obj)`: Plays the media file `obj.filename`. `obj.callback` can be defined as a function that is called after the playback has completed.
-- `void SetTarget(Channel|User targets...)` sets the target of sub-sequence `piepan.Audio.Play()` calls. Call this function with no arguments to remove any voice targeting.
+- `void SetTarget(Channel|User targets...)` sets the target of subsequent `piepan.Audio.Play()` calls. Call this function with no arguments to remove any voice targeting.
 - `void Stop()`: Stops the currently playing stream.
 - `bool IsPlaying()`: Returns true if an stream is currently playing, false otherwise.
 

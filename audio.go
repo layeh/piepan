@@ -31,6 +31,8 @@ func (in *Instance) audioPlay(l *lua.State) int {
 
 			callback.Close()
 		}
+	} else {
+		in.audio.Done = nil
 	}
 
 	in.audio.Play(filename)
