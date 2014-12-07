@@ -4,6 +4,26 @@ import (
 	"github.com/layeh/gumble/gumble"
 )
 
+type disconnectEventWrapper struct {
+	Client *gumble.Client
+	Type   int
+
+	String string
+
+	IsError bool
+	IsUser  bool
+
+	IsOther             bool
+	IsVersion           bool
+	IsUserName          bool
+	IsUserCredentials   bool
+	IsServerPassword    bool
+	IsUsernameInUse     bool
+	IsServerFull        bool
+	IsNoCertificate     bool
+	IsAuthenticatorFail bool
+}
+
 type userChangeEventWrapper struct {
 	Client *gumble.Client
 	Type   int

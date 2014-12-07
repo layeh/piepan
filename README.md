@@ -110,7 +110,7 @@ Registers an event listener for a given event type. The follow events are curren
 
 - `connect` (Arguments: [`ConnectEvent event`](https://godoc.org/github.com/layeh/gumble/gumble#ConnectEvent))
     - Called when connection to the server has been made. This is where a script should perform its initialization.
-- `disconnect`
+- `disconnect` (Arguments: [`DisconnectEvent`](https://godoc.org/github.com/layeh/gumble/gumble#DisconnectEvent))
     - Called when connection to the server has been lost or after `piepan.Disconnect()` is called.
 - `message` (Arguments: [`TextMessageEvent event`](https://godoc.org/github.com/layeh/gumble/gumble#TextMessageEvent))
     - Called when a text message is received.
@@ -124,7 +124,7 @@ Registers an event listener for a given event type. The follow events are curren
 Events with a `Type` field have slight changes than what is documented in gumble:
 
 1. The `Type` field is changed to a number.
-2. Individual bit flag values are added to the object as booleans prefixed with `Is`
+2. Individual bit flag values are added to the event as booleans prefixed with `Is`
     - Example: When a user connects to the server, `UserChangeEvent.IsConnected` will be true.
 
 ## Changelog
