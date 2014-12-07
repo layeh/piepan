@@ -13,8 +13,7 @@ import (
 type Instance struct {
 	client *gumble.Client
 
-	audio             *gumble_ffmpeg.Stream
-	audioCallbackFunc *luar.LuaObject
+	audio *gumble_ffmpeg.Stream
 
 	stateLock sync.Mutex
 	state     *lua.State
@@ -28,7 +27,6 @@ func New(client *gumble.Client) *Instance {
 		listeners: make(map[string][]*luar.LuaObject),
 	}
 	instance.audio, _ = gumble_ffmpeg.New(instance.client)
-	instance.audio.Done = instance.audioCallback
 
 	luar.Register(instance.state, "piepan", luar.Map{
 		"On": instance.luaPiepanOn,
@@ -38,10 +36,9 @@ func New(client *gumble.Client) *Instance {
 
 	instance.state.NewTable()
 	luar.Register(instance.state, "*", luar.Map{
-		"Play":        instance.audioPlay,
-		"IsPlaying":   instance.audioIsPlaying,
-		"Stop":        instance.audioStop,
-		"SetCallback": instance.audioSetCallback,
+		"Play":      instance.audioPlay,
+		"IsPlaying": instance.audioIsPlaying,
+		"Stop":      instance.audioStop,
 	})
 	instance.state.SetField(-2, "Audio")
 

@@ -59,5 +59,7 @@ piepan.On('message', function(e)
   end
 
   piepan.Audio.Stop()
-  piepan.Audio.Play(soundFile)
+  piepan.Audio.Play({
+    filename = soundFile
+  })
 end)

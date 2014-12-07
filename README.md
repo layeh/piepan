@@ -59,14 +59,13 @@ Documentation for types not part of piepan itself (e.g. User and Channel) can be
 
 #### `piepan.Audio`
 
-- `void Play(string filename)`: Plays the given media file.
-- `void SetCallback(function callback)`: Sets a function to be called after an media file is done playing. Passing nil will remove the callback function.
+- `void Play(table obj)`: Plays the media file `obj.filename`. `obj.callback` can be defined as a function that is called after the playback has completed.
 - `void Stop()`: Stops the currently playing stream.
 - `bool IsPlaying()`: Returns true if an stream is currently playing, false otherwise.
 
 #### `piepan.Timer`
 
-- `piepan.Timer New(function func, int timeout)`: Creates a new timer.  After `timeout` seconds elapses, `func` will be executed.
+- `piepan.Timer New(function callback, int timeout)`: Creates a new timer.  After `timeout` seconds elapses, `callback` will be executed.
 
 - `void Cancel()`: Cancels the timer.
 
