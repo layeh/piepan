@@ -3,9 +3,9 @@
 piepan is an easy to use bot framework for interacting with a [Mumble](http://mumble.sourceforge.net/) server.  Here is a simple script that will echo back any chat message that is sent to it:
 
     -- echo.lua
-    function piepan.onMessage(msg)
-        piepan.me.channel:send(msg.text)
-    end
+    piepan.On('message', function(e)
+        piepan.Self().Channel().Send(e.Message)
+    end)
 
 The above script can be started from the command line:
 
@@ -13,268 +13,94 @@ The above script can be started from the command line:
 
 ## Usage
 
-    usage: piepan [options] [[--] scripts...]
+    usage: piepan [options] [scripts...]
     a bot framework for Mumble
-
-      -u <username>        username of the bot (has no effect if the certificate
-                           has been registered with the server under a different
-                           name)
-      -s <server>[:<port>] address of the server (default: localhost), and port
-                           of the server (default: 64738)
-      -p <file>            read server password from the given file (when file is -,
-                           standard input will be read)
-      -t <file>            read access tokens (one per line) from the given file
-      -c <certificate>     certificate to use for the connection
-      -k <keyfile>         key file to use for the connection (defaults to the
-                           certificate file)
-      -d                   enable development mode, which automatically reloads
-                           scripts when they are modified
-      --<name>[=<value>]   a key-value pair that will be accessible from the scripts
-      -h                   display this help
-      -v                   show version
+      -certificate="": user certificate file (PEM)
+      -insecure=false: skip certificate checking
+      -key="": user certificate key file (PEM)
+      -password="": user password
+      -server="localhost:64738": address of the server
+      -username="piepan-bot": username of the bot
 
 ## Programming reference
 
-The following section describes the API that is available for script authors.  Please note that the current API does not contain all of the features that are defined in the Mumble protocol.
+The following section describes the API that is available for piepan scripts.
 
-### Tables
+### Types
 
-#### `piepan.User`
-
-- `int session`: the session ID of the user.
-- `int userId`: the registered user ID of the user.
-- `string name`: the username of the user.
-- `string comment`: the user's comment.
-- `bool isServerMuted`: is the user muted by the server.
-- `bool isServerDeafened`: has the user been deafened by the server.
-- `bool isSelfMuted`: is the user muted by the him/herself.
-- `bool isSelfDeafened`: has the user been deafened by him/herself.
-- `bool isRecording`: is the user recording channel audio.
-- `bool isPrioritySpeaker`: is the user a priority speaker.
-- `piepan.Channel channel`: the channel that the user is currently in.
-- `string texture`: the bytes of the user's texture/avatar.
-- `string hash`: the hexadecimal string representation of the user's certificate hash. This will be nil if the user did not connect to the server with a certificate.
-- `void moveTo(self, piepan.Channel channel)`: moves the user to the given `channel`.
-- `void send(self, string message)`: sends a text message to the user.
-- `void kick(self [, string reason])`: kicks the user from the server with an optional reason.
-- `void ban(self [, string reason])`: bans the user from the server with an optional reason.
-- `void setComment(self [, string comment])`: sets the user's comment to `comment`.
-- `void setTexture(self, string bytes)`: sets the user's texture to the image stored in `bytes`.
-- `void register(self)`: registers the user with the connected server.
-- `void resolveHashes(self)`:  resolves the comment and/or texture hash for the user. The execution of the current function will be suspended and will resume after the data has been received from the server. The function will return instantly if no data needs to be fetched.
-
-    Example:
-
-        -- Get the comment of a user, where the comment is over 128 bytes
-        local user = piepan.users[username]
-        user:resolveHashes()
-        local comment = user.comment
-
-#### `piepan.Message`
-
-- `string text`: the message text.
-- `piepan.User user`: the user who sent the message (this can be `nil`).
-- `piepan.Channel channels`: a table of channels the message was sent to, with the key being the channel ID and the value being the corresponding channel table.
-- `piepan.User users`: a table of users the message was sent to, with the key being the user name and the value being their corresponding user table.
-
-#### `piepan.Channel`
-
-- `int id`: the unique channel identifier.
-- `string name`: the channel name.
-- `string description`: the description of the channel.
-- `piepan.Channel parent`: the parent channel.
-- `bool isTemporary`: is the channel temporary.
-- `void remove(self)`: removes the channel from the server's channel tree.
-- `void setDescription(self [, string description])`: sets the channel's description.
-- `bool play(self, table info [, function callback])`: plays an audio file to the channel. `callback` will be executed when the file finishes playing. Returns `true` if no other audio file was playing and the stream started successfully.
-    - The following fields are supported in the `info` table:
-        - `string filename`: the filename of the file which will be played
-        - `number volume`: the volume at which the audio will be played (default: 1.0)
-- `bool play(self, string filename [, function callback])`: alias for: `bool play(self, {filename = filename, volume = 1}, callback)`
-
-- `void send(self, string message)`: sends a message to the channel.
-
-    Example:
-
-        -- sends a message to the channel the bot is currently in
-        piepan.me.channel:send("Hello Everyone!")
-
-- `piepan.Channel __call(self, string path)`: returns the child at the end of the path. The path items are separated by slashes (`/`).  The path item `.` refers to the current channel, the item `..` refers to the parent channel, and all other items refer to the child channel.
-
-    Example:
-
-        -- moves user to the sibling channel named test
-        local channel = user.channel("../test")
-        user:moveTo(channel)
-
-- `void resolveHashes(self)`: resolves the description hash for the channel (see `piepan.User.resolveHashes()` for details).
+Documentation for types not part of piepan itself (e.g. User and Channel) can be found in the [gumble documentation](https://godoc.org/github.com/layeh/gumble/gumble).
 
 #### `piepan.Audio`
 
-- `void stop()`: stops the currently playing audio stream.
-- `bool isPlaying()`: returns true if an audio stream is currently playing.
-
-*Note: Only Ogg Vorbis files are supported (mono, 48kHz)*
+- `void Play(string filename)`: Plays the given media file.
+- `void SetCallback(function callback)`: Sets a function to be called after an media file is done playing. Passing nil will remove the callback function.
+- `void Stop()`: Stops the currently playing stream.
+- `bool IsPlaying()`: Returns true if an stream is currently playing, false otherwise.
 
 #### `piepan.Timer`
 
-- `piepan.Timer new(function func, int timeout)`: Creates a new timer.  After `timeout` seconds elapses, `func` will be executed.
+- `piepan.Timer New(function func, int timeout)`: Creates a new timer.  After `timeout` seconds elapses, `func` will be executed.
 
-    The (arbitrary) range of `timeout` is 1-3600 (1 second to 1 hour).
+- `void Cancel()`: Cancels the timer.
 
-    Once a timer has been fired or canceled, its reference is no longer valid.
+#### `piepan.Process`
 
-- `void cancel(self)`: Cancels a timer.
+- `piepan.Process New(function callback, string command, string arguments...)`: Executes `command` in a new process with the given arguments. The function `callback` is executed once the process has completed, passing if the execution was successful and the contents of standard output.
 
-#### `piepan.Thread`
-
-- `void new(function worker [, function callback, data])`: Starts executing the global function `worker` in a new thread, with the argument `data`.
-
-    The worker function should only use local variables.  Any use or modification of global variables is undefined.  Values that this function needs should be passed via the `data` argument.
-
-    An optional `callback` will be executed on the main thread after `worker` completes.  It will be passed the value that `worker` returns.
-
-#### `piepan.UserChange`
-
-- `piepan.User user`: the user that changed.
-- `bool isConnected`:  if the user connected to the server.
-- `bool isDisconnected`: if the user disconnected from the server.
-- `bool isChangedChannel`:  if the user moved to a new channel.
-- `bool isChangedComment`: if the user's comment changed.
-
-#### `piepan.ChannelChange`
-
-- `piepan.Channel channel`: the channel that was changed.
-- `bool isCreated`: if the channel was created.
-- `bool isRemoved`: if the channel was removed.
-- `bool isMoved`: if the channel moved in the tree.
-- `bool isChangedName`: if the channel name changed.
-- `bool isChangedDescription`: if the channel description changed.
-
-#### `piepan.Permissions`
-
-- `piepan.Permissions new(int permissionsMask)`: creates a new `piepan.Permissions` table from a bitmask of permissions.
-- `bool write`: can change the channel comment and edit the ACL.
-- `bool traverse`: can move oneself to the channel and sub-channels.
-- `bool enter`: can move oneself into the channel.
-- `bool speak`: can transmit audio to a channel.
-- `bool muteDeafen`: can mute or deafen another user in the channel.
-- `bool move`: can move another user into the channel.
-- `bool makeChannel`:  can create a non-temporary channel.
-- `bool linkChannel`: can add or remove channel links.
-- `bool whisper`: can send audio directly to a user.
-- `bool textMessage`: can send a text message to the channel.
-- `bool makeTemporaryChannel`: can create a temporary channel on the server.
-- `bool kick`: can kick a user from the server.
-- `bool ban`: can ban a user from the server.
-- `bool register`: can register another user on the server.
-- `bool registerSelf`: can register oneself on the server.
-
-#### `piepan.PermissionDenied`
-
-- `piepan.User user`: the user who made the request that was denied by the server.
-- `piepan.Channel channel`: the channel where the action was denied.
-- `piepan.Permissions permissions`: the permissions that the user would have to have in order to perform the action.
-- `string reason`: the reason the server gave for denying the action.
-- `string name`: the name that was denied by the server.
-- `bool isPermission`: denied due to not having the correct permissions.
-- `bool isTextTooLong`: denied due to the text message being too long.
-- `bool isTemporaryChannel`: denied due to the action being impossible to perform on a temporary channel.
-- `bool isMissingCertificate`: denied due to needing a certificate in order to complete the action.
-- `bool isChannelName`: denied due to the channel name being invalid.
-- `bool isUserName`: denied due to the user name being invalid.
-- `bool isChannelFull`: denied due to the channel being full.
-- `bool isOther`: denied due to another reason.
+- `void Kill()`: Kills the process.
 
 ### Variables
 
-#### `piepan.users`
+#### [`Users`](https://godoc.org/github.com/layeh/gumble/gumble#Users) `piepan.Users`
 
-Table containing each connected user on the server, with the keys being the name of the user and the value being their corresponding `piepan.User` table.
+Table containing each connected user on the server, with the keys being the session ID of the user and the value being their corresponding `piepan.User` table.
 
 Example:
 
     -- prints the usernames of all the users connected to the server to standard
     -- output
-    for name,_ in pairs(piepan.users) do
-        print (name)
+    for _, user in pairs(piepan.Users) do
+        print (user.Name())
     end
 
-#### `piepan.channels`
+#### [`Channels`](https://godoc.org/github.com/layeh/gumble/gumble#Channels) `piepan.Channels`
 
-Table that contains all of the channels that are on the server. The channels are mapped by their channel IDs. `piepan.channels[0]` is the server's root channel.
+Table that contains all of the channels that are on the server. The channels are mapped by their channel IDs. `piepan.Channels[0]` is the server's root channel.
 
-`piepan.channels.__call` is mapped to `piepan.channels[0].__call`, therefore the following can be done:
+#### [`User`](https://godoc.org/github.com/layeh/gumble/gumble#User) `piepan.Self`
 
-    local channel = piepan.channels("A/B/C")
-    piepan.me:moveTo(channel)
-
-#### `piepan.me`
-
-The `piepan.User` table that references yourself.
-
-#### `piepan.server`
-
-Table containing information about the server.  This table may have the fields:
-
-- `bool allowHtml`: if HTML messages are allowed to be sent to the server.
-- `int maxBandwidth`: the maximum voice bandwidth a client can use (in bits per second).
-- `int maxMessageLength`: the maximum length of a text message that does not contain an image.
-- `int maxImageMessageLength`: the maximum length of a text message that contains an image.
-- `string welcomeText`: the server's welcome text.
-
-#### `piepan.args`
-
-A table that is populated with the command line arguments that are in the form: `--key=value` or `--key` (in the latter case, `value` is assumed to be an empty string).
-
-The values are stored in the table `piepan.args[key]`, which allows multiple arguments to share the same key.
-
-Example:
-
-    -- print a list of all of the admins
-    for _,admin in ipairs(piepan.args.admin or {}) do
-        print (admin)
-    end
-
-    # program execution
-    $ piepan --admin=user1 --admin=user2 ...
+The `User` table that references yourself.
 
 ### Functions
 
-#### `piepan.disconnect()`
+#### `piepan.Disconnect()`
 
 Disconnects from the server.
 
-### Callbacks
+#### `piepan.On(string event, function callback)`
 
-These are functions that can be defined in script files.  They will be called when the corresponding event happens.
+Registers an event listener for a given event type. The follow events are currently supported:
 
-#### `piepan.onConnect()`
-
-Called when connection to the server has been made. This is where a script should perform its initialization.
-
-#### `piepan.onDisconnect()`
-
-Called when connection to the server has been lost or after `piepan.disconnect()` is called.
-
-#### `piepan.onMessage(piepan.Message message)`
-
-Called when a text message `message` is received.
-
-#### `piepan.onUserChange(piepan.UserChange event)`
-
-Called when a user's status changes.
-
-#### `piepan.onChannelChange(piepan.ChannelChange event)`
-
-Called when a channel changes state (e.g. is added or removed).
-
-#### `piepan.onPermissionDenied(piepan.PermissionDenied event)`
-
-Called when a requested action could not be performed.
+- `connect` (Arguments: [`ConnectEvent event`](https://godoc.org/github.com/layeh/gumble/gumble#ConnectEvent))
+    - Called when connection to the server has been made. This is where a script should perform its initialization.
+- `disconnect`
+    - Called when connection to the server has been lost or after `piepan.disconnect()` is called.
+- `message` (Arguments: [`TextMessageEvent event`](https://godoc.org/github.com/layeh/gumble/gumble#TextMessageEvent))
+    - Called when a text message is received.
+- `userChange` (Arguments: [`UserChangeEvent event`](https://godoc.org/github.com/layeh/gumble/gumble#UserChangeEvent))
+    - Called when a user's properties changes (e.g. connects to the server).
+- `channelChange` (Arguments: [`ChannelChangeEvent event`](https://godoc.org/github.com/layeh/gumble/gumble#ChannelChangeEvent))
+    - Called when a channel changes state (e.g. is added or removed).
+- `permissionDenied` (Arguments: [`PermissionDenied event`](https://godoc.org/github.com/layeh/gumble/gumble#PermissionDeniedEvent))
+    - Called when a requested action could not be performed.
 
 ## Changelog
 
+- Next
+    - Moved to Go (+ gumble)
+    - API has been overhauled. There is no backwards capability with previous versions of piepan.
+- 0.3.1 (2014-10-06)
+    - Fixed audio transmission memory leak
 - 0.3.0 (2014-10-01)
     - Removed `data` argument from `Channel.play` and `Timer.new`
     - Fixed inability to start playing audio from inside of an audio completion callback
@@ -294,20 +120,12 @@ Called when a requested action could not be performed.
 - 0.1 (2013-12-11)
     - Initial Release
 
-## Building
-
-1. Ensure all of the requirements are installed
-2. Run `make` inside of the project directory
-3. The `piepan` executable should appear in the directory
-
 ## Requirements
 
-- [OpenSSL](http://www.openssl.org/)
-- [Lua 5.2](http://www.lua.org/)
-- [libev](http://libev.schmorp.de/)
-- [protobuf-c](https://github.com/protobuf-c/protobuf-c)
-- [Ogg Vorbis](https://xiph.org/vorbis/)
-- [Opus](http://www.opus-codec.org/)
+- [gumble](https://github.com/bontibon/gumble/tree/master/gumble)
+- [gumble_ffmpeg](https://github.com/bontibon/gumble/tree/master/gumble_ffmpeg)
+- [golua](https://github.com/aarzilli/golua)
+- [luar](https://github.com/stevedonovan/luar)
 
 ## License
 
