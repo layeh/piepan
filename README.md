@@ -121,6 +121,12 @@ Registers an event listener for a given event type. The follow events are curren
 - `permissionDenied` (Arguments: [`PermissionDenied event`](https://godoc.org/github.com/layeh/gumble/gumble#PermissionDeniedEvent))
     - Called when a requested action could not be performed.
 
+Events with a `Type` field have slight changes than what is documented in gumble:
+
+1. The `Type` field is changed to a number.
+2. Individual bit flag values are added to the object as booleans prefixed with `Is`
+    - Example: When a user connects to the server, `UserChangeEvent.IsConnected` will be true.
+
 ## Changelog
 
 - Next
