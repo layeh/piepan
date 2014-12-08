@@ -16,17 +16,17 @@ local should_move = false
 
 -- Table with keys being the keywords and values being the sound files
 local sounds = {
-  cheer = "cheer.ogg",
-  hello = "hello.ogg",
-  huh = "huh.ogg",
-  image = "image.ogg",
-  lol = "lol.ogg",
-  mock = "mock.ogg",
-  nice = "nice.ogg"
+  cheer = "sounds/cheer.ogg",
+  hello = "sounds/hello.ogg",
+  huh   = "sounds/huh.ogg",
+  image = "sounds/image.ogg",
+  lol   = "sounds/lol.ogg",
+  mock  = "sounds/mock.ogg",
+  nice  = "sounds/nice.ogg"
 }
 
 -- Sound file path prefix
-local prefix = "examples/sounds/"
+local prefix = os.getenv('PREFIX') or "examples/"
 
 ---------------
 

@@ -5,7 +5,8 @@
 -- Requires:  wget, jshon
 --
 
-local lookup_process = "examples/youtube-info-worker.sh"
+local prefix = os.getenv('PREFIX') or "examples/"
+local worker = prefix .. "youtube-info-worker.sh"
 
 local message_fmt = [[
 <table>
@@ -54,7 +55,7 @@ piepan.On('message', function(e)
         local message = string.format(message_fmt, id, title, duration,
           id, thumbnail)
         piepan.Self.Channel().Send(message, false)
-      end, lookup_process, video_id)
+      end, worker, video_id)
       return
     end
   end
