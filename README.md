@@ -84,14 +84,50 @@ Registers an event listener for a given event type. The follow events are curren
     - Called when a user's properties changes (e.g. connects to the server).
 - `channelChange` (Arguments: [`ChannelChangeEvent event`](https://godoc.org/github.com/layeh/gumble/gumble#ChannelChangeEvent))
     - Called when a channel changes state (e.g. is added or removed).
-- `permissionDenied` (Arguments: [`PermissionDenied event`](https://godoc.org/github.com/layeh/gumble/gumble#PermissionDeniedEvent))
+- `permissionDenied` (Arguments: [`PermissionDeniedEvent event`](https://godoc.org/github.com/layeh/gumble/gumble#PermissionDeniedEvent))
     - Called when a requested action could not be performed.
 
 Note: events with a `Type` field have slight changes than what is documented in gumble:
 
 1. The `Type` field is changed to a number.
 2. Individual bit flag values are added to the event as booleans prefixed with `Is`
-    - Example: When a user connects to the server, `UserChangeEvent.IsConnected` will be true.
+    - `DisconnectEvent`
+        - `IsError`
+        - `IsUser`
+        - `IsOther`
+        - `IsVersion`
+        - `IsUserName`
+        - `IsUserCredentials`
+        - `IsServerPassword`
+        - `IsUsernameInUse`
+        - `IsServerFull`
+        - `IsNoCertificate`
+        - `IsAuthenticatorFail`
+    - `UserChangeEvent`
+        - `IsConnected`
+        - `IsDisconnected`
+        - `IsKicked`
+        - `IsBanned`
+        - `IsChangeName`
+        - `IsChangeChannel`
+        - `IsChangeComment`
+    - `ChannelChangeEvent`
+        - `IsCreated`
+        - `IsRemoved`
+        - `IsMoved`
+        - `IsChangeName`
+        - `IsChangeDescription`
+    - `PermissionDeniedEvent`
+        - `IsOther`
+        - `IsPermission`
+        - `IsSuperUser`
+        - `IsInvalidChannelName`
+        - `IsTextTooLong`
+        - `IsTemporaryChannel`
+        - `IsMissingCertificate`
+        - `IsInvalidUserName`
+        - `IsChannelFull`
+        - `IsNestingLimit`
 
 ### `piepan.Process`
 
