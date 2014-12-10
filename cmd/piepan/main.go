@@ -29,14 +29,10 @@ func main() {
 	flag.Parse()
 
 	// Configuration
-	mux := gumbleutil.EventMultiplexer{}
-	keepAlive := make(chan bool)
-
 	config := gumble.Config{
 		Username: *username,
 		Password: *password,
 		Address:  *server,
-		Listener: &mux,
 	}
 
 	if *insecure {
@@ -66,8 +62,10 @@ func main() {
 	}
 
 	// Event multiplexer
-	mux.Attach(piepan)
-	mux.Attach(gumbleutil.Listener{
+	client.Attach(piepan)
+
+	keepAlive := make(chan bool)
+	client.Attach(gumbleutil.Listener{
 		Disconnect: func(e *gumble.DisconnectEvent) {
 			keepAlive <- true
 		},
