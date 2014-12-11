@@ -3,12 +3,13 @@ package main
 import (
 	"crypto/tls"
 	"flag"
-	"os"
 	"fmt"
+	"os"
 
 	"github.com/layeh/gumble/gumble"
 	"github.com/layeh/gumble/gumbleutil"
 	"github.com/layeh/piepan"
+	"github.com/robertkrimen/otto"
 )
 
 func main() {
@@ -22,7 +23,7 @@ func main() {
 
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "usage: %s [options] [scripts...]\n", os.Args[0])
-		fmt.Fprintf(os.Stderr, "a bot framework for Mumble\n")
+		fmt.Fprintf(os.Stderr, "a scriptable bot framework for Mumble\n")
 		flag.PrintDefaults()
 	}
 
@@ -53,7 +54,13 @@ func main() {
 
 	// piepan
 	piepan := piepan.New(client)
-	defer piepan.Destroy()
+	piepan.ErrFunc = func(err error) {
+		if ottoErr, ok := err.(*otto.Error); ok {
+			fmt.Fprintf(os.Stderr, "%s\n", ottoErr.String())
+		} else {
+			fmt.Fprintf(os.Stderr, "%s\n", err)
+		}
+	}
 
 	for _, script := range flag.Args() {
 		if err := piepan.LoadScriptFile(script); err != nil {

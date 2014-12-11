@@ -1,8 +1,50 @@
 package piepan
 
 import (
+	"strconv"
+
 	"github.com/layeh/gumble/gumble"
 )
+
+type usersWrapper map[string]*gumble.User
+
+func newUsersWrapper(users gumble.Users) usersWrapper {
+	wrapper := usersWrapper{}
+	for _, user := range users {
+		wrapper.add(user)
+	}
+	return wrapper
+}
+
+func (uw usersWrapper) add(user *gumble.User) {
+	session := strconv.FormatUint(uint64(user.Session()), 10)
+	uw[session] = user
+}
+
+func (uw usersWrapper) remove(user *gumble.User) {
+	session := strconv.FormatUint(uint64(user.Session()), 10)
+	delete(uw, session)
+}
+
+type channelsWrapper map[string]*gumble.Channel
+
+func newChannelsWrapper(channels gumble.Channels) channelsWrapper {
+	wrapper := channelsWrapper{}
+	for _, channel := range channels {
+		wrapper.add(channel)
+	}
+	return wrapper
+}
+
+func (cw channelsWrapper) add(channel *gumble.Channel) {
+	id := strconv.FormatUint(uint64(channel.ID()), 10)
+	cw[id] = channel
+}
+
+func (cw channelsWrapper) remove(channel *gumble.Channel) {
+	id := strconv.FormatUint(uint64(channel.ID()), 10)
+	delete(cw, id)
+}
 
 type disconnectEventWrapper struct {
 	Client *gumble.Client

@@ -1,75 +1,118 @@
 package piepan
 
 import (
+	"io/ioutil"
+	"os"
 	"strings"
 	"sync"
 
-	"github.com/aarzilli/golua/lua"
 	"github.com/layeh/gumble/gumble"
 	"github.com/layeh/gumble/gumble_ffmpeg"
-	"github.com/stevedonovan/luar"
+	"github.com/robertkrimen/otto"
+	_ "github.com/robertkrimen/otto/underscore"
 )
 
 type Instance struct {
+	ErrFunc func(error)
+
 	client *gumble.Client
 
 	audio *gumble_ffmpeg.Stream
 
 	stateLock sync.Mutex
-	state     *lua.State
-	listeners map[string][]*luar.LuaObject
+	state     *otto.Otto
+	listeners map[string][]otto.Value
+	users     usersWrapper
+	channels  channelsWrapper
 }
 
 func New(client *gumble.Client) *Instance {
-	instance := &Instance{
+	in := &Instance{
 		client:    client,
-		state:     luar.Init(),
-		listeners: make(map[string][]*luar.LuaObject),
+		state:     otto.New(),
+		listeners: make(map[string][]otto.Value),
 	}
-	instance.audio, _ = gumble_ffmpeg.New(instance.client)
+	in.audio, _ = gumble_ffmpeg.New(in.client)
 
-	luar.Register(instance.state, "piepan", luar.Map{
-		"On": instance.luaPiepanOn,
+	in.state.Set("piepan", map[string]interface{}{
+		"On":         in.apiOn,
+		"Disconnect": in.apiDisconnect,
+		"Audio": map[string]interface{}{
+			"Play":      in.apiAudioPlay,
+			"IsPlaying": in.apiAudioIsPlaying,
+			"Stop":      in.apiAudioStop,
+			"SetTarget": in.apiAudioSetTarget,
+		},
+		"Process": map[string]interface{}{
+			"New": in.apiProcessNew,
+		},
+		"Timer": map[string]interface{}{
+			"New": in.apiTimerNew,
+		},
 	})
-
-	instance.state.GetGlobal("piepan")
-
-	instance.state.NewTable()
-	luar.Register(instance.state, "*", luar.Map{
-		"Play":      instance.audioPlay,
-		"IsPlaying": instance.audioIsPlaying,
-		"Stop":      instance.audioStop,
-		"SetTarget": instance.audioSetTarget,
-	})
-	instance.state.SetField(-2, "Audio")
-
-	instance.state.NewTable()
-	luar.Register(instance.state, "*", luar.Map{
-		"New": instance.timerNew,
-	})
-	instance.state.SetField(-2, "Timer")
-
-	instance.state.NewTable()
-	luar.Register(instance.state, "*", luar.Map{
-		"New": instance.processNew,
-	})
-	instance.state.SetField(-2, "Process")
-
-	instance.state.SetTop(0)
-	return instance
+	in.state.Set("ENV", in.createEnvVars())
+	return in
 }
 
-func (in *Instance) luaPiepanOn(l *lua.State) int {
-	event := strings.ToLower(l.CheckString(1))
-	function := luar.NewLuaObject(l, 2)
+func (in *Instance) createEnvVars() map[string]string {
+	vars := make(map[string]string)
+	for _, val := range os.Environ() {
+		split := strings.SplitN(val, "=", 2)
+		if len(split) != 2 {
+			continue
+		}
+		vars[split[0]] = split[1]
+	}
+	return vars
+}
+
+func (in *Instance) callValue(value otto.Value, arguments ...interface{}) {
+	for i, arg := range arguments {
+		value, err := in.state.ToValue(arg)
+		if err != nil {
+			if errFunc := in.ErrFunc; errFunc != nil {
+				errFunc(err)
+			}
+			return
+		}
+		arguments[i] = value
+	}
+	in.stateLock.Lock()
+	if _, err := value.Call(otto.NullValue(), arguments...); err != nil {
+		in.stateLock.Unlock()
+		if errFunc := in.ErrFunc; errFunc != nil {
+			errFunc(err)
+		}
+	} else {
+		in.stateLock.Unlock()
+	}
+}
+
+func (in *Instance) apiOn(call otto.FunctionCall) otto.Value {
+	event := strings.ToLower(call.Argument(0).String())
+	function := call.Argument(1)
 	in.listeners[event] = append(in.listeners[event], function)
-	return 0
+	return otto.UndefinedValue()
+}
+
+func (in *Instance) apiDisconnect() {
+	if client := in.client; client != nil {
+		client.Disconnect()
+	}
 }
 
 func (in *Instance) LoadScriptFile(filename string) error {
-	return in.state.DoFile(filename)
-}
-
-func (in *Instance) Destroy() {
-	in.state.Close()
+	data, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return err
+	}
+	script, err := in.state.Compile(filename, data)
+	if err != nil {
+		return err
+	}
+	_, err = in.state.Run(script)
+	if err != nil {
+		return err
+	}
+	return nil
 }

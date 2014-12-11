@@ -1,12 +1,9 @@
 package piepan
 
 import (
-	"fmt"
-	"os"
 	"os/exec"
 
-	"github.com/aarzilli/golua/lua"
-	"github.com/stevedonovan/luar"
+	"github.com/robertkrimen/otto"
 )
 
 type process struct {
@@ -17,15 +14,13 @@ func (p *process) Kill() {
 	p.cmd.Process.Kill()
 }
 
-func (in *Instance) processNew(l *lua.State) int {
-	callback := luar.NewLuaObject(l, 1)
-	command := l.CheckString(2)
+func (in *Instance) apiProcessNew(call otto.FunctionCall) otto.Value {
+	callback := call.Argument(0)
+	command := call.Argument(1).String()
 
-	var args []string
-	argCount := l.GetTop()
-	for i := 3; i <= argCount; i++ {
-		value := l.CheckString(i)
-		args = append(args, value)
+	args := make([]string, len(call.ArgumentList)-2)
+	for i, arg := range call.ArgumentList[2:] {
+		args[i] = arg.String()
 	}
 
 	p := &process{
@@ -33,22 +28,14 @@ func (in *Instance) processNew(l *lua.State) int {
 	}
 
 	go func() {
-		defer callback.Close()
-
 		var str string
 		bytes, _ := p.cmd.Output()
 		if bytes != nil {
 			str = string(bytes)
 		}
-		in.stateLock.Lock()
-		defer in.stateLock.Unlock()
-
-		if _, err := callback.Call(p.cmd.ProcessState.Success(), str); err != nil {
-			fmt.Fprintf(os.Stderr, "%s\n", err)
-		}
+		in.callValue(callback, p.cmd.ProcessState.Success(), str)
 	}()
 
-	obj := luar.NewLuaObjectFromValue(l, p)
-	obj.Push()
-	return 1
+	ret, _ := in.state.ToValue(p)
+	return ret
 }

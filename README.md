@@ -1,20 +1,24 @@
 # [piepan][1]: a bot framework for Mumble
 
-piepan is an easy to use bot framework for interacting with a [Mumble](http://mumble.sourceforge.net/) server using Lua scripts.  Here is a simple script that will echo back any chat message that is sent to it:
+piepan is an easy to use framework for writing scriptable [Mumble](http://mumble.sourceforge.net/) bots using JavaScript.  Here is a simple script that will echo back any chat message that is sent to it:
 
-    -- echo.lua
-    piepan.On('message', function(e)
-        piepan.Self().Channel().Send(e.Message)
-    end)
+    -- echo.js
+    piepan.On('message', function(e) {
+      if (e.Sender == null) {
+        return;
+      }
+      piepan.Self.Channel().Send(e.Message, false);
+    });
+
 
 The above script can be started from the command line:
 
-    $ piepan echo.lua
+    $ piepan echo.js
 
 ## Usage
 
     usage: piepan [options] [scripts...]
-    a bot framework for Mumble
+    a scriptable bot framework for Mumble
       -certificate="": user certificate file (PEM)
       -insecure=false: skip certificate checking
       -key="": user certificate key file (PEM)
@@ -28,7 +32,7 @@ The above script can be started from the command line:
 
     # 1. Install dependencies
     # 1.a. Base dependencies
-    sudo apt-get install -y liblua5.1-0-dev git libopus-dev mercurial wget python-software-properties software-properties-common
+    sudo apt-get install -y git libopus-dev mercurial wget python-software-properties software-properties-common
 
     # 1.b. Latest Go version (https://golang.org/dl/)
     wget https://storage.googleapis.com/golang/go1.3.3.linux-amd64.tar.gz
@@ -51,20 +55,20 @@ The above script can be started from the command line:
 
 ## Programming reference
 
-The following section describes the API that is available for piepan Lua scripts.
+The following section describes the API that is available for piepan scripts.
 
 piepan is built using the [gumble](https://github.com/layeh/gumble) library. Documentation for types not part of piepan itself (including User and Channel) can be found in the [gumble documentation](https://godoc.org/github.com/layeh/gumble/gumble).
 
 ### `piepan.Audio`
 
-- `void Play(table obj)`: Plays the media file `obj.filename`. `obj.callback` can be defined as a function that is called after the playback has completed.
+- `void Play(object obj)`: Plays the media file `obj.filename`. `obj.callback` can be defined as a function that is called after the playback has completed.
 - `void SetTarget(Channel|User targets...)` sets the target of subsequent `piepan.Audio.Play()` calls. Call this function with no arguments to remove any voice targeting.
 - `void Stop()`: Stops the currently playing stream.
 - `bool IsPlaying()`: Returns true if an stream is currently playing, false otherwise.
 
 ### [`Channels`](https://godoc.org/github.com/layeh/gumble/gumble#Channels) `piepan.Channels`
 
-Table that contains all of the channels that are on the server. The channels are mapped by their channel IDs. `piepan.Channels[0]` is the server's root channel.
+Object that contains all of the channels that are on the server. The channels are mapped by their channel IDs (as a string). `piepan.Channels["0"]` is the server's root channel.
 
 ### `piepan.Disconnect()`
 
@@ -137,31 +141,32 @@ Note: events with a `Type` field have slight changes than what is documented in 
 
 ### [`User`](https://godoc.org/github.com/layeh/gumble/gumble#User) `piepan.Self`
 
-The `User` table that references yourself.
+The `User` object that references yourself.
 
 ### `piepan.Timer`
 
-- `piepan.Timer New(function callback, int timeout)`: Creates a new timer.  After `timeout` seconds elapses, `callback` will be executed.
+- `piepan.Timer New(function callback, int timeout)`: Creates a new timer.  After at least `timeout` milliseconds, `callback` will be executed.
 
 - `void Cancel()`: Cancels the timer.
 
 ### [`Users`](https://godoc.org/github.com/layeh/gumble/gumble#Users) `piepan.Users`
 
-Table containing each connected user on the server, with the keys being the session ID of the user and the value being their corresponding `piepan.User` table.
+Object containing each connected user on the server, with the keys being the session ID of the user (as a string) and the value being their corresponding `piepan.User` object.
 
 Example:
 
-    -- prints the usernames of all the users connected to the server to standard
-    -- output
-    for _, user in pairs(piepan.Users) do
-        print (user.Name())
-    end
+    // Print the names of the connected users to standard output
+    for (var k in piepan.Users) {
+      var user = piepan.Users[k];
+      console.log(user.Name());
+    }
 
 ## Changelog
 
 - Next
     - Moved to Go (+ gumble)
     - API has been overhauled. There is no backwards capability with previous versions of piepan.
+    - JavaScript is now being used as the script language
 - 0.3.1 (2014-10-06)
     - Fixed audio transmission memory leak
 - 0.3.0 (2014-10-01)
@@ -187,8 +192,7 @@ Example:
 
 - [gumble](https://github.com/bontibon/gumble/tree/master/gumble)
 - [gumble_ffmpeg](https://github.com/bontibon/gumble/tree/master/gumble_ffmpeg)
-- [golua](https://github.com/aarzilli/golua)
-- [luar](https://github.com/stevedonovan/luar)
+- [otto](https://github.com/robertkrimen/otto)
 
 ## License
 

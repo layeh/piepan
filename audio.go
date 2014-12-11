@@ -1,56 +1,43 @@
 package piepan
 
 import (
-	"fmt"
-	"os"
-
-	"github.com/aarzilli/golua/lua"
 	"github.com/layeh/gumble/gumble"
-	"github.com/stevedonovan/luar"
+	"github.com/robertkrimen/otto"
 )
 
-func (in *Instance) audioPlay(l *lua.State) int {
+func (in *Instance) apiAudioPlay(call otto.FunctionCall) otto.Value {
 	if in.audio.IsPlaying() {
-		return 0
+		return otto.FalseValue()
+	}
+	obj := call.Argument(0).Object()
+	if obj == nil {
+		return otto.FalseValue()
 	}
 
-	obj := luar.NewLuaObject(l, 1)
-	defer obj.Close()
+	filenameValue, _ := obj.Get("filename")
+	callbackValue, _ := obj.Get("callback")
 
-	filename := obj.Get("filename").(string)
-	callback := obj.GetObject("callback")
-
-	if callback.Type != "nil" {
+	if callbackValue.IsFunction() {
 		in.audio.Done = func() {
-			in.stateLock.Lock()
-			defer in.stateLock.Unlock()
-
-			if _, err := callback.Call(); err != nil {
-				fmt.Fprintf(os.Stderr, "%s\n", err)
-			}
-
-			callback.Close()
+			in.audio.Done = nil
+			in.callValue(callbackValue)
 		}
-	} else {
-		in.audio.Done = nil
 	}
 
-	in.audio.Play(filename)
-	return 0
+	in.audio.Play(filenameValue.String())
+	return otto.TrueValue()
 }
 
-func (in *Instance) audioSetTarget(l *lua.State) int {
-	if l.GetTop() == 0 {
+func (in *Instance) apiAudioSetTarget(call otto.FunctionCall) otto.Value {
+	if len(call.ArgumentList) == 0 {
 		in.client.SetVoiceTarget(nil)
-		return 0
+		return otto.UndefinedValue()
 	}
 
 	vt := gumble.VoiceTarget{}
 	vt.SetID(1)
-
-	argCount := l.GetTop()
-	for i := 1; i <= argCount; i++ {
-		value := luar.LuaToGo(l, nil, i)
+	for _, arg := range call.ArgumentList {
+		value, _ := arg.Export()
 		switch val := value.(type) {
 		case *gumble.User:
 			vt.AddUser(val)
@@ -58,17 +45,21 @@ func (in *Instance) audioSetTarget(l *lua.State) int {
 			vt.AddChannel(val, false, false)
 		}
 	}
-
 	in.client.Send(&vt)
 	in.client.SetVoiceTarget(&vt)
 
-	return 0
+	return otto.UndefinedValue()
 }
 
-func (in *Instance) audioStop() {
+func (in *Instance) apiAudioStop(call otto.FunctionCall) otto.Value {
 	in.audio.Stop()
+	return otto.UndefinedValue()
 }
 
-func (in *Instance) audioIsPlaying() bool {
-	return in.audio.IsPlaying()
+func (in *Instance) apiAudioIsPlaying(call otto.FunctionCall) otto.Value {
+	if in.audio.IsPlaying() {
+		return otto.TrueValue()
+	} else {
+		return otto.FalseValue()
+	}
 }

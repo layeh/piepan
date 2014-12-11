@@ -1,35 +1,26 @@
 package piepan
 
 import (
-	"fmt"
-	"os"
-
 	"github.com/layeh/gumble/gumble"
-	"github.com/stevedonovan/luar"
 )
 
 func (in *Instance) OnConnect(e *gumble.ConnectEvent) {
-	luar.Register(in.state, "piepan", luar.Map{
-		"Self":       e.Client.Self(),
-		"Users":      e.Client.Users(),
-		"Channels":   e.Client.Channels(),
-		"Disconnect": in.disconnect,
-	})
+	global, _ := in.state.Get("piepan")
+	if obj := global.Object(); obj != nil {
+		in.users = newUsersWrapper(in.client.Users())
+		in.channels = newChannelsWrapper(in.client.Channels())
 
-	in.stateLock.Lock()
-	defer in.stateLock.Unlock()
+		obj.Set("Self", e.Client.Self())
+		obj.Set("Users", in.users)
+		obj.Set("Channels", in.channels)
+	}
 
 	for _, listener := range in.listeners["connect"] {
-		if _, err := listener.Call(e); err != nil {
-			fmt.Fprintf(os.Stderr, "%s\n", err)
-		}
+		in.callValue(listener, e)
 	}
 }
 
 func (in *Instance) OnDisconnect(e *gumble.DisconnectEvent) {
-	in.stateLock.Lock()
-	defer in.stateLock.Unlock()
-
 	event := disconnectEventWrapper{
 		Client: e.Client,
 		Type:   int(e.Type),
@@ -50,28 +41,21 @@ func (in *Instance) OnDisconnect(e *gumble.DisconnectEvent) {
 		IsAuthenticatorFail: e.Type.Has(gumble.DisconnectAuthenticatorFail),
 	}
 
+	in.users = nil
+	in.channels = nil
+
 	for _, listener := range in.listeners["disconnect"] {
-		if _, err := listener.Call(&event); err != nil {
-			fmt.Fprintf(os.Stderr, "%s\n", err)
-		}
+		in.callValue(listener, &event)
 	}
 }
 
 func (in *Instance) OnTextMessage(e *gumble.TextMessageEvent) {
-	in.stateLock.Lock()
-	defer in.stateLock.Unlock()
-
 	for _, listener := range in.listeners["message"] {
-		if _, err := listener.Call(e); err != nil {
-			fmt.Fprintf(os.Stderr, "%s\n", err)
-		}
+		in.callValue(listener, e)
 	}
 }
 
 func (in *Instance) OnUserChange(e *gumble.UserChangeEvent) {
-	in.stateLock.Lock()
-	defer in.stateLock.Unlock()
-
 	event := userChangeEventWrapper{
 		Client: e.Client,
 		Type:   int(e.Type),
@@ -89,17 +73,18 @@ func (in *Instance) OnUserChange(e *gumble.UserChangeEvent) {
 		IsChangeComment: e.Type.Has(gumble.UserChangeComment),
 	}
 
+	if event.IsConnected {
+		in.users.add(e.User)
+	} else if event.IsDisconnected {
+		in.users.remove(e.User)
+	}
+
 	for _, listener := range in.listeners["userchange"] {
-		if _, err := listener.Call(&event); err != nil {
-			fmt.Fprintf(os.Stderr, "%s\n", err)
-		}
+		in.callValue(listener, &event)
 	}
 }
 
 func (in *Instance) OnChannelChange(e *gumble.ChannelChangeEvent) {
-	in.stateLock.Lock()
-	defer in.stateLock.Unlock()
-
 	event := channelChangeEventWrapper{
 		Client:  e.Client,
 		Type:    int(e.Type),
@@ -113,16 +98,11 @@ func (in *Instance) OnChannelChange(e *gumble.ChannelChangeEvent) {
 	}
 
 	for _, listener := range in.listeners["channelchange"] {
-		if _, err := listener.Call(&event); err != nil {
-			fmt.Fprintf(os.Stderr, "%s\n", err)
-		}
+		in.callValue(listener, &event)
 	}
 }
 
 func (in *Instance) OnPermissionDenied(e *gumble.PermissionDeniedEvent) {
-	in.stateLock.Lock()
-	defer in.stateLock.Unlock()
-
 	event := permissionDeniedEventWrapper{
 		Client:  e.Client,
 		Type:    int(e.Type),
@@ -145,9 +125,7 @@ func (in *Instance) OnPermissionDenied(e *gumble.PermissionDeniedEvent) {
 	}
 
 	for _, listener := range in.listeners["permissiondenied"] {
-		if _, err := listener.Call(&event); err != nil {
-			fmt.Fprintf(os.Stderr, "%s\n", err)
-		}
+		in.callValue(listener, &event)
 	}
 }
 
