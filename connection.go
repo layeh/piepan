@@ -64,13 +64,19 @@ func (in *Instance) OnUserChange(e *gumble.UserChangeEvent) {
 
 		String: e.String,
 
-		IsConnected:     e.Type.Has(gumble.UserChangeConnected),
-		IsDisconnected:  e.Type.Has(gumble.UserChangeDisconnected),
-		IsKicked:        e.Type.Has(gumble.UserChangeKicked),
-		IsBanned:        e.Type.Has(gumble.UserChangeBanned),
-		IsChangeName:    e.Type.Has(gumble.UserChangeName),
-		IsChangeChannel: e.Type.Has(gumble.UserChangeChannel),
-		IsChangeComment: e.Type.Has(gumble.UserChangeComment),
+		IsConnected:             e.Type.Has(gumble.UserChangeConnected),
+		IsDisconnected:          e.Type.Has(gumble.UserChangeDisconnected),
+		IsKicked:                e.Type.Has(gumble.UserChangeKicked),
+		IsBanned:                e.Type.Has(gumble.UserChangeBanned),
+		IsRegistered:            e.Type.Has(gumble.UserChangeRegistered),
+		IsUnregistered:          e.Type.Has(gumble.UserChangeUnregistered),
+		IsChangeName:            e.Type.Has(gumble.UserChangeName),
+		IsChangeChannel:         e.Type.Has(gumble.UserChangeChannel),
+		IsChangeComment:         e.Type.Has(gumble.UserChangeComment),
+		IsChangeAudio:           e.Type.Has(gumble.UserChangeAudio),
+		IsChangeTexture:         e.Type.Has(gumble.UserChangeTexture),
+		IsChangePrioritySpeaker: e.Type.Has(gumble.UserChangePrioritySpeaker),
+		IsChangeRecording:       e.Type.Has(gumble.UserChangeRecording),
 	}
 
 	if event.IsConnected {
@@ -95,6 +101,7 @@ func (in *Instance) OnChannelChange(e *gumble.ChannelChangeEvent) {
 		IsMoved:             e.Type.Has(gumble.ChannelChangeMoved),
 		IsChangeName:        e.Type.Has(gumble.ChannelChangeName),
 		IsChangeDescription: e.Type.Has(gumble.ChannelChangeDescription),
+		IsChangePosition:    e.Type.Has(gumble.ChannelChangePosition),
 	}
 
 	for _, listener := range in.listeners["channelchange"] {

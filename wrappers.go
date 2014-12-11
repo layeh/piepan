@@ -74,13 +74,19 @@ type userChangeEventWrapper struct {
 
 	String string
 
-	IsConnected     bool
-	IsDisconnected  bool
-	IsKicked        bool
-	IsBanned        bool
-	IsChangeName    bool
-	IsChangeChannel bool
-	IsChangeComment bool
+	IsConnected             bool
+	IsDisconnected          bool
+	IsKicked                bool
+	IsBanned                bool
+	IsRegistered            bool
+	IsUnregistered          bool
+	IsChangeName            bool
+	IsChangeChannel         bool
+	IsChangeComment         bool
+	IsChangeAudio           bool
+	IsChangeTexture         bool
+	IsChangePrioritySpeaker bool
+	IsChangeRecording       bool
 }
 
 type channelChangeEventWrapper struct {
@@ -93,6 +99,7 @@ type channelChangeEventWrapper struct {
 	IsMoved             bool
 	IsChangeName        bool
 	IsChangeDescription bool
+	IsChangePosition    bool
 }
 
 type permissionDeniedEventWrapper struct {

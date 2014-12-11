@@ -112,15 +112,22 @@ Note: events with a `Type` field have slight changes than what is documented in 
         - `IsDisconnected`
         - `IsKicked`
         - `IsBanned`
+        - `IsRegistered`
+        - `IsUnregistered`
         - `IsChangeName`
         - `IsChangeChannel`
         - `IsChangeComment`
+        - `IsChangeAudio`
+        - `IsChangeTexture`
+        - `IsChangePrioritySpeaker`
+        - `IsChangeRecording`
     - `ChannelChangeEvent`
         - `IsCreated`
         - `IsRemoved`
         - `IsMoved`
         - `IsChangeName`
         - `IsChangeDescription`
+        - `IsChangePosition`
     - `PermissionDeniedEvent`
         - `IsOther`
         - `IsPermission`
