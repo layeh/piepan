@@ -172,7 +172,7 @@ Example:
 
 ## Changelog
 
-- Next
+- 0.4.0 (2014-12-11)
     - Moved to Go (+ gumble)
     - API has been overhauled. There is no backwards capability with previous versions of piepan.
     - JavaScript is now being used as the scripting language
