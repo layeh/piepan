@@ -70,6 +70,8 @@ piepan is built using the [gumble](https://github.com/layeh/gumble) library. Doc
 
 Object that contains all of the channels that are on the server. The channels are mapped by their channel IDs (as a string). `piepan.Channels["0"]` is the server's root channel.
 
+Note: [`Channel.Channels()`](https://godoc.org/github.com/layeh/gumble/gumble#Channel.Channels) and [`Channel.Users()`](https://godoc.org/github.com/layeh/gumble/gumble#Channel.Users) cannot be iterated over.
+
 ### `piepan.Disconnect()`
 
 Disconnects from the server.
@@ -173,7 +175,7 @@ Example:
 - Next
     - Moved to Go (+ gumble)
     - API has been overhauled. There is no backwards capability with previous versions of piepan.
-    - JavaScript is now being used as the script language
+    - JavaScript is now being used as the scripting language
 - 0.3.1 (2014-10-06)
     - Fixed audio transmission memory leak
 - 0.3.0 (2014-10-01)
