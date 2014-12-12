@@ -35,8 +35,8 @@ The above script can be started from the command line:
     sudo apt-get install -y git libopus-dev mercurial wget python-software-properties software-properties-common
 
     # 1.b. Latest Go version (https://golang.org/dl/)
-    wget https://storage.googleapis.com/golang/go1.3.3.linux-amd64.tar.gz
-    tar -C /usr/local -xzf go1.3.3.linux-amd64.tar.gz
+    wget https://storage.googleapis.com/golang/go1.4.linux-amd64.tar.gz
+    tar -C /usr/local -xzf go1.4.linux-amd64.tar.gz
     export PATH="/usr/local/go/bin:$PATH"
 
     # 1.c. ffmpeg, if you would like to play media files
