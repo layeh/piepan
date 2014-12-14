@@ -28,6 +28,38 @@ The above script can be started from the command line:
 
 ## Building
 
+### Windows
+
+1. Install dependencies (use 32-bit/386/x86 installers)
+  1. Download and run [Go installer](https://golang.org/dl/)
+  2. Download and run [MinGW installer](http://www.mingw.org/)
+    - Configure [PATH variable](http://www.mingw.org/wiki/getting_started#toc7)
+    - Install the following packages from the MinGW installation manager:
+      - mingw-developer-toolkit
+      - mingw32-base
+      - msys-base
+      - msys-wget
+  3. Download [pkg-config-lite](http://sourceforge.net/projects/pkgconfiglite/)
+    - Extract zip contents to the MinGW installation folder
+  4. Download and run [Git installer](http://git-scm.com/download/win)
+    - Select "Use Git from the Windows Command Prompt" during installation
+  5. Download and run [Mercurial installer](http://mercurial.selenic.com/downloads)
+    - Ensure "Add the installation path to the search path" is checked
+2. Open MSYS terminal (defaults to `C:\MinGW\msys\1.0\msys.bat`)
+  1. Download and install Opus
+    - `wget http://downloads.xiph.org/releases/opus/opus-1.1.tar.gz`
+    - `tar xzf opus-1.1.tar.gz`
+    - `(cd opus-1.1; ./configure && make install)`
+  2. Configure GOPATH
+    - `export GOPATH=$(mktemp -d)`
+  3. Configure pkg-config path
+    - `export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig/`
+  4. Build piepan
+    - `go get -u github.com/layeh/piepan/cmd/piepan`
+  5. Copy .exe to current directory
+    - `cp "$GOPATH/bin/piepan.exe" .`
+  6. Run piepan.exe
+
 ### Ubuntu 14.04
 
     # 1. Install dependencies
