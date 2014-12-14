@@ -20,6 +20,8 @@ func main() {
 	certificateFile := flag.String("certificate", "", "user certificate file (PEM)")
 	keyFile := flag.String("key", "", "user certificate key file (PEM)")
 	insecure := flag.Bool("insecure", false, "skip certificate checking")
+	lock := flag.String("lock", "", "server certificate lock file")
+	serverName := flag.String("servername", "", "override server name used in TLS handshake")
 
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "usage: %s [options] [scripts...]\n", os.Args[0])
@@ -36,8 +38,16 @@ func main() {
 		Address:  *server,
 	}
 
+	client := gumble.NewClient(&config)
+
 	if *insecure {
 		config.TLSConfig.InsecureSkipVerify = true
+	}
+	if *serverName != "" {
+		config.TLSConfig.ServerName = *serverName
+	}
+	if *lock != "" {
+		gumbleutil.CertificateLockFile(client, &config, *lock)
 	}
 	if *certificateFile != "" {
 		if *keyFile == "" {
@@ -49,8 +59,6 @@ func main() {
 			config.TLSConfig.Certificates = append(config.TLSConfig.Certificates, certificate)
 		}
 	}
-
-	client := gumble.NewClient(&config)
 
 	// piepan
 	piepan := piepan.New(client)
