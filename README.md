@@ -62,7 +62,8 @@ piepan is built using the [gumble](https://github.com/layeh/gumble) library. Doc
 ### `piepan.Audio`
 
 - `void Play(object obj)`: Plays the media file `obj.filename`. `obj.callback` can be defined as a function that is called after the playback has completed.
-- `void SetTarget(Channel|User targets...)` sets the target of subsequent `piepan.Audio.Play()` calls. Call this function with no arguments to remove any voice targeting.
+- [`VoiceTarget`](https://godoc.org/github.com/layeh/gumble/gumble#VoiceTarget)   `NewTarget(int id)`: Create a new voice target object.
+- `void SetTarget(VoiceTarget target)` sets the target of subsequent `piepan.Audio.Play()` calls. Call this function with no arguments to remove any voice targeting.
 - `void Stop()`: Stops the currently playing stream.
 - `bool IsPlaying()`: Returns true if an stream is currently playing, false otherwise.
 
@@ -172,6 +173,8 @@ Example:
 
 ## Changelog
 
+- Next
+    - Voice targeting is more like the gumble API
 - 0.4.0 (2014-12-11)
     - Moved to Go (+ gumble)
     - API has been overhauled. There is no backwards capability with previous versions of piepan.

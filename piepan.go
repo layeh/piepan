@@ -41,6 +41,7 @@ func New(client *gumble.Client) *Instance {
 			"Play":      in.apiAudioPlay,
 			"IsPlaying": in.apiAudioIsPlaying,
 			"Stop":      in.apiAudioStop,
+			"NewTarget": in.apiAudioNewTarget,
 			"SetTarget": in.apiAudioSetTarget,
 		},
 		"Process": map[string]interface{}{
