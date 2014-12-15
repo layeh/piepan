@@ -2,13 +2,10 @@
  * Echos back any links to youtube videos with the video's title, duration,
  * and thumbnail.
  *
- * Requires:  wget, jshon
+ * Requires:  wget
  */
 
 (function() {
-
-var prefix = ENV['PREFIX'] || 'examples/';
-var worker = prefix + 'youtube-info-worker.sh';
 
 var message_template = _.template('\
 <table>\
@@ -58,11 +55,10 @@ piepan.On('message', function(e) {
       if (!success) {
         return;
       }
-
-      var matches = data.match(/([^\r\n]+)\r?\n([^\r\n]+)\r?\n([^\r\n]+)\r?\n([^\r\n]+)\r?\n/);
-
-      var minutes = (matches[3] / 60).toFixed(0).toString();
-      var seconds = (matches[3] % 60).toFixed(0);
+      var json = JSON.parse(data);
+      var seconds = json.data.duration;
+      var minutes = (seconds / 60).toFixed(0).toString();
+      seconds = (seconds % 60).toFixed(0);
       var duration = minutes + ":";
       if (seconds < 10) {
         duration += "0";
@@ -70,13 +66,13 @@ piepan.On('message', function(e) {
       duration += seconds;
 
       var message = message_template({
-        id: matches[1],
-        title: matches[2],
+        id: json.data.id,
+        title: json.data.title,
         duration: duration,
-        thumbnail: matches[4],
+        thumbnail: json.data.thumbnail.hqDefault,
       });
       piepan.Self.Channel().Send(message, false);
-    }, worker, video_id);
+    }, 'wget', '-q', '-O', '-', 'http://gdata.youtube.com/feeds/api/videos/' + video_id + '?v=2&alt=jsonc');
     return;
   }
 });
