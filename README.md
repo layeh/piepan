@@ -95,6 +95,8 @@ piepan is built using the [gumble](https://github.com/layeh/gumble) library. Doc
 - `void SetTarget(VoiceTarget target)` sets the target of subsequent `piepan.Audio.Play()` calls. Call this function with no arguments to remove any voice targeting.
 - `void Stop()`: Stops the currently playing stream.
 - `bool IsPlaying()`: Returns true if an stream is currently playing, false otherwise.
+- `int Bitrate()`: Returns the bitrate of the audio encoder.
+- `void SetBitrate(int bitrate)`: Sets the bitrate of the audio encoder.
 
 ### [`Channels`](https://godoc.org/github.com/layeh/gumble/gumble#Channels) `piepan.Channels`
 
@@ -205,9 +207,10 @@ Example:
 - Next
     - Voice targeting is more like the gumble API
     - Add certificate locking
+    - Add bitrate functions to piepan.Audio
 - 0.4.0 (2014-12-11)
     - Moved to Go (+ gumble)
-    - API has been overhauled. There is no backwards capability with previous versions of piepan.
+    - API has been overhauled. There is no backwards capability with previous versions of piepan
     - JavaScript is now being used as the scripting language
 - 0.3.1 (2014-10-06)
     - Fixed audio transmission memory leak

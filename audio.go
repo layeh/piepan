@@ -40,6 +40,21 @@ func (in *Instance) apiAudioNewTarget(call otto.FunctionCall) otto.Value {
 	return value
 }
 
+func (in *Instance) apiAudioBitrate(call otto.FunctionCall) otto.Value {
+	encoder := in.client.AudioEncoder()
+	value, _ := in.state.ToValue(encoder.Bitrate())
+	return value
+}
+
+func (in *Instance) apiAudioSetBitrate(call otto.FunctionCall) otto.Value {
+	bitrate, err := call.Argument(0).ToInteger()
+	if err != nil {
+		return otto.UndefinedValue()
+	}
+	in.client.AudioEncoder().SetBitrate(int(bitrate))
+	return otto.UndefinedValue()
+}
+
 func (in *Instance) apiAudioSetTarget(call otto.FunctionCall) otto.Value {
 	if len(call.ArgumentList) == 0 {
 		in.client.SetVoiceTarget(nil)
