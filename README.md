@@ -209,7 +209,7 @@ Example:
 - Next
     - Voice targeting is more like the gumble API
     - Add certificate locking
-    - Add bitrate functions to piepan.Audio
+    - Add bitrate, volume functions to piepan.Audio
 - 0.4.0 (2014-12-11)
     - Moved to Go (+ gumble)
     - API has been overhauled. There is no backwards capability with previous versions of piepan
