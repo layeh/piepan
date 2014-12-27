@@ -55,6 +55,20 @@ func (in *Instance) apiAudioSetBitrate(call otto.FunctionCall) otto.Value {
 	return otto.UndefinedValue()
 }
 
+func (in *Instance) apiAudioVolume(call otto.FunctionCall) otto.Value {
+	value, _ := in.state.ToValue(in.audio.Volume())
+	return value
+}
+
+func (in *Instance) apiAudioSetVolume(call otto.FunctionCall) otto.Value {
+	volume, err := call.Argument(0).ToFloat()
+	if err != nil {
+		return otto.UndefinedValue()
+	}
+	in.audio.SetVolume(float32(volume))
+	return otto.UndefinedValue()
+}
+
 func (in *Instance) apiAudioSetTarget(call otto.FunctionCall) otto.Value {
 	if len(call.ArgumentList) == 0 {
 		in.client.SetVoiceTarget(nil)

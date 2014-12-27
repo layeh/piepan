@@ -97,6 +97,8 @@ piepan is built using the [gumble](https://github.com/layeh/gumble) library. Doc
 - `bool IsPlaying()`: Returns true if an stream is currently playing, false otherwise.
 - `int Bitrate()`: Returns the bitrate of the audio encoder.
 - `void SetBitrate(int bitrate)`: Sets the bitrate of the audio encoder.
+- `float Volume()`: Returns the audio volume.
+- `void SetVolume(float volume)`: Sets the volume of transmitted audio (default: 1.0).
 
 ### [`Channels`](https://godoc.org/github.com/layeh/gumble/gumble#Channels) `piepan.Channels`
 
