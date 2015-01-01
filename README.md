@@ -45,8 +45,6 @@ The above script can be started from the command line:
     - Extract zip contents to the MinGW installation folder
   4. Download and run [Git installer](http://git-scm.com/download/win)
     - Select "Use Git from the Windows Command Prompt" during installation
-  5. Download and run [Mercurial installer](http://mercurial.selenic.com/downloads)
-    - Ensure "Add the installation path to the search path" is checked
 2. Open MSYS terminal (defaults to `C:\MinGW\msys\1.0\msys.bat`)
   1. Download and install Opus
     - `wget http://downloads.xiph.org/releases/opus/opus-1.1.tar.gz`
@@ -66,7 +64,7 @@ The above script can be started from the command line:
 
 1. Install dependencies
   2. Base dependencies
-    - `sudo apt-get install -y git libopus-dev mercurial wget python-software-properties software-properties-common pkg-config gcc`
+    - `sudo apt-get install -y git libopus-dev wget python-software-properties software-properties-common pkg-config gcc`
   2. Golang
     - `sudo add-apt-repository -y ppa:evarlast/golang1.4`
     - `sudo apt-get update`
