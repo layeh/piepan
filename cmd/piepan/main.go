@@ -76,7 +76,7 @@ func main() {
 		}
 	}
 
-	// Event multiplexer
+	client.Attach(gumbleutil.AutoBitrate)
 	client.Attach(piepan)
 
 	keepAlive := make(chan bool)
