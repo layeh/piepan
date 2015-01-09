@@ -94,7 +94,7 @@ piepan is built using the [gumble](https://github.com/layeh/gumble) library. Doc
 - `void Stop()`: Stops the currently playing stream.
 - `bool IsPlaying()`: Returns true if an stream is currently playing, false otherwise.
 - `int Bitrate()`: Returns the bitrate of the audio encoder.
-- `void SetBitrate(int bitrate)`: Sets the bitrate of the audio encoder.
+- `void SetBitrate(int bitrate)`: Sets the bitrate of the audio encoder. Calling this function will override the automatically-configured, optimal bitrate.
 - `float Volume()`: Returns the audio volume.
 - `void SetVolume(float volume)`: Sets the volume of transmitted audio (default: 1.0).
 
@@ -208,6 +208,7 @@ Example:
     - Voice targeting is more like the gumble API
     - Add certificate locking
     - Add bitrate, volume functions to piepan.Audio
+    - Add auto bitrate setting
 - 0.4.0 (2014-12-11)
     - Moved to Go (+ gumble)
     - API has been overhauled. There is no backwards capability with previous versions of piepan
