@@ -139,7 +139,7 @@ func (in *Instance) OnPermissionDenied(e *gumble.PermissionDeniedEvent) {
 func (in *Instance) OnUserList(e *gumble.UserListEvent) {
 }
 
-func (in *Instance) OnAcl(e *gumble.AclEvent) {
+func (in *Instance) OnACL(e *gumble.ACLEvent) {
 }
 
 func (in *Instance) OnBanList(e *gumble.BanListEvent) {
