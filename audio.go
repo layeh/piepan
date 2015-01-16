@@ -1,6 +1,7 @@
 package piepan
 
 import (
+	"github.com/layeh/gopus"
 	"github.com/layeh/gumble/gumble"
 	"github.com/robertkrimen/otto"
 )
@@ -22,6 +23,10 @@ func (in *Instance) apiAudioPlay(call otto.FunctionCall) otto.Value {
 			in.audio.Done = nil
 			in.callValue(callbackValue)
 		}
+	}
+
+	if enc := in.client.AudioEncoder(); enc != nil {
+		enc.SetApplication(gopus.Audio)
 	}
 
 	in.audio.Play(filenameValue.String())
