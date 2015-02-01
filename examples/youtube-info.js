@@ -14,13 +14,13 @@ var message_template = _.template('\
             <img src="https://www.youtube.com/yt/brand/media/image/YouTube-icon-full_color.png" height="25" />\
         </td>\
         <td align="center" valign="middle">\
-            <a href="http://youtu.be/<%= id %>"><%= title %> (<%= duration %>)</a>\
+            <a href="https://youtu.be/<%= id %>"><%= title %> (<%= duration %>)</a>\
         </td>\
     </tr>\
     <tr>\
         <td></td>\
         <td align="center">\
-            <a href="http://youtu.be/<%= id %>"><img src="<%= thumbnail %>" width="250" /></a>\
+            <a href="https://youtu.be/<%= id %>"><img src="<%= thumbnail %>" width="250" /></a>\
         </td>\
     </tr>\
 </table>');
@@ -57,7 +57,7 @@ piepan.On('message', function(e) {
       }
       var json = JSON.parse(data);
       var seconds = json.data.duration;
-      var minutes = (seconds / 60).toFixed(0).toString();
+      var minutes = Math.floor(seconds / 60).toFixed(0).toString();
       seconds = (seconds % 60).toFixed(0);
       var duration = minutes + ":";
       if (seconds < 10) {
