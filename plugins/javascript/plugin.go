@@ -16,9 +16,9 @@ import (
 )
 
 const helpString = ` Scripting via JavaScript.
- Configuration:
-   file <string>: the file names of scripts that will be executed. Can appear
-                  multiple times in the same plugin block.`
+  Configuration:
+    file <string>: the file names of scripts that will be executed. Can appear
+                   multiple times in the same plugin block.`
 
 func init() {
 	piepan.Register("javascript", &piepan.Plugin{
