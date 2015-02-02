@@ -13,6 +13,7 @@ import (
 	"github.com/layeh/piepan"
 
 	_ "github.com/layeh/piepan/plugins/autobitrate"
+	_ "github.com/layeh/piepan/plugins/comment"
 	_ "github.com/layeh/piepan/plugins/javascript"
 )
 

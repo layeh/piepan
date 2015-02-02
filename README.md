@@ -18,6 +18,11 @@
     Plugin: autobitrate
      Automatically sets the audio bitrate based on the server's maximum bitrate.
 
+    Plugin: comment
+     Sets the comment for the bot upon joining a server.
+      Configuration:
+        comment <string>: the comment.
+
     Plugin: javascript
      Scripting via JavaScript.
      Configuration:
