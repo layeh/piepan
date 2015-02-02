@@ -1,16 +1,47 @@
-package piepan
+package plugin
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"strings"
 	"sync"
 
+	"github.com/layeh/bconf"
 	"github.com/layeh/gumble/gumble"
 	"github.com/layeh/gumble/gumble_ffmpeg"
+	"github.com/layeh/piepan"
 	"github.com/robertkrimen/otto"
 	_ "github.com/robertkrimen/otto/underscore"
 )
+
+const helpString = ` Scripting via JavaScript.
+ Configuration:
+   file <string>: the file names of scripts that will be executed. Can appear
+                  multiple times in the same plugin block.`
+
+func init() {
+	piepan.Register("javascript", &piepan.Plugin{
+		Help: helpString,
+		Init: func(client *gumble.Client, conf *bconf.Block) error {
+			instance := New(client)
+			for _, script := range conf.Fields["file"] {
+				if err := instance.LoadScriptFile(script.String(0)); err != nil {
+					return err
+				}
+			}
+			instance.ErrFunc = func(err error) {
+				if ottoErr, ok := err.(*otto.Error); ok {
+					fmt.Fprintf(os.Stderr, "%s\n", ottoErr.String())
+				} else {
+					fmt.Fprintf(os.Stderr, "%s\n", err)
+				}
+			}
+			client.Attach(instance)
+			return nil
+		},
+	})
+}
 
 type Instance struct {
 	ErrFunc func(error)

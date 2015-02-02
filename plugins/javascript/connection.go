@@ -1,4 +1,4 @@
-package piepan
+package plugin
 
 import (
 	"github.com/layeh/gumble/gumble"

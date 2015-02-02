@@ -9,7 +9,10 @@ import (
 	"github.com/layeh/gumble/gumble"
 	"github.com/layeh/gumble/gumbleutil"
 	"github.com/layeh/piepan"
-	"github.com/robertkrimen/otto"
+	"github.com/layeh/bconf"
+
+	_ "github.com/layeh/piepan/plugins/autobitrate"
+	_ "github.com/layeh/piepan/plugins/javascript"
 )
 
 func main() {
@@ -24,9 +27,14 @@ func main() {
 	serverName := flag.String("servername", "", "override server name used in TLS handshake")
 
 	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, "usage: %s [options] [scripts...]\n", os.Args[0])
-		fmt.Fprintf(os.Stderr, "a scriptable bot framework for Mumble\n")
+		fmt.Fprintf(os.Stderr, "usage: %s [options] [configuration file]\n", os.Args[0])
+		fmt.Fprintf(os.Stderr, "a bot framework for Mumble\n")
 		flag.PrintDefaults()
+		fmt.Fprintf(os.Stderr, "\nDefault configuration file name: piepan.conf\n")
+		for _, pluginName := range piepan.PluginNames {
+			plugin := piepan.Plugins[pluginName]
+			fmt.Fprintf(os.Stderr, "\nPlugin: %s\n%s\n", pluginName, plugin.Help)
+		}
 	}
 
 	flag.Parse()
@@ -60,24 +68,28 @@ func main() {
 		}
 	}
 
-	// piepan
-	piepan := piepan.New(client)
-	piepan.ErrFunc = func(err error) {
-		if ottoErr, ok := err.(*otto.Error); ok {
-			fmt.Fprintf(os.Stderr, "%s\n", ottoErr.String())
-		} else {
-			fmt.Fprintf(os.Stderr, "%s\n", err)
+	// Load configuration file
+	configurationFileName := "piepan.conf"
+	if len(flag.Args()) >= 1 {
+		configurationFileName = flag.Arg(0)
+	}
+	configFile, err := bconf.DecodeFile(configurationFileName)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "%s\n", err)
+		os.Exit(1)
+	}
+	for _, block := range configFile.Blocks["plugin"] {
+		pluginName := block.Tag.String(0)
+		plugin := piepan.Plugins[pluginName]
+		if plugin == nil {
+			fmt.Fprintf(os.Stderr, "unknown plugin: `%s`\n", pluginName)
+			os.Exit(1)
+		}
+		if err := plugin.Init(client, block); err != nil {
+			fmt.Fprintf(os.Stderr, "%s plugin error: %s\n", pluginName, err)
+			os.Exit(1)
 		}
 	}
-
-	for _, script := range flag.Args() {
-		if err := piepan.LoadScriptFile(script); err != nil {
-			fmt.Fprintf(os.Stderr, "%s\n", err)
-		}
-	}
-
-	client.Attach(gumbleutil.AutoBitrate)
-	client.Attach(piepan)
 
 	keepAlive := make(chan bool)
 	client.Attach(gumbleutil.Listener{
