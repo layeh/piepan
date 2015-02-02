@@ -23,21 +23,22 @@ const helpString = ` Scripting via JavaScript.
 func init() {
 	piepan.Register("javascript", &piepan.Plugin{
 		Help: helpString,
-		Init: func(client *gumble.Client, conf *bconf.Block) error {
-			instance := New(client)
+		Init: func(instance *piepan.Instance, conf *bconf.Block) error {
+			js := New(instance.Client)
 			for _, script := range conf.Fields["file"] {
-				if err := instance.LoadScriptFile(script.String(0)); err != nil {
+				if err := js.LoadScriptFile(script.String(0)); err != nil {
 					return err
 				}
 			}
-			instance.ErrFunc = func(err error) {
+			js.ErrFunc = func(err error) {
 				if ottoErr, ok := err.(*otto.Error); ok {
 					fmt.Fprintf(os.Stderr, "%s\n", ottoErr.String())
 				} else {
 					fmt.Fprintf(os.Stderr, "%s\n", err)
 				}
 			}
-			client.Attach(instance)
+			js.audio = instance.FFmpeg
+			instance.Client.Attach(js)
 			return nil
 		},
 	})
@@ -63,7 +64,6 @@ func New(client *gumble.Client) *Instance {
 		state:     otto.New(),
 		listeners: make(map[string][]otto.Value),
 	}
-	in.audio, _ = gumble_ffmpeg.New(in.client)
 
 	in.state.Set("piepan", map[string]interface{}{
 		"On":         in.apiOn,

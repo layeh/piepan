@@ -6,10 +6,11 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/layeh/bconf"
 	"github.com/layeh/gumble/gumble"
+	"github.com/layeh/gumble/gumble_ffmpeg"
 	"github.com/layeh/gumble/gumbleutil"
 	"github.com/layeh/piepan"
-	"github.com/layeh/bconf"
 
 	_ "github.com/layeh/piepan/plugins/autobitrate"
 	_ "github.com/layeh/piepan/plugins/javascript"
@@ -47,6 +48,11 @@ func main() {
 	}
 
 	client := gumble.NewClient(&config)
+	instance := piepan.Instance{
+		Client: client,
+	}
+	audio, _ := gumble_ffmpeg.New(client)
+	instance.FFmpeg = audio
 
 	if *insecure {
 		config.TLSConfig.InsecureSkipVerify = true
@@ -85,7 +91,7 @@ func main() {
 			fmt.Fprintf(os.Stderr, "unknown plugin: `%s`\n", pluginName)
 			os.Exit(1)
 		}
-		if err := plugin.Init(client, block); err != nil {
+		if err := plugin.Init(&instance, block); err != nil {
 			fmt.Fprintf(os.Stderr, "%s plugin error: %s\n", pluginName, err)
 			os.Exit(1)
 		}
