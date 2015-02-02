@@ -61,7 +61,7 @@ func (in *Instance) apiAudioSetBitrate(call otto.FunctionCall) otto.Value {
 }
 
 func (in *Instance) apiAudioVolume(call otto.FunctionCall) otto.Value {
-	value, _ := in.state.ToValue(in.audio.Volume())
+	value, _ := in.state.ToValue(in.audio.Volume)
 	return value
 }
 
@@ -70,7 +70,7 @@ func (in *Instance) apiAudioSetVolume(call otto.FunctionCall) otto.Value {
 	if err != nil {
 		return otto.UndefinedValue()
 	}
-	in.audio.SetVolume(float32(volume))
+	in.audio.Volume = float32(volume)
 	return otto.UndefinedValue()
 }
 
