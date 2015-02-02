@@ -18,18 +18,15 @@ func (in *Instance) apiAudioPlay(call otto.FunctionCall) otto.Value {
 	filenameValue, _ := obj.Get("filename")
 	callbackValue, _ := obj.Get("callback")
 
-	if callbackValue.IsFunction() {
-		in.audio.Done = func() {
-			in.audio.Done = nil
-			in.callValue(callbackValue)
-		}
-	}
-
 	if enc := in.client.AudioEncoder(); enc != nil {
 		enc.SetApplication(gopus.Audio)
 	}
 
-	in.audio.Play(filenameValue.String())
+	in.audio.Play(filenameValue.String(), func() {
+		if callbackValue.IsFunction() {
+			in.callValue(callbackValue)
+		}
+	})
 	return otto.TrueValue()
 }
 
