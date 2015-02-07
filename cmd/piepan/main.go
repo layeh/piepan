@@ -30,7 +30,7 @@ func main() {
 		fmt.Fprintf(os.Stderr, "an easy to use framework for writing scriptable Mumble bots\n")
 		flag.PrintDefaults()
 		fmt.Fprintf(os.Stderr, "\nScript files are defined in the following way:\n")
-		fmt.Fprintf(os.Stderr, "  [type:[environment:]]filename\n")
+		fmt.Fprintf(os.Stderr, "  [type%c[environment%c]]filename\n", os.PathListSeparator, os.PathListSeparator)
 		fmt.Fprintf(os.Stderr, "    filename: path to script file\n")
 		fmt.Fprintf(os.Stderr, "    type: type of script file (default: file extension)\n")
 		fmt.Fprintf(os.Stderr, "    environment: name of environment where script will be executed (default: type)\n")
