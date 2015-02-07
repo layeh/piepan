@@ -27,7 +27,7 @@
   };
 
   // Sound file path prefix
-  var prefix = ENV['PREFIX'] || "plugins/javascript/_examples/";
+  var prefix = ENV['PREFIX'] || "_examples/";
 
   piepan.On('connect', function() {
     console.log("Soundboard loaded!");
