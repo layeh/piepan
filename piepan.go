@@ -9,11 +9,6 @@ import (
 	"github.com/layeh/gumble/gumble_ffmpeg"
 )
 
-type Listener interface {
-	Call(interface{})
-	Destroy()
-}
-
 type Environment interface {
 	gumble.EventListener
 	LoadScriptFile(filename string) error
