@@ -2,13 +2,14 @@ package plugin
 
 import (
 	"github.com/layeh/gumble/gumble"
+	. "github.com/layeh/piepan/plugins"
 )
 
 func (p *Plugin) OnConnect(e *gumble.ConnectEvent) {
 	global, _ := p.state.Get("piepan")
 	if obj := global.Object(); obj != nil {
-		p.users = newUsersWrapper(p.instance.Client.Users())
-		p.channels = newChannelsWrapper(p.instance.Client.Channels())
+		p.users = NewUsersWrapper(p.instance.Client.Users())
+		p.channels = NewChannelsWrapper(p.instance.Client.Channels())
 
 		obj.Set("Self", e.Client.Self())
 		obj.Set("Users", p.users)
@@ -21,7 +22,7 @@ func (p *Plugin) OnConnect(e *gumble.ConnectEvent) {
 }
 
 func (p *Plugin) OnDisconnect(e *gumble.DisconnectEvent) {
-	event := disconnectEventWrapper{
+	event := DisconnectEventWrapper{
 		Client: e.Client,
 		Type:   int(e.Type),
 
@@ -50,13 +51,16 @@ func (p *Plugin) OnDisconnect(e *gumble.DisconnectEvent) {
 }
 
 func (p *Plugin) OnTextMessage(e *gumble.TextMessageEvent) {
+	event := TextMessageEventWrapper{
+		TextMessageEvent: e,
+	}
 	for _, listener := range p.listeners["message"] {
-		p.callValue(listener, e)
+		p.callValue(listener, &event)
 	}
 }
 
 func (p *Plugin) OnUserChange(e *gumble.UserChangeEvent) {
-	event := userChangeEventWrapper{
+	event := UserChangeEventWrapper{
 		Client: e.Client,
 		Type:   int(e.Type),
 		User:   e.User,
@@ -80,9 +84,9 @@ func (p *Plugin) OnUserChange(e *gumble.UserChangeEvent) {
 	}
 
 	if event.IsConnected {
-		p.users.add(e.User)
+		p.users.Add(e.User)
 	} else if event.IsDisconnected {
-		p.users.remove(e.User)
+		p.users.Remove(e.User)
 	}
 
 	for _, listener := range p.listeners["userchange"] {
@@ -91,7 +95,7 @@ func (p *Plugin) OnUserChange(e *gumble.UserChangeEvent) {
 }
 
 func (p *Plugin) OnChannelChange(e *gumble.ChannelChangeEvent) {
-	event := channelChangeEventWrapper{
+	event := ChannelChangeEventWrapper{
 		Client:  e.Client,
 		Type:    int(e.Type),
 		Channel: e.Channel,
@@ -110,7 +114,7 @@ func (p *Plugin) OnChannelChange(e *gumble.ChannelChangeEvent) {
 }
 
 func (p *Plugin) OnPermissionDenied(e *gumble.PermissionDeniedEvent) {
-	event := permissionDeniedEventWrapper{
+	event := PermissionDeniedEventWrapper{
 		Client:  e.Client,
 		Type:    int(e.Type),
 		Channel: e.Channel,

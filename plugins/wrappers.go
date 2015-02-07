@@ -4,49 +4,50 @@ import (
 	"strconv"
 
 	"github.com/layeh/gumble/gumble"
+	"github.com/layeh/gumble/gumbleutil"
 )
 
-type usersWrapper map[string]*gumble.User
+type UsersWrapper map[string]*gumble.User
 
-func newUsersWrapper(users gumble.Users) usersWrapper {
-	wrapper := usersWrapper{}
+func NewUsersWrapper(users gumble.Users) UsersWrapper {
+	wrapper := UsersWrapper{}
 	for _, user := range users {
-		wrapper.add(user)
+		wrapper.Add(user)
 	}
 	return wrapper
 }
 
-func (uw usersWrapper) add(user *gumble.User) {
+func (uw UsersWrapper) Add(user *gumble.User) {
 	session := strconv.FormatUint(uint64(user.Session()), 10)
 	uw[session] = user
 }
 
-func (uw usersWrapper) remove(user *gumble.User) {
+func (uw UsersWrapper) Remove(user *gumble.User) {
 	session := strconv.FormatUint(uint64(user.Session()), 10)
 	delete(uw, session)
 }
 
-type channelsWrapper map[string]*gumble.Channel
+type ChannelsWrapper map[string]*gumble.Channel
 
-func newChannelsWrapper(channels gumble.Channels) channelsWrapper {
-	wrapper := channelsWrapper{}
+func NewChannelsWrapper(channels gumble.Channels) ChannelsWrapper {
+	wrapper := ChannelsWrapper{}
 	for _, channel := range channels {
-		wrapper.add(channel)
+		wrapper.Add(channel)
 	}
 	return wrapper
 }
 
-func (cw channelsWrapper) add(channel *gumble.Channel) {
+func (cw ChannelsWrapper) Add(channel *gumble.Channel) {
 	id := strconv.FormatUint(uint64(channel.ID()), 10)
 	cw[id] = channel
 }
 
-func (cw channelsWrapper) remove(channel *gumble.Channel) {
+func (cw ChannelsWrapper) Remove(channel *gumble.Channel) {
 	id := strconv.FormatUint(uint64(channel.ID()), 10)
 	delete(cw, id)
 }
 
-type disconnectEventWrapper struct {
+type DisconnectEventWrapper struct {
 	Client *gumble.Client
 	Type   int
 
@@ -66,7 +67,15 @@ type disconnectEventWrapper struct {
 	IsAuthenticatorFail bool
 }
 
-type userChangeEventWrapper struct {
+type TextMessageEventWrapper struct {
+	*gumble.TextMessageEvent
+}
+
+func (t *TextMessageEventWrapper) PlainText() string {
+	return gumbleutil.PlainText(&t.TextMessageEvent.TextMessage)
+}
+
+type UserChangeEventWrapper struct {
 	Client *gumble.Client
 	Type   int
 	User   *gumble.User
@@ -89,7 +98,7 @@ type userChangeEventWrapper struct {
 	IsChangeRecording       bool
 }
 
-type channelChangeEventWrapper struct {
+type ChannelChangeEventWrapper struct {
 	Client  *gumble.Client
 	Type    int
 	Channel *gumble.Channel
@@ -102,7 +111,7 @@ type channelChangeEventWrapper struct {
 	IsChangePosition    bool
 }
 
-type permissionDeniedEventWrapper struct {
+type PermissionDeniedEventWrapper struct {
 	Client  *gumble.Client
 	Type    int
 	Channel *gumble.Channel

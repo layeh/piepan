@@ -8,6 +8,7 @@ import (
 	"sync"
 
 	"github.com/layeh/piepan"
+	. "github.com/layeh/piepan/plugins"
 	"github.com/robertkrimen/otto"
 	_ "github.com/robertkrimen/otto/underscore"
 )
@@ -58,8 +59,8 @@ type Plugin struct {
 	state     *otto.Otto
 
 	listeners map[string][]otto.Value
-	users     usersWrapper
-	channels  channelsWrapper
+	users     UsersWrapper
+	channels  ChannelsWrapper
 }
 
 func (p *Plugin) LoadScriptFile(filename string) error {
