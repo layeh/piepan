@@ -88,6 +88,7 @@
     - Add bitrate, volume functions to piepan.Audio
     - Add auto bitrate setting
     - Add Lua plugin
+    - Add `piepan.File` to JavaScript plugin
     - Voice targeting is more like the gumble API
 - 0.4.0 (2014-12-11)
     - Moved to Go (+ gumble)
