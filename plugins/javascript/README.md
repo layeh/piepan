@@ -1,7 +1,5 @@
 # JavaScript plugin documentation
 
-## Configuration
-
 ## API
 
 The following section describes the API that is available for piepan JavaScript scripts.
