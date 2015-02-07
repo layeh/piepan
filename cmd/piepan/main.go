@@ -10,9 +10,6 @@ import (
 	"github.com/layeh/gumble/gumble_ffmpeg"
 	"github.com/layeh/gumble/gumbleutil"
 	"github.com/layeh/piepan"
-
-	_ "github.com/layeh/piepan/plugins/javascript"
-	_ "github.com/layeh/piepan/plugins/lua"
 )
 
 func main() {
