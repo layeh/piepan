@@ -1,4 +1,4 @@
-# `javascript` plugin documentation
+# JavaScript plugin documentation
 
 ## Configuration
 
@@ -123,8 +123,3 @@ Example:
       var user = piepan.Users[k];
       console.log(user.Name());
     }
-
-## Requirements
-
-- [gumble_ffmpeg](https://github.com/bontibon/gumble/tree/master/gumble_ffmpeg)
-- [otto](https://github.com/robertkrimen/otto)

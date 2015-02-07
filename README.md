@@ -22,6 +22,10 @@
     Enabled script types:
       js
 
+## Scripting documentation
+
+- [JavaScript](https://github.com/layeh/piepan/blob/master/plugins/javascript/README.md)
+
 ## Building
 
 ### Windows
