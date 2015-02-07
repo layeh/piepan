@@ -11,7 +11,9 @@ type process struct {
 }
 
 func (p *process) Kill() {
-	p.cmd.Process.Kill()
+	if proc := p.cmd.Process; proc != nil {
+		proc.Kill()
+	}
 }
 
 func (p *Plugin) apiProcessNew(call otto.FunctionCall) otto.Value {
