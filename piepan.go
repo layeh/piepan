@@ -31,7 +31,6 @@ func New(client *gumble.Client) *Instance {
 		Client: client,
 		envs:   make(map[string]Environment),
 	}
-	client.Attach(in)
 	return in
 }
 
@@ -62,6 +61,7 @@ func (in *Instance) LoadScript(name string) error {
 	env := in.envs[environment]
 	if env == nil {
 		env = plugin.New(in)
+		in.Client.Attach(env)
 		in.envs[environment] = env
 	}
 	if err := env.LoadScriptFile(filename); err != nil {
