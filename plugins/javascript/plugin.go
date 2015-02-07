@@ -1,11 +1,11 @@
 package plugin
 
 import (
+	"fmt"
 	"io/ioutil"
+	"os"
 	"strings"
 	"sync"
-	"os"
-	"fmt"
 
 	"github.com/layeh/piepan"
 	"github.com/robertkrimen/otto"
@@ -34,6 +34,9 @@ func init() {
 					"SetBitrate": p.apiAudioSetBitrate,
 					"Volume":     p.apiAudioVolume,
 					"SetVolume":  p.apiAudioSetVolume,
+				},
+				"File": map[string]interface{}{
+					"Open": p.apiFileOpen,
 				},
 				"Process": map[string]interface{}{
 					"New": p.apiProcessNew,

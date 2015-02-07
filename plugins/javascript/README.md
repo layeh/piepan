@@ -28,6 +28,23 @@ Note: [`Channel.Channels()`](https://godoc.org/github.com/layeh/gumble/gumble#Ch
 
 Disconnects from the server.
 
+#### `piepan.File`
+
+- `piepan.File Open(string filename [, string mode])`: opens `filename` with `mode`. The following modes are supported:
+    - `r`: read only
+    - `r+`: read-write
+    - `w`: write only, create file if it does not exist
+    - `w+`: read-write, create file if it does not exist, truncate file
+    - `a`: write only, create file if it does not exist, append file
+    - `a+`: read-write, create file if it does not exist, append file
+- `void Close()`: close the file.
+- `string Read([int n])`: reads `n` bytes from the file, starting at the current offset. Omitting or setting `n` less than 1 will read until the end of file.
+- `int Seek(int offset [, string whence])`: Seeks to `offset`, relative to `whence`. `whence` can be one of:
+    - `set`: `offset` relative to start of file
+    - `cur`: `offset` relative to the current offset (default)
+    - `end`: `offset` relative to end of file
+- `int Write(string data)`: write `data` to file. Returns number of bytes written.
+
 #### `piepan.On(string event, function callback)`
 
 Registers an event listener for a given event type. The follow events are currently supported:
