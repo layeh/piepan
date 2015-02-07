@@ -21,10 +21,12 @@
 
     Enabled script types:
       js
+      lua
 
 ## Scripting documentation
 
 - [JavaScript](https://github.com/layeh/piepan/blob/master/plugins/javascript/README.md)
+- [Lua](https://github.com/layeh/piepan/blob/master/plugins/lua/README.md)
 
 ## Building
 

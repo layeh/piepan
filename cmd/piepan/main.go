@@ -12,6 +12,7 @@ import (
 	"github.com/layeh/piepan"
 
 	_ "github.com/layeh/piepan/plugins/javascript"
+	_ "github.com/layeh/piepan/plugins/lua"
 )
 
 func main() {
