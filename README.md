@@ -1,9 +1,9 @@
-# piepan: a bot framework for [Mumble](http://mumble.sourceforge.net/)
+# piepan: an easy to use framework for writing scriptable [Mumble](http://mumble.sourceforge.net/) bots
 
 ## Usage
 
-    usage: piepan [options] [configuration file]
-    a bot framework for Mumble
+    usage: piepan [options] [script files]
+    an easy to use framework for writing scriptable Mumble bots
       -certificate="": user certificate file (PEM)
       -insecure=false: skip certificate checking
       -key="": user certificate key file (PEM)
@@ -13,21 +13,14 @@
       -servername="": override server name used in TLS handshake
       -username="piepan-bot": username of the bot
 
-    Default configuration file name: piepan.conf
+    Script files are defined in the following way:
+      [type:[environment:]]filename
+        filename: path to script file
+        type: type of script file (default: file extension)
+        environment: name of environment where script will be executed (default: type)
 
-    Plugin: autobitrate
-     Automatically sets the audio bitrate based on the server's maximum bitrate.
-
-    Plugin: comment
-     Sets the comment for the bot upon joining a server.
-      Configuration:
-        comment <string>: the comment.
-
-    Plugin: javascript
-     Scripting via JavaScript.
-      Configuration:
-        file <string>: the file names of scripts that will be executed. Can appear
-                       multiple times in the same plugin block.
+    Enabled script types:
+      js
 
 ## Building
 

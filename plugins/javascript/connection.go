@@ -4,23 +4,23 @@ import (
 	"github.com/layeh/gumble/gumble"
 )
 
-func (in *Instance) OnConnect(e *gumble.ConnectEvent) {
-	global, _ := in.state.Get("piepan")
+func (p *Plugin) OnConnect(e *gumble.ConnectEvent) {
+	global, _ := p.state.Get("piepan")
 	if obj := global.Object(); obj != nil {
-		in.users = newUsersWrapper(in.client.Users())
-		in.channels = newChannelsWrapper(in.client.Channels())
+		p.users = newUsersWrapper(p.instance.Client.Users())
+		p.channels = newChannelsWrapper(p.instance.Client.Channels())
 
 		obj.Set("Self", e.Client.Self())
-		obj.Set("Users", in.users)
-		obj.Set("Channels", in.channels)
+		obj.Set("Users", p.users)
+		obj.Set("Channels", p.channels)
 	}
 
-	for _, listener := range in.listeners["connect"] {
-		in.callValue(listener, e)
+	for _, listener := range p.listeners["connect"] {
+		p.callValue(listener, e)
 	}
 }
 
-func (in *Instance) OnDisconnect(e *gumble.DisconnectEvent) {
+func (p *Plugin) OnDisconnect(e *gumble.DisconnectEvent) {
 	event := disconnectEventWrapper{
 		Client: e.Client,
 		Type:   int(e.Type),
@@ -41,21 +41,21 @@ func (in *Instance) OnDisconnect(e *gumble.DisconnectEvent) {
 		IsAuthenticatorFail: e.Type.Has(gumble.DisconnectAuthenticatorFail),
 	}
 
-	in.users = nil
-	in.channels = nil
+	p.users = nil
+	p.channels = nil
 
-	for _, listener := range in.listeners["disconnect"] {
-		in.callValue(listener, &event)
+	for _, listener := range p.listeners["disconnect"] {
+		p.callValue(listener, &event)
 	}
 }
 
-func (in *Instance) OnTextMessage(e *gumble.TextMessageEvent) {
-	for _, listener := range in.listeners["message"] {
-		in.callValue(listener, e)
+func (p *Plugin) OnTextMessage(e *gumble.TextMessageEvent) {
+	for _, listener := range p.listeners["message"] {
+		p.callValue(listener, e)
 	}
 }
 
-func (in *Instance) OnUserChange(e *gumble.UserChangeEvent) {
+func (p *Plugin) OnUserChange(e *gumble.UserChangeEvent) {
 	event := userChangeEventWrapper{
 		Client: e.Client,
 		Type:   int(e.Type),
@@ -80,17 +80,17 @@ func (in *Instance) OnUserChange(e *gumble.UserChangeEvent) {
 	}
 
 	if event.IsConnected {
-		in.users.add(e.User)
+		p.users.add(e.User)
 	} else if event.IsDisconnected {
-		in.users.remove(e.User)
+		p.users.remove(e.User)
 	}
 
-	for _, listener := range in.listeners["userchange"] {
-		in.callValue(listener, &event)
+	for _, listener := range p.listeners["userchange"] {
+		p.callValue(listener, &event)
 	}
 }
 
-func (in *Instance) OnChannelChange(e *gumble.ChannelChangeEvent) {
+func (p *Plugin) OnChannelChange(e *gumble.ChannelChangeEvent) {
 	event := channelChangeEventWrapper{
 		Client:  e.Client,
 		Type:    int(e.Type),
@@ -104,12 +104,12 @@ func (in *Instance) OnChannelChange(e *gumble.ChannelChangeEvent) {
 		IsChangePosition:    e.Type.Has(gumble.ChannelChangePosition),
 	}
 
-	for _, listener := range in.listeners["channelchange"] {
-		in.callValue(listener, &event)
+	for _, listener := range p.listeners["channelchange"] {
+		p.callValue(listener, &event)
 	}
 }
 
-func (in *Instance) OnPermissionDenied(e *gumble.PermissionDeniedEvent) {
+func (p *Plugin) OnPermissionDenied(e *gumble.PermissionDeniedEvent) {
 	event := permissionDeniedEventWrapper{
 		Client:  e.Client,
 		Type:    int(e.Type),
@@ -131,19 +131,19 @@ func (in *Instance) OnPermissionDenied(e *gumble.PermissionDeniedEvent) {
 		IsNestingLimit:       e.Type.Has(gumble.PermissionDeniedNestingLimit),
 	}
 
-	for _, listener := range in.listeners["permissiondenied"] {
-		in.callValue(listener, &event)
+	for _, listener := range p.listeners["permissiondenied"] {
+		p.callValue(listener, &event)
 	}
 }
 
-func (in *Instance) OnUserList(e *gumble.UserListEvent) {
+func (p *Plugin) OnUserList(e *gumble.UserListEvent) {
 }
 
-func (in *Instance) OnACL(e *gumble.ACLEvent) {
+func (p *Plugin) OnACL(e *gumble.ACLEvent) {
 }
 
-func (in *Instance) OnBanList(e *gumble.BanListEvent) {
+func (p *Plugin) OnBanList(e *gumble.BanListEvent) {
 }
 
-func (in *Instance) OnContextActionChange(e *gumble.ContextActionChangeEvent) {
+func (p *Plugin) OnContextActionChange(e *gumble.ContextActionChangeEvent) {
 }

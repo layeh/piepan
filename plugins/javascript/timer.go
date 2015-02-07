@@ -16,7 +16,7 @@ func (t *timer) Cancel() {
 	}
 }
 
-func (in *Instance) apiTimerNew(call otto.FunctionCall) otto.Value {
+func (p *Plugin) apiTimerNew(call otto.FunctionCall) otto.Value {
 	callback := call.Argument(0)
 	timeout, _ := call.Argument(1).ToInteger()
 
@@ -32,11 +32,11 @@ func (in *Instance) apiTimerNew(call otto.FunctionCall) otto.Value {
 
 		select {
 		case <-time.After(time.Millisecond * time.Duration(timeout)):
-			in.callValue(callback)
+			p.callValue(callback)
 		case <-t.cancel:
 		}
 	}()
 
-	ret, _ := in.state.ToValue(t)
+	ret, _ := p.state.ToValue(t)
 	return ret
 }

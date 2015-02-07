@@ -6,14 +6,11 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/layeh/bconf"
 	"github.com/layeh/gumble/gumble"
 	"github.com/layeh/gumble/gumble_ffmpeg"
 	"github.com/layeh/gumble/gumbleutil"
 	"github.com/layeh/piepan"
 
-	_ "github.com/layeh/piepan/plugins/autobitrate"
-	_ "github.com/layeh/piepan/plugins/comment"
 	_ "github.com/layeh/piepan/plugins/javascript"
 )
 
@@ -29,13 +26,17 @@ func main() {
 	serverName := flag.String("servername", "", "override server name used in TLS handshake")
 
 	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, "usage: %s [options] [configuration file]\n", os.Args[0])
-		fmt.Fprintf(os.Stderr, "a bot framework for Mumble\n")
+		fmt.Fprintf(os.Stderr, "usage: %s [options] [script files]\n", os.Args[0])
+		fmt.Fprintf(os.Stderr, "an easy to use framework for writing scriptable Mumble bots\n")
 		flag.PrintDefaults()
-		fmt.Fprintf(os.Stderr, "\nDefault configuration file name: piepan.conf\n")
+		fmt.Fprintf(os.Stderr, "\nScript files are defined in the following way:\n")
+		fmt.Fprintf(os.Stderr, "  [type:[environment:]]filename\n")
+		fmt.Fprintf(os.Stderr, "    filename: path to script file\n")
+		fmt.Fprintf(os.Stderr, "    type: type of script file (default: file extension)\n")
+		fmt.Fprintf(os.Stderr, "    environment: name of environment where script will be executed (default: type)\n")
+		fmt.Fprintf(os.Stderr, "\nEnabled script types:\n")
 		for _, pluginName := range piepan.PluginNames {
-			plugin := piepan.Plugins[pluginName]
-			fmt.Fprintf(os.Stderr, "\nPlugin: %s\n%s\n", pluginName, plugin.Help)
+			fmt.Fprintf(os.Stderr, "  %s\n", pluginName)
 		}
 	}
 
@@ -49,11 +50,9 @@ func main() {
 	}
 
 	client := gumble.NewClient(&config)
-	instance := piepan.Instance{
-		Client: client,
-	}
+	instance := piepan.New(client)
 	audio, _ := gumble_ffmpeg.New(client)
-	instance.FFmpeg = audio
+	instance.Audio = audio
 
 	if *insecure {
 		config.TLSConfig.InsecureSkipVerify = true
@@ -75,26 +74,12 @@ func main() {
 		}
 	}
 
-	// Load configuration file
-	configurationFileName := "piepan.conf"
-	if len(flag.Args()) >= 1 {
-		configurationFileName = flag.Arg(0)
-	}
-	configFile, err := bconf.DecodeFile(configurationFileName)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "%s\n", err)
-		os.Exit(1)
-	}
-	for _, block := range configFile.Blocks["plugin"] {
-		pluginName := block.Tag.String(0)
-		plugin := piepan.Plugins[pluginName]
-		if plugin == nil {
-			fmt.Fprintf(os.Stderr, "unknown plugin: `%s`\n", pluginName)
-			os.Exit(1)
-		}
-		if err := plugin.Init(&instance, block); err != nil {
-			fmt.Fprintf(os.Stderr, "%s plugin error: %s\n", pluginName, err)
-			os.Exit(1)
+	client.Attach(gumbleutil.AutoBitrate)
+
+	// Load scripts
+	for _, script := range flag.Args() {
+		if err := instance.LoadScript(script); err != nil {
+			fmt.Fprintf(os.Stderr, "%s: %s\n", script, err)
 		}
 	}
 

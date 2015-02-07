@@ -2,10 +2,6 @@ package piepan
 
 import (
 	"sort"
-
-	"github.com/layeh/bconf"
-	"github.com/layeh/gumble/gumble"
-	"github.com/layeh/gumble/gumble_ffmpeg"
 )
 
 var (
@@ -13,14 +9,8 @@ var (
 	Plugins     map[string]*Plugin = map[string]*Plugin{}
 )
 
-type Instance struct {
-	Client *gumble.Client
-	FFmpeg *gumble_ffmpeg.Stream
-}
-
 type Plugin struct {
-	Help string
-	Init func(*Instance, *bconf.Block) error
+	New func(*Instance) Environment
 }
 
 func Register(name string, plugin *Plugin) {
