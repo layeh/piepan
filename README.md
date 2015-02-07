@@ -84,10 +84,11 @@
 
 - Next
     - Moved to plugin-based system
-    - Voice targeting is more like the gumble API
     - Add certificate locking
     - Add bitrate, volume functions to piepan.Audio
     - Add auto bitrate setting
+    - Add Lua plugin
+    - Voice targeting is more like the gumble API
 - 0.4.0 (2014-12-11)
     - Moved to Go (+ gumble)
     - API has been overhauled. There is no backwards capability with previous versions of piepan
