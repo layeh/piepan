@@ -78,9 +78,9 @@
 3. Fetch piepan
     - Base package
         - `go get -u github.com/layeh/piepan`
-    - JavaScript support (Optional)
+    - JavaScript plugin (Optional)
         - `go get -u github.com/layeh/piepan/plugins/javascript`
-    - Lua support (Optional)
+    - Lua plugin (Optional)
         - `go get -u github.com/layeh/piepan/plugins/lua`
 4. Build piepan (plugins can be removed if they are not wanted)
     - `go build -o piepan $GOPATH/src/github.com/layeh/piepan/cmd/piepan/{javascript,lua,main}.go`
