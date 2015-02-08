@@ -15,6 +15,7 @@ import (
 
 func init() {
 	piepan.Register("js", &piepan.Plugin{
+		Name: "JavaScript",
 		New: func(in *piepan.Instance) piepan.Environment {
 			s := otto.New()
 			p := &Plugin{

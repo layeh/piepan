@@ -35,8 +35,8 @@ func main() {
 		fmt.Fprintf(os.Stderr, "    type: type of script file (default: file extension)\n")
 		fmt.Fprintf(os.Stderr, "    environment: name of environment where script will be executed (default: type)\n")
 		fmt.Fprintf(os.Stderr, "\nEnabled script types:\n")
-		for _, pluginName := range piepan.PluginNames {
-			fmt.Fprintf(os.Stderr, "  %s\n", pluginName)
+		for _, ext := range piepan.PluginExtensions {
+			fmt.Fprintf(os.Stderr, "  %s (.%s)\n", piepan.Plugins[ext].Name, ext)
 		}
 	}
 

@@ -13,6 +13,7 @@ import (
 
 func init() {
 	piepan.Register("lua", &piepan.Plugin{
+		Name: "Lua",
 		New: func(in *piepan.Instance) piepan.Environment {
 			s := luar.Init()
 			p := &Plugin{

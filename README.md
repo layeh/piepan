@@ -22,8 +22,8 @@
         environment: name of environment where script will be executed (default: type)
 
     Enabled script types:
-      js
-      lua
+      JavaScript (.js)
+      Lua (.lua)
 
 ## Scripting documentation
 
