@@ -35,32 +35,28 @@
 ### Windows
 
 1. Install dependencies (use 32-bit/386/x86 installers)
-  1. Download and run [Go installer](https://golang.org/dl/)
-  2. Download and run [MinGW installer](http://www.mingw.org/)
-    - Configure [PATH variable](http://www.mingw.org/wiki/getting_started#toc7)
-    - Install the following packages from the MinGW installation manager:
-      - mingw-developer-toolkit
-      - mingw32-base
-      - msys-base
-      - msys-wget
-  3. Download [pkg-config-lite](http://sourceforge.net/projects/pkgconfiglite/)
-    - Extract zip contents to the MinGW installation folder
-  4. Download and run [Git installer](http://git-scm.com/download/win)
-    - Select "Use Git from the Windows Command Prompt" during installation
-2. Open MSYS terminal (defaults to `C:\MinGW\msys\1.0\msys.bat`)
-  1. Download and install Opus
-    - `wget http://downloads.xiph.org/releases/opus/opus-1.1.tar.gz`
-    - `tar xzf opus-1.1.tar.gz`
-    - `(cd opus-1.1; ./configure && make install)`
-  2. Configure GOPATH
+    1. Base dependencies
+        1. Download and run [Go installer](https://golang.org/dl/)
+        2. Download and run [MSYS2 installer](http://sourceforge.net/projects/msys2/)
+            - Uncheck "Run MSYS2 32bit now"
+    2. Open the MSYS2 "MinGW-w64 Win32 Shell" from the start menu to install additional dependencies
+      - `pacman -Syy mingw-w64-i686-toolchain git mingw-w64-i686-opus pkg-config mingw-w64-i686-ffmpeg`
+2. Create a GOPATH (skip if you already have a GOPATH you want to use)
     - `export GOPATH=$(mktemp -d)`
-  3. Configure pkg-config path
-    - `export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig/`
-  4. Build piepan
-    - `go get -u github.com/layeh/piepan/cmd/piepan`
-  5. Copy .exe to current directory
-    - `cp "$GOPATH/bin/piepan.exe" .`
-  6. Run piepan.exe
+3. Configure environment for building Opus
+    - `export CGO_LDFLAGS="$(pkg-config --libs opus)"`
+    - `export CGO_CFLAGS="$(pkg-config --cflags opus)"`
+4. Fetch piepan
+    - Base package
+        - `go get -tags nopkgconfig -u github.com/layeh/piepan`
+    - JavaScript plugin (Optional)
+        - `go get -u github.com/layeh/piepan/plugins/javascript`
+    - Lua plugin (Optional)
+        - Unavailable on Windows
+5. Build piepan
+    - `go build -o piepan.exe $GOPATH/src/github.com/layeh/piepan/cmd/piepan/{javascript,main}.go`
+6. Run piepan
+    - `./piepan.exe ...`
 
 ### Ubuntu 14.04
 
@@ -85,7 +81,7 @@
 4. Build piepan (plugins can be removed if they are not wanted)
     - `go build -o piepan $GOPATH/src/github.com/layeh/piepan/cmd/piepan/{javascript,lua,main}.go`
 5. Run piepan using `avconv`
-    - `piepan -ffmpeg=avconv ...`
+    - `./piepan -ffmpeg=avconv ...`
 
 ## Changelog
 
