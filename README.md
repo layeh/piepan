@@ -85,7 +85,7 @@
 
 ## Changelog
 
-- Next
+- 0.5.0 (2015-02-08)
     - Moved to plugin-based system
     - Add certificate locking
     - Add bitrate, volume functions to piepan.Audio
