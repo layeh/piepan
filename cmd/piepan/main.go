@@ -22,6 +22,7 @@ func main() {
 	insecure := flag.Bool("insecure", false, "skip certificate checking")
 	lock := flag.String("lock", "", "server certificate lock file")
 	serverName := flag.String("servername", "", "override server name used in TLS handshake")
+	ffmpeg := flag.String("ffmpeg", "ffmpeg", "ffmpeg-capable executable for media streaming")
 
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "usage: %s [options] [script files]\n", os.Args[0])
@@ -50,6 +51,7 @@ func main() {
 	client := gumble.NewClient(&config)
 	instance := piepan.New(client)
 	audio, _ := gumble_ffmpeg.New(client)
+	audio.Command = *ffmpeg
 	instance.Audio = audio
 
 	if *insecure {

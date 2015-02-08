@@ -5,6 +5,7 @@
     usage: piepan [options] [script files]
     an easy to use framework for writing scriptable Mumble bots
       -certificate="": user certificate file (PEM)
+      -ffmpeg="ffmpeg": ffmpeg-capable executable for media streaming
       -insecure=false: skip certificate checking
       -key="": user certificate key file (PEM)
       -lock="": server certificate lock file
