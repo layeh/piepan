@@ -2,6 +2,7 @@
 
 ## Usage
 
+    piepan v0.5.0
     usage: piepan [options] [script files]
     an easy to use framework for writing scriptable Mumble bots
       -certificate="": user certificate file (PEM)
