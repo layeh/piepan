@@ -65,22 +65,27 @@
 ### Ubuntu 14.04
 
 1. Install dependencies
-  2. Base dependencies
-    - `sudo apt-get install -y git libopus-dev wget python-software-properties software-properties-common pkg-config gcc`
-  2. Golang
-    - `sudo add-apt-repository -y ppa:evarlast/golang1.4`
-    - `sudo apt-get update`
-    - `sudo apt-get install -y golang`
-  3. ffmpeg (if you would like to play media files)
-    - `sudo add-apt-repository -y ppa:jon-severinsson/ffmpeg`
-    - `sudo apt-get update`
-    - `sudo apt-get install -y ffmpeg`
+  1. Base dependencies
+      - `sudo apt-get install -y git libopus-dev wget python-software-properties software-properties-common pkg-config gcc libav-tools`
+  2. Go
+      - `sudo add-apt-repository -y ppa:evarlast/golang1.4`
+      - `sudo apt-get update`
+      - `sudo apt-get install -y golang`
+  3. Lua 5.1 (Optional)
+      - `sudo apt-get install -y liblua5.1-0-dev`
 2. Create a GOPATH (skip if you already have a GOPATH you want to use)
-  - `export GOPATH=$(mktemp -d)`
-3. Build piepan
-  - `go get -u github.com/layeh/piepan/cmd/piepan`
-4. Copy binary to current directory
-  - `cp "$GOPATH/bin/piepan" .`
+    - `export GOPATH=$(mktemp -d)`
+3. Fetch piepan
+    - Base package
+        - `go get -u github.com/layeh/piepan`
+    - JavaScript support (Optional)
+        - `go get -u github.com/layeh/piepan/plugins/javascript`
+    - Lua support (Optional)
+        - `go get -u github.com/layeh/piepan/plugins/lua`
+4. Build piepan (plugins can be removed if they are not wanted)
+    - `go build -o piepan $GOPATH/src/github.com/layeh/piepan/cmd/piepan/{javascript,lua,main}.go`
+5. Run piepan using `avconv`
+    - `piepan -ffmpeg=avconv ...`
 
 ## Changelog
 
