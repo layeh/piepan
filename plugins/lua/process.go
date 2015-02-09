@@ -32,11 +32,15 @@ func (p *Plugin) apiProcessNew(l *lua.State) int {
 
 	go func() {
 		var str string
-		bytes, _ := proc.cmd.Output()
-		if bytes != nil {
-			str = string(bytes)
+		bytes, err := proc.cmd.Output()
+		if err == nil {
+			if bytes != nil {
+				str = string(bytes)
+			}
+			p.callValue(callback, proc.cmd.ProcessState.Success(), str)
+		} else {
+			p.callValue(callback, false, "")
 		}
-		p.callValue(callback, proc.cmd.ProcessState.Success(), str)
 		callback.Close()
 	}()
 

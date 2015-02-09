@@ -85,6 +85,8 @@
 
 ## Changelog
 
+- Next
+    - Fix crash if `piepan.Process.New` executable did not exist
 - 0.5.0 (2015-02-08)
     - Moved to plugin-based system
     - Add certificate locking

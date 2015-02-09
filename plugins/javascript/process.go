@@ -31,11 +31,15 @@ func (p *Plugin) apiProcessNew(call otto.FunctionCall) otto.Value {
 
 	go func() {
 		var str string
-		bytes, _ := proc.cmd.Output()
-		if bytes != nil {
-			str = string(bytes)
+		bytes, err := proc.cmd.Output()
+		if err == nil {
+			if bytes != nil {
+				str = string(bytes)
+			}
+			p.callValue(callback, proc.cmd.ProcessState.Success(), str)
+		} else {
+			p.callValue(callback, false, "")
 		}
-		p.callValue(callback, proc.cmd.ProcessState.Success(), str)
 	}()
 
 	ret, _ := p.state.ToValue(proc)
