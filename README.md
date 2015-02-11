@@ -121,10 +121,6 @@
 - 0.1 (2013-12-11)
     - Initial Release
 
-## Requirements
-
-- [gumble](https://github.com/bontibon/gumble/tree/master/gumble)
-
 ## License
 
 This software is released under the MIT license (see LICENSE).
