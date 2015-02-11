@@ -22,7 +22,7 @@ piepan is built using the [gumble](https://github.com/layeh/gumble) library. Doc
 
 Object that contains all of the channels that are on the server. The channels are mapped by their channel IDs (as a string). `piepan.Channels["0"]` is the server's root channel.
 
-Note: [`Channel.Channels()`](https://godoc.org/github.com/layeh/gumble/gumble#Channel.Channels) and [`Channel.Users()`](https://godoc.org/github.com/layeh/gumble/gumble#Channel.Users) cannot be iterated over.
+Note: `Channel.Channels` and `Channel.Users` cannot be iterated over.
 
 #### `piepan.Disconnect()`
 
@@ -136,5 +136,5 @@ Example:
     // Print the names of the connected users to standard output
     for (var k in piepan.Users) {
       var user = piepan.Users[k];
-      console.log(user.Name());
+      console.log(user.Name);
     }
