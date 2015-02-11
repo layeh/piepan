@@ -2,7 +2,7 @@
 
 ## Usage
 
-    piepan v0.5.0
+    piepan v0.6.0
     usage: piepan [options] [script files]
     an easy to use framework for writing scriptable Mumble bots
       -certificate="": user certificate file (PEM)
@@ -85,7 +85,7 @@
 
 ## Changelog
 
-- Next
+- 0.6.0 (2015-02-11)
     - Fixes due to gumble API changes (see the [gumble API](https://godoc.org/github.com/layeh/gumble/gumble) if your scripts are not working).
     - Fix crash if `piepan.Process.New` executable did not exist
 - 0.5.0 (2015-02-08)
