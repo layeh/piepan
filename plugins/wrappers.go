@@ -18,12 +18,12 @@ func NewUsersWrapper(users gumble.Users) UsersWrapper {
 }
 
 func (uw UsersWrapper) Add(user *gumble.User) {
-	session := strconv.FormatUint(uint64(user.Session()), 10)
+	session := strconv.FormatUint(uint64(user.Session), 10)
 	uw[session] = user
 }
 
 func (uw UsersWrapper) Remove(user *gumble.User) {
-	session := strconv.FormatUint(uint64(user.Session()), 10)
+	session := strconv.FormatUint(uint64(user.Session), 10)
 	delete(uw, session)
 }
 
@@ -38,12 +38,12 @@ func NewChannelsWrapper(channels gumble.Channels) ChannelsWrapper {
 }
 
 func (cw ChannelsWrapper) Add(channel *gumble.Channel) {
-	id := strconv.FormatUint(uint64(channel.ID()), 10)
+	id := strconv.FormatUint(uint64(channel.ID), 10)
 	cw[id] = channel
 }
 
 func (cw ChannelsWrapper) Remove(channel *gumble.Channel) {
-	id := strconv.FormatUint(uint64(channel.ID()), 10)
+	id := strconv.FormatUint(uint64(channel.ID), 10)
 	delete(cw, id)
 }
 

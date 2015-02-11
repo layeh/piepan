@@ -18,7 +18,7 @@ func (p *Plugin) apiAudioPlay(l *lua.State) int {
 	callback := obj.GetObject("callback")
 	obj.Close()
 
-	if enc := p.instance.Client.AudioEncoder(); enc != nil {
+	if enc := p.instance.Client.AudioEncoder; enc != nil {
 		enc.SetApplication(gopus.Audio)
 	}
 
@@ -36,7 +36,7 @@ func (p *Plugin) apiAudioNewTarget(l *lua.State) int {
 	id := l.ToInteger(1)
 
 	target := &gumble.VoiceTarget{}
-	target.SetID(int(id))
+	target.ID = uint32(id)
 
 	obj := luar.NewLuaObjectFromValue(l, target)
 	obj.Push()
@@ -45,14 +45,14 @@ func (p *Plugin) apiAudioNewTarget(l *lua.State) int {
 }
 
 func (p *Plugin) apiAudioBitrate(l *lua.State) int {
-	encoder := p.instance.Client.AudioEncoder()
+	encoder := p.instance.Client.AudioEncoder
 	l.PushInteger(int64(encoder.Bitrate()))
 	return 1
 }
 
 func (p *Plugin) apiAudioSetBitrate(l *lua.State) int {
 	bitrate := l.ToInteger(1)
-	p.instance.Client.AudioEncoder().SetBitrate(bitrate)
+	p.instance.Client.AudioEncoder.SetBitrate(bitrate)
 	return 0
 }
 
@@ -69,7 +69,7 @@ func (p *Plugin) apiAudioSetVolume(l *lua.State) int {
 
 func (p *Plugin) apiAudioSetTarget(l *lua.State) int {
 	if l.GetTop() == 0 {
-		p.instance.Client.SetVoiceTarget(nil)
+		p.instance.Client.VoiceTarget = nil
 		return 0
 	}
 
@@ -79,7 +79,7 @@ func (p *Plugin) apiAudioSetTarget(l *lua.State) int {
 		return 1
 	}
 	p.instance.Client.Send(voiceTarget)
-	p.instance.Client.SetVoiceTarget(voiceTarget)
+	p.instance.Client.VoiceTarget = voiceTarget
 	return 0
 }
 

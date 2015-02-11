@@ -8,10 +8,10 @@ import (
 func (p *Plugin) OnConnect(e *gumble.ConnectEvent) {
 	global, _ := p.state.Get("piepan")
 	if obj := global.Object(); obj != nil {
-		p.users = NewUsersWrapper(p.instance.Client.Users())
-		p.channels = NewChannelsWrapper(p.instance.Client.Channels())
+		p.users = NewUsersWrapper(p.instance.Client.Users)
+		p.channels = NewChannelsWrapper(p.instance.Client.Channels)
 
-		obj.Set("Self", e.Client.Self())
+		obj.Set("Self", e.Client.Self)
 		obj.Set("Users", p.users)
 		obj.Set("Channels", p.channels)
 	}

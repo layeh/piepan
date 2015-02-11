@@ -18,7 +18,7 @@ func (p *Plugin) apiAudioPlay(call otto.FunctionCall) otto.Value {
 	filenameValue, _ := obj.Get("filename")
 	callbackValue, _ := obj.Get("callback")
 
-	if enc := p.instance.Client.AudioEncoder(); enc != nil {
+	if enc := p.instance.Client.AudioEncoder; enc != nil {
 		enc.SetApplication(gopus.Audio)
 	}
 
@@ -37,13 +37,13 @@ func (p *Plugin) apiAudioNewTarget(call otto.FunctionCall) otto.Value {
 	}
 
 	target := &gumble.VoiceTarget{}
-	target.SetID(int(id))
+	target.ID = uint32(id)
 	value, _ := p.state.ToValue(target)
 	return value
 }
 
 func (p *Plugin) apiAudioBitrate(call otto.FunctionCall) otto.Value {
-	encoder := p.instance.Client.AudioEncoder()
+	encoder := p.instance.Client.AudioEncoder
 	value, _ := p.state.ToValue(encoder.Bitrate())
 	return value
 }
@@ -53,7 +53,7 @@ func (p *Plugin) apiAudioSetBitrate(call otto.FunctionCall) otto.Value {
 	if err != nil {
 		return otto.UndefinedValue()
 	}
-	p.instance.Client.AudioEncoder().SetBitrate(int(bitrate))
+	p.instance.Client.AudioEncoder.SetBitrate(int(bitrate))
 	return otto.UndefinedValue()
 }
 
@@ -73,7 +73,7 @@ func (p *Plugin) apiAudioSetVolume(call otto.FunctionCall) otto.Value {
 
 func (p *Plugin) apiAudioSetTarget(call otto.FunctionCall) otto.Value {
 	if len(call.ArgumentList) == 0 {
-		p.instance.Client.SetVoiceTarget(nil)
+		p.instance.Client.VoiceTarget = nil
 		return otto.TrueValue()
 	}
 	target, err := call.Argument(0).Export()
@@ -82,7 +82,7 @@ func (p *Plugin) apiAudioSetTarget(call otto.FunctionCall) otto.Value {
 	}
 	voiceTarget := target.(*gumble.VoiceTarget)
 	p.instance.Client.Send(voiceTarget)
-	p.instance.Client.SetVoiceTarget(voiceTarget)
+	p.instance.Client.VoiceTarget = voiceTarget
 	return otto.TrueValue()
 }
 

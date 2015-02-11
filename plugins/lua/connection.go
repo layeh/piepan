@@ -8,9 +8,9 @@ import (
 
 func (p *Plugin) OnConnect(e *gumble.ConnectEvent) {
 	luar.Register(p.state, "piepan", luar.Map{
-		"Self":     e.Client.Self(),
-		"Users":    e.Client.Users(),
-		"Channels": e.Client.Channels(),
+		"Self":     e.Client.Self,
+		"Users":    e.Client.Users,
+		"Channels": e.Client.Channels,
 	})
 
 	for _, listener := range p.listeners["connect"] {

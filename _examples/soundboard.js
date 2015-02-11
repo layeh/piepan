@@ -50,11 +50,11 @@
     if (piepan.Audio.IsPlaying() && !interrupt_sounds) {
       return;
     }
-    if (piepan.Self.Channel().ID() != e.Sender.Channel().ID()) {
+    if (piepan.Self.Channel.ID != e.Sender.Channel.ID) {
       if (!should_move) {
         return;
       }
-      piepan.Self.Move(e.Sender.Channel());
+      piepan.Self.Move(e.Sender.Channel);
     }
 
     piepan.Audio.Stop();

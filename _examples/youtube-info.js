@@ -71,7 +71,7 @@ piepan.On('message', function(e) {
         duration: duration,
         thumbnail: json.data.thumbnail.hqDefault,
       });
-      piepan.Self.Channel().Send(message, false);
+      piepan.Self.Channel.Send(message, false);
     }, 'wget', '-q', '-O', '-', 'http://gdata.youtube.com/feeds/api/videos/' + video_id + '?v=2&alt=jsonc');
     return;
   }
