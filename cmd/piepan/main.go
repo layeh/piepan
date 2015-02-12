@@ -85,8 +85,12 @@ func main() {
 	}
 
 	keepAlive := make(chan bool)
+	exitStatus := 0
 	client.Attach(gumbleutil.Listener{
 		Disconnect: func(e *gumble.DisconnectEvent) {
+			if e.Type != gumble.DisconnectUser {
+				exitStatus = int(e.Type) + 1
+			}
 			keepAlive <- true
 		},
 	})
@@ -97,4 +101,5 @@ func main() {
 	}
 
 	<-keepAlive
+	os.Exit(exitStatus)
 }
