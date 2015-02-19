@@ -87,6 +87,7 @@
 
 - Next
     - Non-script-invoked disconnections are reported though the exit status
+    - Remove `-servername` flag (`-lock` + `-insecure` should be used instead)
 - 0.6.0 (2015-02-11)
     - Fixes due to gumble API changes (see the [gumble API](https://godoc.org/github.com/layeh/gumble/gumble) if your scripts are not working).
     - Fix crash if `piepan.Process.New` executable did not exist
