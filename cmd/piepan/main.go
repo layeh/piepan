@@ -58,7 +58,7 @@ func main() {
 		config.TLSConfig.InsecureSkipVerify = true
 	}
 	if *lock != "" {
-		gumbleutil.CertificateLockFile(client, &config, *lock)
+		gumbleutil.CertificateLockFile(client, *lock)
 	}
 	if *certificateFile != "" {
 		if *keyFile == "" {
