@@ -21,7 +21,6 @@ func main() {
 	keyFile := flag.String("key", "", "user certificate key file (PEM)")
 	insecure := flag.Bool("insecure", false, "skip certificate checking")
 	lock := flag.String("lock", "", "server certificate lock file")
-	serverName := flag.String("servername", "", "override server name used in TLS handshake")
 	ffmpeg := flag.String("ffmpeg", "ffmpeg", "ffmpeg-capable executable for media streaming")
 
 	flag.Usage = func() {
@@ -57,9 +56,6 @@ func main() {
 
 	if *insecure {
 		config.TLSConfig.InsecureSkipVerify = true
-	}
-	if *serverName != "" {
-		config.TLSConfig.ServerName = *serverName
 	}
 	if *lock != "" {
 		gumbleutil.CertificateLockFile(client, &config, *lock)
