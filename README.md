@@ -12,7 +12,6 @@
       -lock="": server certificate lock file
       -password="": user password
       -server="localhost:64738": address of the server
-      -servername="": override server name used in TLS handshake
       -username="piepan-bot": username of the bot
 
     Script files are defined in the following way:
