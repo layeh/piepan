@@ -1,4 +1,4 @@
-# C Lua plugin documentation
+# Go Lua plugin documentation
 
 ## API
 

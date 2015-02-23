@@ -2,7 +2,7 @@
 
 ## Usage
 
-    piepan v0.6.0
+    piepan v0.7.0
     usage: piepan [options] [script files]
     an easy to use framework for writing scriptable Mumble bots
       -certificate="": user certificate file (PEM)
@@ -22,12 +22,13 @@
 
     Enabled script types:
       JavaScript (.js)
-      Lua (.lua)
+      Lua (Go) (.lua)
 
 ## Scripting documentation
 
 - [JavaScript](https://github.com/layeh/piepan/blob/master/plugins/javascript/README.md)
-- [Lua](https://github.com/layeh/piepan/blob/master/plugins/lua/README.md)
+- [Go Lua](https://github.com/layeh/piepan/blob/master/plugins/golua/README.md)
+- [C Lua](https://github.com/layeh/piepan/blob/master/plugins/lua/README.md)
 
 ## Building
 
@@ -50,10 +51,12 @@
         - `go get -tags nopkgconfig -u github.com/layeh/piepan`
     - JavaScript plugin (Optional)
         - `go get -u github.com/layeh/piepan/plugins/javascript`
-    - Lua plugin (Optional)
+    - Go Lua plugin (Optional)
+        - `go get -u github.com/layeh/piepan/plugins/golua`
+    - C Lua plugin (Optional)
         - Unavailable on Windows
 5. Build piepan
-    - `go build -o piepan.exe $GOPATH/src/github.com/layeh/piepan/cmd/piepan/{javascript,main}.go`
+    - `go build -o piepan.exe $GOPATH/src/github.com/layeh/piepan/cmd/piepan/{javascript,golua,main}.go`
 6. Run piepan
     - `./piepan.exe ...`
 
@@ -66,7 +69,7 @@
       - `sudo add-apt-repository -y ppa:evarlast/golang1.4`
       - `sudo apt-get update`
       - `sudo apt-get install -y golang`
-  3. Lua 5.1 (Optional)
+  3. Lua 5.1 (Optional, used for C Lua)
       - `sudo apt-get install -y liblua5.1-0-dev`
 2. Create a GOPATH (skip if you already have a GOPATH you want to use)
     - `export GOPATH=$(mktemp -d)`
@@ -75,16 +78,19 @@
         - `go get -u github.com/layeh/piepan`
     - JavaScript plugin (Optional)
         - `go get -u github.com/layeh/piepan/plugins/javascript`
-    - Lua plugin (Optional)
+    - Go Lua plugin (Optional)
+        - `go get -u github.com/layeh/piepan/plugins/golua`
+    - C Lua plugin (Optional)
         - `go get -u github.com/layeh/piepan/plugins/lua`
 4. Build piepan (plugins can be removed if they are not wanted)
-    - `go build -o piepan $GOPATH/src/github.com/layeh/piepan/cmd/piepan/{javascript,lua,main}.go`
+    - `go build -o piepan $GOPATH/src/github.com/layeh/piepan/cmd/piepan/{javascript,golua,lua,main}.go`
 5. Run piepan using `avconv`
     - `./piepan -ffmpeg=avconv ...`
 
 ## Changelog
 
 - Next
+    - Add additional Lua support via [gopher-lua](https://github.com/yuin/gopher-lua)
     - Non-script-invoked disconnections are reported though the exit status
     - Remove `-servername` flag (`-lock` + `-insecure` should be used instead)
 - 0.6.0 (2015-02-11)
