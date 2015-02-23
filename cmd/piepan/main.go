@@ -24,7 +24,7 @@ func main() {
 	ffmpeg := flag.String("ffmpeg", "ffmpeg", "ffmpeg-capable executable for media streaming")
 
 	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, "piepan v0.6.0\n")
+		fmt.Fprintf(os.Stderr, "piepan v0.7.0\n")
 		fmt.Fprintf(os.Stderr, "usage: %s [options] [script files]\n", os.Args[0])
 		fmt.Fprintf(os.Stderr, "an easy to use framework for writing scriptable Mumble bots\n")
 		flag.PrintDefaults()
