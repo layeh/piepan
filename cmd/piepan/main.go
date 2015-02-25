@@ -32,10 +32,11 @@ func main() {
 		fmt.Fprintf(os.Stderr, "  [type%c[environment%c]]filename\n", os.PathListSeparator, os.PathListSeparator)
 		fmt.Fprintf(os.Stderr, "    filename: path to script file\n")
 		fmt.Fprintf(os.Stderr, "    type: type of script file (default: file extension)\n")
-		fmt.Fprintf(os.Stderr, "    environment: name of environment where script will be executed (default: type)\n")
-		fmt.Fprintf(os.Stderr, "\nEnabled script types:\n")
+		fmt.Fprintf(os.Stderr, "    environment: name of environment where script will be executed (default: type)\n\n")
+		fmt.Fprintf(os.Stderr, "Enabled script types:\n")
+		fmt.Fprintf(os.Stderr, "  Type         Name\n")
 		for _, ext := range piepan.PluginExtensions {
-			fmt.Fprintf(os.Stderr, "  %s (.%s)\n", piepan.Plugins[ext].Name, ext)
+			fmt.Fprintf(os.Stderr, "  %-12s %s\n", ext, piepan.Plugins[ext].Name)
 		}
 	}
 
