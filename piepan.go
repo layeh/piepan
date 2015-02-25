@@ -36,7 +36,12 @@ func (in *Instance) LoadScript(name string) error {
 	switch len(pieces) {
 	case 1:
 		filename = pieces[0]
-		filetype = strings.TrimPrefix(filepath.Ext(filename), ".")
+		for _, ext := range PluginExtensions {
+			if strings.HasSuffix(filename, ext) {
+				filetype = ext
+				break
+			}
+		}
 		environment = filetype
 	case 2:
 		filename = pieces[1]

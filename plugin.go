@@ -4,8 +4,25 @@ import (
 	"sort"
 )
 
+type PluginExts []string
+
+func (p PluginExts) Len() int {
+	return len(p)
+}
+
+func (p PluginExts) Less(i, j int) bool {
+	if len(p[i]) == len(p[j]) {
+		return p[i] < p[j]
+	}
+	return len(p[i]) > len(p[j])
+}
+
+func (p PluginExts) Swap(i, j int) {
+	p[i], p[j] = p[j], p[i]
+}
+
 var (
-	PluginExtensions []string
+	PluginExtensions PluginExts
 	Plugins          map[string]*Plugin = map[string]*Plugin{}
 )
 
@@ -22,6 +39,6 @@ func Register(extension string, plugin *Plugin) {
 		panic("piepan: extension " + extension + " already registered")
 	}
 	PluginExtensions = append(PluginExtensions, extension)
-	sort.Strings(PluginExtensions)
+	sort.Sort(PluginExtensions)
 	Plugins[extension] = plugin
 }

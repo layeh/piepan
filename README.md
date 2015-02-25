@@ -21,8 +21,9 @@
         environment: name of environment where script will be executed (default: type)
 
     Enabled script types:
+      Lua (Go) (.go.lua)
+      Lua (C) (.lua)
       JavaScript (.js)
-      Lua (Go) (.lua)
 
 ## Scripting documentation
 

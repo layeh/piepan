@@ -12,7 +12,7 @@ import (
 )
 
 func init() {
-	piepan.Register("lua", &piepan.Plugin{
+	piepan.Register("go.lua", &piepan.Plugin{
 		Name: "Lua (Go)",
 		New: func(in *piepan.Instance) piepan.Environment {
 			s := lua.NewState()
