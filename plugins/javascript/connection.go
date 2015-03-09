@@ -8,12 +8,9 @@ import (
 func (p *Plugin) OnConnect(e *gumble.ConnectEvent) {
 	global, _ := p.state.Get("piepan")
 	if obj := global.Object(); obj != nil {
-		p.users = NewUsersWrapper(p.instance.Client.Users)
-		p.channels = NewChannelsWrapper(p.instance.Client.Channels)
-
 		obj.Set("Self", e.Client.Self)
-		obj.Set("Users", p.users)
-		obj.Set("Channels", p.channels)
+		obj.Set("Users", p.instance.Client.Users)
+		obj.Set("Channels", p.instance.Client.Channels)
 	}
 
 	for _, listener := range p.listeners["connect"] {
@@ -41,9 +38,6 @@ func (p *Plugin) OnDisconnect(e *gumble.DisconnectEvent) {
 		IsNoCertificate:     e.Type.Has(gumble.DisconnectNoCertificate),
 		IsAuthenticatorFail: e.Type.Has(gumble.DisconnectAuthenticatorFail),
 	}
-
-	p.users = nil
-	p.channels = nil
 
 	for _, listener := range p.listeners["disconnect"] {
 		p.callValue(listener, &event)
@@ -81,12 +75,6 @@ func (p *Plugin) OnUserChange(e *gumble.UserChangeEvent) {
 		IsChangeTexture:         e.Type.Has(gumble.UserChangeTexture),
 		IsChangePrioritySpeaker: e.Type.Has(gumble.UserChangePrioritySpeaker),
 		IsChangeRecording:       e.Type.Has(gumble.UserChangeRecording),
-	}
-
-	if event.IsConnected {
-		p.users.Add(e.User)
-	} else if event.IsDisconnected {
-		p.users.Remove(e.User)
 	}
 
 	for _, listener := range p.listeners["userchange"] {

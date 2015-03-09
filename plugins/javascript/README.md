@@ -20,9 +20,7 @@ piepan is built using the [gumble](https://github.com/layeh/gumble) library. Doc
 
 #### [`Channels`](https://godoc.org/github.com/layeh/gumble/gumble#Channels) `piepan.Channels`
 
-Object that contains all of the channels that are on the server. The channels are mapped by their channel IDs (as a string). `piepan.Channels["0"]` is the server's root channel.
-
-Note: `Channel.Channels` and `Channel.Users` cannot be iterated over.
+Object that contains all of the channels that are on the server. The channels are mapped by their channel IDs. `piepan.Channels[0]` is the server's root channel.
 
 #### `piepan.Disconnect()`
 
@@ -129,7 +127,7 @@ The `User` object that references yourself.
 
 #### [`Users`](https://godoc.org/github.com/layeh/gumble/gumble#Users) `piepan.Users`
 
-Object containing each connected user on the server, with the keys being the session ID of the user (as a string) and the value being their corresponding `piepan.User` object.
+Object containing each connected user on the server, with the keys being the session ID of the user and the value being their corresponding `piepan.User` object.
 
 Example:
 

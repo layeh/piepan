@@ -1,51 +1,9 @@
 package plugin
 
 import (
-	"strconv"
-
 	"github.com/layeh/gumble/gumble"
 	"github.com/layeh/gumble/gumbleutil"
 )
-
-type UsersWrapper map[string]*gumble.User
-
-func NewUsersWrapper(users gumble.Users) UsersWrapper {
-	wrapper := UsersWrapper{}
-	for _, user := range users {
-		wrapper.Add(user)
-	}
-	return wrapper
-}
-
-func (uw UsersWrapper) Add(user *gumble.User) {
-	session := strconv.FormatUint(uint64(user.Session), 10)
-	uw[session] = user
-}
-
-func (uw UsersWrapper) Remove(user *gumble.User) {
-	session := strconv.FormatUint(uint64(user.Session), 10)
-	delete(uw, session)
-}
-
-type ChannelsWrapper map[string]*gumble.Channel
-
-func NewChannelsWrapper(channels gumble.Channels) ChannelsWrapper {
-	wrapper := ChannelsWrapper{}
-	for _, channel := range channels {
-		wrapper.Add(channel)
-	}
-	return wrapper
-}
-
-func (cw ChannelsWrapper) Add(channel *gumble.Channel) {
-	id := strconv.FormatUint(uint64(channel.ID), 10)
-	cw[id] = channel
-}
-
-func (cw ChannelsWrapper) Remove(channel *gumble.Channel) {
-	id := strconv.FormatUint(uint64(channel.ID), 10)
-	delete(cw, id)
-}
 
 type DisconnectEventWrapper struct {
 	Client *gumble.Client

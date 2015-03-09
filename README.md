@@ -95,6 +95,7 @@
     - Add additional Lua support via [gopher-lua](https://github.com/yuin/gopher-lua)
     - Non-script-invoked disconnections are reported though the exit status
     - Remove `-servername` flag (`-lock` + `-insecure` should be used instead)
+    - JavaScript plugin: `piepan.Users` and `piepan.Channels` are no longer mapped using string keys ([otto](https://github.com/robertkrimen/otto) needs to be updated before building)
 - 0.6.0 (2015-02-11)
     - Fixes due to gumble API changes (see the [gumble API](https://godoc.org/github.com/layeh/gumble/gumble) if your scripts are not working).
     - Fix crash if `piepan.Process.New` executable did not exist
