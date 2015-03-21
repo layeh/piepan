@@ -12,6 +12,17 @@ import (
 	"github.com/layeh/piepan"
 )
 
+type strFlagSlice []string
+
+func (s *strFlagSlice) Set(str string) error {
+	*s = append(*s, str)
+	return nil
+}
+
+func (s *strFlagSlice) String() string {
+	return fmt.Sprintf("%v", *s)
+}
+
 func main() {
 	// Flags
 	username := flag.String("username", "piepan-bot", "username of the bot")
@@ -22,6 +33,8 @@ func main() {
 	insecure := flag.Bool("insecure", false, "skip certificate checking")
 	lock := flag.String("lock", "", "server certificate lock file")
 	ffmpeg := flag.String("ffmpeg", "ffmpeg", "ffmpeg-capable executable for media streaming")
+	var accessTokens strFlagSlice
+	flag.Var(&accessTokens, "access-token", "server access token (can be defined multiple times)")
 
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "piepan v0.7.0\n")
@@ -47,6 +60,7 @@ func main() {
 		Username: *username,
 		Password: *password,
 		Address:  *server,
+		Tokens:   gumble.AccessTokens(accessTokens),
 	}
 
 	client := gumble.NewClient(&config)

@@ -5,6 +5,7 @@
     piepan v0.7.0
     usage: piepan [options] [script files]
     an easy to use framework for writing scriptable Mumble bots
+      -access-token=[]: server access token (can be defined multiple times)
       -certificate="": user certificate file (PEM)
       -ffmpeg="ffmpeg": ffmpeg-capable executable for media streaming
       -insecure=false: skip certificate checking
@@ -96,6 +97,7 @@
 
 - Next
     - Add additional Lua support via [gopher-lua](https://github.com/yuin/gopher-lua)
+    - Add access token flag
     - Non-script-invoked disconnections are reported though the exit status
     - Remove `-servername` flag (`-lock` + `-insecure` should be used instead)
     - JavaScript plugin: `piepan.Users` and `piepan.Channels` are no longer mapped using string keys ([otto](https://github.com/robertkrimen/otto) needs to be updated before building)
