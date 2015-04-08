@@ -95,7 +95,7 @@
 
 ## Changelog
 
-- Next
+- 0.7.0 (2015-04-08)
     - Add additional Lua support via [gopher-lua](https://github.com/yuin/gopher-lua)
     - Add access token flag
     - Non-script-invoked disconnections are reported though the exit status
