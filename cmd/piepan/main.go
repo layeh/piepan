@@ -65,7 +65,7 @@ func main() {
 
 	client := gumble.NewClient(&config)
 	instance := piepan.New(client)
-	audio, _ := gumble_ffmpeg.New(client)
+	audio := gumble_ffmpeg.New(client)
 	audio.Command = *ffmpeg
 	instance.Audio = audio
 

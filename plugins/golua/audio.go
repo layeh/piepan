@@ -3,6 +3,7 @@ package plugin
 import (
 	"github.com/layeh/gopus"
 	"github.com/layeh/gumble/gumble"
+	"github.com/layeh/gumble/gumble_ffmpeg"
 	"github.com/yuin/gopher-lua"
 )
 
@@ -18,11 +19,14 @@ func (p *Plugin) apiAudioPlay(tbl *lua.LTable) bool {
 		enc.SetApplication(gopus.Audio)
 	}
 
-	p.instance.Audio.Play(filename, func() {
+	p.instance.Audio.Source = gumble_ffmpeg.SourceFile(filename)
+	p.instance.Audio.Play()
+	go func() {
+		p.instance.Audio.Wait()
 		if callback.Type() != lua.LTNil {
 			p.callValue(callback)
 		}
-	})
+	}()
 
 	return true
 }

@@ -4,6 +4,7 @@ import (
 	"github.com/aarzilli/golua/lua"
 	"github.com/layeh/gopus"
 	"github.com/layeh/gumble/gumble"
+	"github.com/layeh/gumble/gumble_ffmpeg"
 	"github.com/stevedonovan/luar"
 )
 
@@ -22,12 +23,15 @@ func (p *Plugin) apiAudioPlay(l *lua.State) int {
 		enc.SetApplication(gopus.Audio)
 	}
 
-	p.instance.Audio.Play(filename, func() {
+	p.instance.Audio.Source = gumble_ffmpeg.SourceFile(filename)
+	p.instance.Audio.Play()
+	go func() {
+		p.instance.Audio.Wait()
 		if callback.Type != "nil" {
 			p.callValue(callback)
 		}
 		callback.Close()
-	})
+	}()
 
 	return 0
 }

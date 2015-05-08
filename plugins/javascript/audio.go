@@ -3,6 +3,7 @@ package plugin
 import (
 	"github.com/layeh/gopus"
 	"github.com/layeh/gumble/gumble"
+	"github.com/layeh/gumble/gumble_ffmpeg"
 	"github.com/robertkrimen/otto"
 )
 
@@ -22,11 +23,14 @@ func (p *Plugin) apiAudioPlay(call otto.FunctionCall) otto.Value {
 		enc.SetApplication(gopus.Audio)
 	}
 
-	p.instance.Audio.Play(filenameValue.String(), func() {
+	p.instance.Audio.Source = gumble_ffmpeg.SourceFile(filenameValue.String())
+	p.instance.Audio.Play()
+	go func() {
+		p.instance.Audio.Wait()
 		if callbackValue.IsFunction() {
 			p.callValue(callbackValue)
 		}
-	})
+	}()
 	return otto.TrueValue()
 }
 
