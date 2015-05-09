@@ -1,6 +1,7 @@
 package plugin
 
 import (
+	"time"
 	"github.com/layeh/gopus"
 	"github.com/layeh/gumble/gumble"
 	"github.com/layeh/gumble/gumble_ffmpeg"
@@ -18,12 +19,16 @@ func (p *Plugin) apiAudioPlay(call otto.FunctionCall) otto.Value {
 
 	filenameValue, _ := obj.Get("filename")
 	callbackValue, _ := obj.Get("callback")
+	offsetValue, _ := obj.Get("offset")
+
+	offsetFloat, _ := offsetValue.ToFloat()
 
 	if enc := p.instance.Client.AudioEncoder; enc != nil {
 		enc.SetApplication(gopus.Audio)
 	}
 
 	p.instance.Audio.Source = gumble_ffmpeg.SourceFile(filenameValue.String())
+	p.instance.Audio.Offset = time.Duration(offsetFloat*float64(time.Second))
 	p.instance.Audio.Play()
 	go func() {
 		p.instance.Audio.Wait()
@@ -92,7 +97,8 @@ func (p *Plugin) apiAudioSetTarget(call otto.FunctionCall) otto.Value {
 
 func (p *Plugin) apiAudioStop(call otto.FunctionCall) otto.Value {
 	p.instance.Audio.Stop()
-	return otto.UndefinedValue()
+	value, _ := p.state.ToValue(p.instance.Audio.ElapsedTime.Seconds())
+	return value
 }
 
 func (p *Plugin) apiAudioIsPlaying(call otto.FunctionCall) otto.Value {
