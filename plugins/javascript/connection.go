@@ -13,8 +13,18 @@ func (p *Plugin) OnConnect(e *gumble.ConnectEvent) {
 		obj.Set("Channels", p.instance.Client.Channels)
 	}
 
+	event := ConnectEventWrapper{
+		Client: e.Client,
+	}
+	if e.WelcomeMessage != nil {
+		event.WelcomeMessage = *e.WelcomeMessage
+	}
+	if e.MaximumBitrate != nil {
+		event.MaximumBitrate = *e.MaximumBitrate
+	}
+
 	for _, listener := range p.listeners["connect"] {
-		p.callValue(listener, e)
+		p.callValue(listener, event)
 	}
 }
 
@@ -138,4 +148,7 @@ func (p *Plugin) OnBanList(e *gumble.BanListEvent) {
 }
 
 func (p *Plugin) OnContextActionChange(e *gumble.ContextActionChangeEvent) {
+}
+
+func (p *Plugin) OnServerConfig(e *gumble.ServerConfigEvent) {
 }

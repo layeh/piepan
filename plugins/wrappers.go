@@ -5,6 +5,12 @@ import (
 	"github.com/layeh/gumble/gumbleutil"
 )
 
+type ConnectEventWrapper struct {
+	Client         *gumble.Client
+	WelcomeMessage string
+	MaximumBitrate int
+}
+
 type DisconnectEventWrapper struct {
 	Client *gumble.Client
 	Type   int
