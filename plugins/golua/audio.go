@@ -3,6 +3,7 @@ package plugin
 import (
 	"github.com/layeh/gopus"
 	"github.com/layeh/gumble/gumble"
+	"github.com/layeh/gumble/opus"
 	"github.com/layeh/gumble/gumble_ffmpeg"
 	"github.com/yuin/gopher-lua"
 )
@@ -12,14 +13,38 @@ func (p *Plugin) apiAudioPlay(tbl *lua.LTable) bool {
 		return false
 	}
 
-	filename := tbl.RawGetH(lua.LString("filename")).String()
+	filename := tbl.RawGetH(lua.LString("filename"))
+
+	exec := tbl.RawGetH(lua.LString("exec"))
+	args := tbl.RawGetH(lua.LString("args"))
+
 	callback := tbl.RawGetH(lua.LString("callback"))
 
-	if enc := p.instance.Client.AudioEncoder; enc != nil {
+	if enc, ok := p.instance.Client.AudioEncoder.(*opus.Encoder); ok {
 		enc.SetApplication(gopus.Audio)
 	}
 
-	p.instance.Audio.Source = gumble_ffmpeg.SourceFile(filename)
+	switch {
+	// source file
+	case filename != lua.LNil && exec == lua.LNil && args == lua.LNil:
+		p.instance.Audio.Source = gumble_ffmpeg.SourceFile(filename.String())
+	// source exec
+	case filename == lua.LNil && exec != lua.LNil:
+		var argsStr []string
+		if argsTable, ok := args.(*lua.LTable); ok {
+			for i := 1; ; i++ {
+				arg := argsTable.RawGetInt(i)
+				if arg == lua.LNil {
+					break
+				}
+				argsStr = append(argsStr, arg.String())
+			}
+		}
+		p.instance.Audio.Source = gumble_ffmpeg.SourceExec(exec.String(), argsStr...)
+	default:
+		panic("invalid source type")
+	}
+
 	p.instance.Audio.Play()
 	go func() {
 		p.instance.Audio.Wait()
@@ -38,12 +63,16 @@ func (p *Plugin) apiAudioNewTarget(id uint32) *gumble.VoiceTarget {
 }
 
 func (p *Plugin) apiAudioBitrate() int {
-	encoder := p.instance.Client.AudioEncoder
-	return encoder.Bitrate()
+	if enc, ok := p.instance.Client.AudioEncoder.(*opus.Encoder); ok {
+		return enc.Bitrate()
+	}
+	return -1
 }
 
 func (p *Plugin) apiAudioSetBitrate(bitrate int) {
-	p.instance.Client.AudioEncoder.SetBitrate(bitrate)
+	if enc, ok := p.instance.Client.AudioEncoder.(*opus.Encoder); ok {
+		enc.SetBitrate(bitrate)
+	}
 }
 
 func (p *Plugin) apiAudioVolume() float32 {

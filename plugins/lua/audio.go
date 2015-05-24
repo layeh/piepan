@@ -4,6 +4,7 @@ import (
 	"github.com/aarzilli/golua/lua"
 	"github.com/layeh/gopus"
 	"github.com/layeh/gumble/gumble"
+	"github.com/layeh/gumble/opus"
 	"github.com/layeh/gumble/gumble_ffmpeg"
 	"github.com/stevedonovan/luar"
 )
@@ -19,7 +20,7 @@ func (p *Plugin) apiAudioPlay(l *lua.State) int {
 	callback := obj.GetObject("callback")
 	obj.Close()
 
-	if enc := p.instance.Client.AudioEncoder; enc != nil {
+	if enc, ok := p.instance.Client.AudioEncoder.(*opus.Encoder); ok {
 		enc.SetApplication(gopus.Audio)
 	}
 
@@ -49,14 +50,19 @@ func (p *Plugin) apiAudioNewTarget(l *lua.State) int {
 }
 
 func (p *Plugin) apiAudioBitrate(l *lua.State) int {
-	encoder := p.instance.Client.AudioEncoder
-	l.PushInteger(int64(encoder.Bitrate()))
+	if enc, ok := p.instance.Client.AudioEncoder.(*opus.Encoder); ok {
+		l.PushInteger(int64(enc.Bitrate()))
+	} else {
+		l.PushInteger(-1)
+	}
 	return 1
 }
 
 func (p *Plugin) apiAudioSetBitrate(l *lua.State) int {
 	bitrate := l.ToInteger(1)
-	p.instance.Client.AudioEncoder.SetBitrate(bitrate)
+	if enc, ok := p.instance.Client.AudioEncoder.(*opus.Encoder); ok {
+		enc.SetBitrate(bitrate)
+	}
 	return 0
 }
 

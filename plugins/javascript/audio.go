@@ -3,6 +3,7 @@ package plugin
 import (
 	"github.com/layeh/gopus"
 	"github.com/layeh/gumble/gumble"
+	"github.com/layeh/gumble/opus"
 	"github.com/layeh/gumble/gumble_ffmpeg"
 	"github.com/robertkrimen/otto"
 )
@@ -19,7 +20,7 @@ func (p *Plugin) apiAudioPlay(call otto.FunctionCall) otto.Value {
 	filenameValue, _ := obj.Get("filename")
 	callbackValue, _ := obj.Get("callback")
 
-	if enc := p.instance.Client.AudioEncoder; enc != nil {
+	if enc, ok := p.instance.Client.AudioEncoder.(*opus.Encoder); ok {
 		enc.SetApplication(gopus.Audio)
 	}
 
@@ -47,9 +48,11 @@ func (p *Plugin) apiAudioNewTarget(call otto.FunctionCall) otto.Value {
 }
 
 func (p *Plugin) apiAudioBitrate(call otto.FunctionCall) otto.Value {
-	encoder := p.instance.Client.AudioEncoder
-	value, _ := p.state.ToValue(encoder.Bitrate())
-	return value
+	if enc, ok := p.instance.Client.AudioEncoder.(*opus.Encoder); ok {
+		value, _ := p.state.ToValue(enc.Bitrate())
+		return value
+	}
+	return otto.UndefinedValue()
 }
 
 func (p *Plugin) apiAudioSetBitrate(call otto.FunctionCall) otto.Value {
@@ -57,7 +60,9 @@ func (p *Plugin) apiAudioSetBitrate(call otto.FunctionCall) otto.Value {
 	if err != nil {
 		return otto.UndefinedValue()
 	}
-	p.instance.Client.AudioEncoder.SetBitrate(int(bitrate))
+	if enc, ok := p.instance.Client.AudioEncoder.(*opus.Encoder); ok {
+		enc.SetBitrate(int(bitrate))
+	}
 	return otto.UndefinedValue()
 }
 
