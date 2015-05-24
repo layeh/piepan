@@ -56,14 +56,13 @@ func main() {
 	flag.Parse()
 
 	// Configuration
-	config := gumble.Config{
-		Username: *username,
-		Password: *password,
-		Address:  *server,
-		Tokens:   gumble.AccessTokens(accessTokens),
-	}
+	config := gumble.NewConfig()
+	config.Username = *username
+	config.Password = *password
+	config.Address = *server
+	config.Tokens = gumble.AccessTokens(accessTokens)
 
-	client := gumble.NewClient(&config)
+	client := gumble.NewClient(config)
 	instance := piepan.New(client)
 	audio := gumble_ffmpeg.New(client)
 	audio.Command = *ffmpeg
