@@ -11,7 +11,7 @@ func (p *Plugin) OnConnect(e *gumble.ConnectEvent) {
 	pp := p.state.GetGlobal("piepan").(*lua.LTable)
 	pp.RawSetH(lua.LString("Self"), luar.New(p.state, e.Client.Self))
 	pp.RawSetH(lua.LString("Users"), luar.New(p.state, e.Client.Users))
-	pp.RawSetH(lua.LString("Users"), luar.New(p.state, e.Client.Channels))
+	pp.RawSetH(lua.LString("Channels"), luar.New(p.state, e.Client.Channels))
 
 	event := ConnectEventWrapper{
 		Client: e.Client,
