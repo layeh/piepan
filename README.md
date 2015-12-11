@@ -86,7 +86,7 @@ piepan is built using the [gumble](https://github.com/layeh/gumble) library. Doc
     `obj.callback` can be defined as a function that is called after the playback has completed.
     If audio has been paused
 - `piepan.AudioStream Current()`: Returns the currently playing stream.
-- `void SetTarget(VoiceTarget target)` sets the target of subsequent `piepan.Audio.Play()` calls. Call this function with no arguments to remove any voice targeting.
+- `void SetTarget(VoiceTarget target)` sets the target for the new audio stream that is played. Calling this function with no arguments removes any voice targeting.
 - `int Bitrate()`: Returns the bitrate of the audio encoder.
 - `void SetBitrate(int bitrate)`: Sets the bitrate of the audio encoder. Calling this function will override the automatically-configured, optimal bitrate.
 - `bool IsPlaying()`: Returns if there is a stream currently playing.
