@@ -113,6 +113,13 @@ func (s *State) apiAudioStop() {
 	}
 }
 
+func (s *State) apiAudioElapsed() float64 {
+	if s.audioStream == nil {
+		return 0
+	}
+	return s.audioStream.Elapsed().Seconds()
+}
+
 func (s *State) apiAudioIsPlaying() bool {
 	if s.audioStream == nil {
 		return false

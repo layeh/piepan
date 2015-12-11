@@ -40,6 +40,7 @@ func New(client *gumble.Client) *State {
 	{
 		s := l.NewTable()
 		s.RawSetString("Play", luar.New(l, state.apiAudioPlay))
+		s.RawSetString("Elapsed", luar.New(l, state.apiAudioElapsed))
 		s.RawSetString("IsPlaying", luar.New(l, state.apiAudioIsPlaying))
 		s.RawSetString("Stop", luar.New(l, state.apiAudioStop))
 		s.RawSetString("NewTarget", luar.New(l, state.apiAudioNewTarget))

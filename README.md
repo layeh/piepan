@@ -87,6 +87,7 @@ piepan is built using the [gumble](https://github.com/layeh/gumble) library. Doc
 - `void SetTarget(VoiceTarget target)` sets the target of subsequent `piepan.Audio.Play()` calls. Call this function with no arguments to remove any voice targeting.
 - `void Stop()`: Stops the currently playing stream.
 - `bool IsPlaying()`: Returns if an stream is currently playing.
+- `float Elapsed()` Returns the amount of audio (in seconds) that the current or most recent stream played.
 - `int Bitrate()`: Returns the bitrate of the audio encoder.
 - `void SetBitrate(int bitrate)`: Sets the bitrate of the audio encoder. Calling this function will override the automatically-configured, optimal bitrate.
 - `float Volume()`: Returns the audio volume.
@@ -189,9 +190,10 @@ Object containing each connected user on the server, with the keys being the ses
 ## Changelog
 
 - 0.8.0 (Next)
-    - Add gumble.ConnectEvent wrapper
+    - Add `gumble.ConnectEvent` wrapper
     - Add pipe support to `piepan.Audio.Play`
     - Add `offset` field to `piepan.Audio.Play`'s argument
+    - Add `piepan.Audio.Elapsed`
     - Remove all plugins; piepan is Lua only
 - 0.7.0 (2015-04-08)
     - Add additional Lua support via [gopher-lua](https://github.com/yuin/gopher-lua)
