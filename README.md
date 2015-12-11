@@ -81,6 +81,7 @@ piepan is built using the [gumble](https://github.com/layeh/gumble) library. Doc
     - Pipe:
         - Uses the output of the program `obj.exec` executed with `obj.args`.
 
+    `obj.offset` defines the number of seconds from the beginning of the stream to starting playing at.  
     `obj.callback` can be defined as a function that is called after the playback has completed.
 - [`VoiceTarget`](https://godoc.org/github.com/layeh/gumble/gumble#VoiceTarget)   `NewTarget(int id)`: Create a new voice target object.
 - `void SetTarget(VoiceTarget target)` sets the target of subsequent `piepan.Audio.Play()` calls. Call this function with no arguments to remove any voice targeting.
@@ -190,6 +191,7 @@ Object containing each connected user on the server, with the keys being the ses
 - 0.8.0 (Next)
     - Add gumble.ConnectEvent wrapper
     - Add pipe support to `piepan.Audio.Play`
+    - Add `offset` field to `piepan.Audio.Play`'s argument
     - Remove all plugins; piepan is Lua only
 - 0.7.0 (2015-04-08)
     - Add additional Lua support via [gopher-lua](https://github.com/yuin/gopher-lua)

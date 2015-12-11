@@ -1,6 +1,8 @@
 package piepan
 
 import (
+	"time"
+
 	"github.com/layeh/gopus"
 	"github.com/layeh/gumble/gumble"
 	"github.com/layeh/gumble/gumbleffmpeg"
@@ -14,6 +16,7 @@ func (s *State) apiAudioPlay(tbl *lua.LTable) bool {
 	exec := tbl.RawGetString("exec")
 	args := tbl.RawGetString("args")
 
+	offset := tbl.RawGetString("offset")
 	callback := tbl.RawGetString("callback")
 
 	if s.audioStream != nil {
@@ -47,6 +50,9 @@ func (s *State) apiAudioPlay(tbl *lua.LTable) bool {
 	}
 
 	s.audioStream = gumbleffmpeg.New(s.Client, source)
+	if number, ok := offset.(lua.LNumber); ok {
+		s.audioStream.Offset = time.Second * time.Duration(number)
+	}
 	s.audioStream.Play()
 	go func(stream *gumbleffmpeg.Stream) {
 		stream.Wait()
