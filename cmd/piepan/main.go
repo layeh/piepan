@@ -7,7 +7,6 @@ import (
 	"os"
 
 	"github.com/layeh/gumble/gumble"
-	"github.com/layeh/gumble/gumble_ffmpeg"
 	"github.com/layeh/gumble/gumbleutil"
 	"github.com/layeh/piepan"
 )
@@ -37,20 +36,10 @@ func main() {
 	flag.Var(&accessTokens, "access-token", "server access token (can be defined multiple times)")
 
 	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, "piepan v0.7.0\n")
+		fmt.Fprintf(os.Stderr, "piepan v0.8.0\n")
 		fmt.Fprintf(os.Stderr, "usage: %s [options] [script files]\n", os.Args[0])
-		fmt.Fprintf(os.Stderr, "an easy to use framework for writing scriptable Mumble bots\n")
+		fmt.Fprintf(os.Stderr, "an easy to use framework for writing Mumble bots using Lua\n")
 		flag.PrintDefaults()
-		fmt.Fprintf(os.Stderr, "\nScript files are defined in the following way:\n")
-		fmt.Fprintf(os.Stderr, "  [type%c[environment%c]]filename\n", os.PathListSeparator, os.PathListSeparator)
-		fmt.Fprintf(os.Stderr, "    filename: path to script file\n")
-		fmt.Fprintf(os.Stderr, "    type: type of script file (default: file extension)\n")
-		fmt.Fprintf(os.Stderr, "    environment: name of environment where script will be executed (default: type)\n\n")
-		fmt.Fprintf(os.Stderr, "Enabled script types:\n")
-		fmt.Fprintf(os.Stderr, "  Type         Name\n")
-		for _, ext := range piepan.PluginExtensions {
-			fmt.Fprintf(os.Stderr, "  %-12s %s\n", ext, piepan.Plugins[ext].Name)
-		}
 	}
 
 	flag.Parse()
@@ -64,9 +53,7 @@ func main() {
 
 	client := gumble.NewClient(config)
 	instance := piepan.New(client)
-	audio := gumble_ffmpeg.New(client)
-	audio.Command = *ffmpeg
-	instance.Audio = audio
+	instance.AudioCommand = *ffmpeg
 
 	if *insecure {
 		config.TLSConfig.InsecureSkipVerify = true
@@ -78,18 +65,19 @@ func main() {
 		if *keyFile == "" {
 			keyFile = certificateFile
 		}
-		if certificate, err := tls.LoadX509KeyPair(*certificateFile, *keyFile); err != nil {
-			panic(err)
-		} else {
-			config.TLSConfig.Certificates = append(config.TLSConfig.Certificates, certificate)
+		certificate, err := tls.LoadX509KeyPair(*certificateFile, *keyFile)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "%s\n", err)
+			os.Exit(1)
 		}
+		config.TLSConfig.Certificates = append(config.TLSConfig.Certificates, certificate)
 	}
 
 	client.Attach(gumbleutil.AutoBitrate)
 
 	// Load scripts
 	for _, script := range flag.Args() {
-		if err := instance.LoadScript(script); err != nil {
+		if err := instance.LoadFile(script); err != nil {
 			fmt.Fprintf(os.Stderr, "%s: %s\n", script, err)
 		}
 	}

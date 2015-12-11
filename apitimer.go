@@ -1,9 +1,9 @@
-package plugin
+package piepan
 
 import (
 	"time"
 
-	"github.com/robertkrimen/otto"
+	"github.com/yuin/gopher-lua"
 )
 
 type timer struct {
@@ -16,10 +16,7 @@ func (t *timer) Cancel() {
 	}
 }
 
-func (p *Plugin) apiTimerNew(call otto.FunctionCall) otto.Value {
-	callback := call.Argument(0)
-	timeout, _ := call.Argument(1).ToInteger()
-
+func (s *State) apiTimerNew(callback *lua.LFunction, timeout int) *timer {
 	t := &timer{
 		cancel: make(chan bool),
 	}
@@ -32,11 +29,10 @@ func (p *Plugin) apiTimerNew(call otto.FunctionCall) otto.Value {
 
 		select {
 		case <-time.After(time.Millisecond * time.Duration(timeout)):
-			p.callValue(callback)
+			s.callValue(callback)
 		case <-t.cancel:
 		}
 	}()
 
-	ret, _ := p.state.ToValue(t)
-	return ret
+	return t
 }

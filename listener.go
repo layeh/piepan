@@ -1,17 +1,14 @@
-package plugin
+package piepan
 
 import (
 	"github.com/layeh/gopher-luar"
 	"github.com/layeh/gumble/gumble"
-	. "github.com/layeh/piepan/plugins"
-	"github.com/yuin/gopher-lua"
 )
 
-func (p *Plugin) OnConnect(e *gumble.ConnectEvent) {
-	pp := p.state.GetGlobal("piepan").(*lua.LTable)
-	pp.RawSetH(lua.LString("Self"), luar.New(p.state, e.Client.Self))
-	pp.RawSetH(lua.LString("Users"), luar.New(p.state, e.Client.Users))
-	pp.RawSetH(lua.LString("Channels"), luar.New(p.state, e.Client.Channels))
+func (s *State) OnConnect(e *gumble.ConnectEvent) {
+	s.table.RawSetString("Self", luar.New(s.LState, e.Client.Self))
+	s.table.RawSetString("Users", luar.New(s.LState, e.Client.Users))
+	s.table.RawSetString("Channels", luar.New(s.LState, e.Client.Channels))
 
 	event := ConnectEventWrapper{
 		Client: e.Client,
@@ -23,12 +20,12 @@ func (p *Plugin) OnConnect(e *gumble.ConnectEvent) {
 		event.MaximumBitrate = *e.MaximumBitrate
 	}
 
-	for _, listener := range p.listeners["connect"] {
-		p.callValue(listener, event)
+	for _, listener := range s.listeners["connect"] {
+		s.callValue(listener, event)
 	}
 }
 
-func (p *Plugin) OnDisconnect(e *gumble.DisconnectEvent) {
+func (s *State) OnDisconnect(e *gumble.DisconnectEvent) {
 	event := DisconnectEventWrapper{
 		Client: e.Client,
 		Type:   int(e.Type),
@@ -49,21 +46,21 @@ func (p *Plugin) OnDisconnect(e *gumble.DisconnectEvent) {
 		IsAuthenticatorFail: e.Type.Has(gumble.DisconnectAuthenticatorFail),
 	}
 
-	for _, listener := range p.listeners["disconnect"] {
-		p.callValue(listener, &event)
+	for _, listener := range s.listeners["disconnect"] {
+		s.callValue(listener, &event)
 	}
 }
 
-func (p *Plugin) OnTextMessage(e *gumble.TextMessageEvent) {
+func (s *State) OnTextMessage(e *gumble.TextMessageEvent) {
 	event := TextMessageEventWrapper{
 		TextMessageEvent: e,
 	}
-	for _, listener := range p.listeners["message"] {
-		p.callValue(listener, &event)
+	for _, listener := range s.listeners["message"] {
+		s.callValue(listener, &event)
 	}
 }
 
-func (p *Plugin) OnUserChange(e *gumble.UserChangeEvent) {
+func (s *State) OnUserChange(e *gumble.UserChangeEvent) {
 	event := UserChangeEventWrapper{
 		Client: e.Client,
 		Type:   int(e.Type),
@@ -87,12 +84,12 @@ func (p *Plugin) OnUserChange(e *gumble.UserChangeEvent) {
 		IsChangeRecording:       e.Type.Has(gumble.UserChangeRecording),
 	}
 
-	for _, listener := range p.listeners["userchange"] {
-		p.callValue(listener, &event)
+	for _, listener := range s.listeners["userchange"] {
+		s.callValue(listener, &event)
 	}
 }
 
-func (p *Plugin) OnChannelChange(e *gumble.ChannelChangeEvent) {
+func (s *State) OnChannelChange(e *gumble.ChannelChangeEvent) {
 	event := ChannelChangeEventWrapper{
 		Client:  e.Client,
 		Type:    int(e.Type),
@@ -106,12 +103,12 @@ func (p *Plugin) OnChannelChange(e *gumble.ChannelChangeEvent) {
 		IsChangePosition:    e.Type.Has(gumble.ChannelChangePosition),
 	}
 
-	for _, listener := range p.listeners["channelchange"] {
-		p.callValue(listener, &event)
+	for _, listener := range s.listeners["channelchange"] {
+		s.callValue(listener, &event)
 	}
 }
 
-func (p *Plugin) OnPermissionDenied(e *gumble.PermissionDeniedEvent) {
+func (s *State) OnPermissionDenied(e *gumble.PermissionDeniedEvent) {
 	event := PermissionDeniedEventWrapper{
 		Client:  e.Client,
 		Type:    int(e.Type),
@@ -133,22 +130,22 @@ func (p *Plugin) OnPermissionDenied(e *gumble.PermissionDeniedEvent) {
 		IsNestingLimit:       e.Type.Has(gumble.PermissionDeniedNestingLimit),
 	}
 
-	for _, listener := range p.listeners["permissiondenied"] {
-		p.callValue(listener, &event)
+	for _, listener := range s.listeners["permissiondenied"] {
+		s.callValue(listener, &event)
 	}
 }
 
-func (p *Plugin) OnUserList(e *gumble.UserListEvent) {
+func (s *State) OnUserList(e *gumble.UserListEvent) {
 }
 
-func (p *Plugin) OnACL(e *gumble.ACLEvent) {
+func (s *State) OnACL(e *gumble.ACLEvent) {
 }
 
-func (p *Plugin) OnBanList(e *gumble.BanListEvent) {
+func (s *State) OnBanList(e *gumble.BanListEvent) {
 }
 
-func (p *Plugin) OnContextActionChange(e *gumble.ContextActionChangeEvent) {
+func (s *State) OnContextActionChange(e *gumble.ContextActionChangeEvent) {
 }
 
-func (p *Plugin) OnServerConfig(e *gumble.ServerConfigEvent) {
+func (s *State) OnServerConfig(e *gumble.ServerConfigEvent) {
 }

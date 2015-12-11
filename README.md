@@ -1,37 +1,28 @@
-# piepan: an easy to use framework for writing scriptable [Mumble](http://mumble.sourceforge.net/) bots
+# piepan: an easy to use framework for writing [Mumble](http://mumble.info) bots using [Lua](http://lua.org/)
 
 ## Usage
 
-    piepan v0.7.0
+    piepan v0.8.0
     usage: piepan [options] [script files]
-    an easy to use framework for writing scriptable Mumble bots
-      -access-token=[]: server access token (can be defined multiple times)
-      -certificate="": user certificate file (PEM)
-      -ffmpeg="ffmpeg": ffmpeg-capable executable for media streaming
-      -insecure=false: skip certificate checking
-      -key="": user certificate key file (PEM)
-      -lock="": server certificate lock file
-      -password="": user password
-      -server="localhost:64738": address of the server
-      -username="piepan-bot": username of the bot
-
-    Script files are defined in the following way:
-      [type:[environment:]]filename
-        filename: path to script file
-        type: type of script file (default: file extension)
-        environment: name of environment where script will be executed (default: type)
-
-    Enabled script types:
-      Type         Name
-      go.lua       Lua (Go)
-      lua          Lua (C)
-      js           JavaScript
-
-## Scripting documentation
-
-- [JavaScript](https://github.com/layeh/piepan/blob/master/plugins/javascript/README.md)
-- [Go Lua](https://github.com/layeh/piepan/blob/master/plugins/golua/README.md)
-- [C Lua](https://github.com/layeh/piepan/blob/master/plugins/lua/README.md)
+    an easy to use framework for writing Mumble bots using Lua
+      -access-token value
+            server access token (can be defined multiple times) (default [])
+      -certificate string
+            user certificate file (PEM)
+      -ffmpeg string
+            ffmpeg-capable executable for media streaming (default "ffmpeg")
+      -insecure
+            skip certificate checking
+      -key string
+            user certificate key file (PEM)
+      -lock string
+            server certificate lock file
+      -password string
+            user password
+      -server string
+            address of the server (default "localhost:64738")
+      -username string
+            username of the bot (default "piepan-bot")
 
 ## Building
 
@@ -53,16 +44,9 @@
     - `export CGO_LDFLAGS="$(pkg-config --libs opus)"`
     - `export CGO_CFLAGS="$(pkg-config --cflags opus)"`
 4. Fetch piepan
-    - Base package
-        - `go get -tags nopkgconfig -u github.com/layeh/piepan`
-    - JavaScript plugin (Optional)
-        - `go get -u github.com/layeh/piepan/plugins/javascript`
-    - Go Lua plugin (Optional)
-        - `go get -u github.com/layeh/piepan/plugins/golua`
-    - C Lua plugin (Optional)
-        - Unavailable on Windows
+    - `go get -tags nopkgconfig -u github.com/layeh/piepan`
 5. Build piepan
-    - `go build -o piepan.exe $GOPATH/src/github.com/layeh/piepan/cmd/piepan/{javascript,golua,main}.go`
+    - `go build -o piepan.exe $GOPATH/src/github.com/layeh/piepan/cmd/piepan/main.go`
 6. Run piepan
     - `./piepan.exe ...`
 
@@ -75,28 +59,138 @@
       - `sudo add-apt-repository -y ppa:evarlast/golang1.4`
       - `sudo apt-get update`
       - `sudo apt-get install -y golang`
-  3. Lua 5.1 (Optional, used for C Lua)
-      - `sudo apt-get install -y liblua5.1-0-dev`
 2. Create a GOPATH (skip if you already have a GOPATH you want to use)
     - `export GOPATH=$(mktemp -d)`
 3. Fetch piepan
-    - Base package
-        - `go get -u github.com/layeh/piepan`
-    - JavaScript plugin (Optional)
-        - `go get -u github.com/layeh/piepan/plugins/javascript`
-    - Go Lua plugin (Optional)
-        - `go get -u github.com/layeh/piepan/plugins/golua`
-    - C Lua plugin (Optional)
-        - `go get -u github.com/layeh/piepan/plugins/lua`
-4. Build piepan (plugins can be removed if they are not wanted)
-    - `go build -o piepan $GOPATH/src/github.com/layeh/piepan/cmd/piepan/{javascript,golua,lua,main}.go`
-5. Run piepan using `avconv`
+    - `go get -u github.com/layeh/piepan`
+4. Build piepan
+    - `go build -o piepan $GOPATH/src/github.com/layeh/piepan/cmd/piepan/main.go`
+5. Run piepan with `avconv`
     - `./piepan -ffmpeg=avconv ...`
+
+
+## API
+
+piepan is built using the [gumble](https://github.com/layeh/gumble) library. Documentation for types not part of piepan itself (including User and Channel) can be found in the [gumble documentation](https://godoc.org/github.com/layeh/gumble/gumble).
+
+### `piepan.Audio`
+
+- `void Play(table obj)`: The following modes are supported:
+    - Filename:
+        - Plays the media file `obj.filename`.
+    - Pipe:
+        - Uses the output of the program `obj.exec` executed with `obj.args`.
+
+    `obj.callback` can be defined as a function that is called after the playback has completed.
+- [`VoiceTarget`](https://godoc.org/github.com/layeh/gumble/gumble#VoiceTarget)   `NewTarget(int id)`: Create a new voice target object.
+- `void SetTarget(VoiceTarget target)` sets the target of subsequent `piepan.Audio.Play()` calls. Call this function with no arguments to remove any voice targeting.
+- `void Stop()`: Stops the currently playing stream.
+- `bool IsPlaying()`: Returns if an stream is currently playing.
+- `int Bitrate()`: Returns the bitrate of the audio encoder.
+- `void SetBitrate(int bitrate)`: Sets the bitrate of the audio encoder. Calling this function will override the automatically-configured, optimal bitrate.
+- `float Volume()`: Returns the audio volume.
+- `void SetVolume(float volume)`: Sets the volume of transmitted audio (default: 1.0).
+
+#### [`Channels`](https://godoc.org/github.com/layeh/gumble/gumble#Channels) `piepan.Channels`
+
+Object that contains all of the channels that are on the server. The channels are mapped by their channel IDs. `piepan.Channels[0]` is the server's root channel.
+
+#### `piepan.Disconnect()`
+
+Disconnects from the server.
+
+#### `piepan.On(string event, function callback)`
+
+Registers an event listener for a given event type. The follow events are currently supported:
+
+- `connect` (Arguments: [`ConnectEvent event`](https://godoc.org/github.com/layeh/gumble/gumble#ConnectEvent))
+    - Called when connection to the server has been made. This is where a script should perform its initialization.
+- `disconnect` (Arguments: [`DisconnectEvent event`](https://godoc.org/github.com/layeh/gumble/gumble#DisconnectEvent))
+    - Called when connection to the server has been lost or after `piepan.Disconnect()` is called.
+- `message` (Arguments: [`TextMessageEvent event`](https://godoc.org/github.com/layeh/gumble/gumble#TextMessageEvent))
+    - Called when a text message is received.
+- `userChange` (Arguments: [`UserChangeEvent event`](https://godoc.org/github.com/layeh/gumble/gumble#UserChangeEvent))
+    - Called when a user's properties changes (e.g. connects to the server).
+- `channelChange` (Arguments: [`ChannelChangeEvent event`](https://godoc.org/github.com/layeh/gumble/gumble#ChannelChangeEvent))
+    - Called when a channel changes state (e.g. is added or removed).
+- `permissionDenied` (Arguments: [`PermissionDeniedEvent event`](https://godoc.org/github.com/layeh/gumble/gumble#PermissionDeniedEvent))
+    - Called when a requested action could not be performed.
+
+Note: events with a `Type` field have slight changes than what is documented in gumble:
+
+1. The `Type` field is changed to a number.
+2. Individual bit flag values are added to the event as booleans prefixed with `Is`
+    - `DisconnectEvent`
+        - `IsError`
+        - `IsUser`
+        - `IsOther`
+        - `IsVersion`
+        - `IsUserName`
+        - `IsUserCredentials`
+        - `IsServerPassword`
+        - `IsUsernameInUse`
+        - `IsServerFull`
+        - `IsNoCertificate`
+        - `IsAuthenticatorFail`
+    - `UserChangeEvent`
+        - `IsConnected`
+        - `IsDisconnected`
+        - `IsKicked`
+        - `IsBanned`
+        - `IsRegistered`
+        - `IsUnregistered`
+        - `IsChangeName`
+        - `IsChangeChannel`
+        - `IsChangeComment`
+        - `IsChangeAudio`
+        - `IsChangeTexture`
+        - `IsChangePrioritySpeaker`
+        - `IsChangeRecording`
+    - `ChannelChangeEvent`
+        - `IsCreated`
+        - `IsRemoved`
+        - `IsMoved`
+        - `IsChangeName`
+        - `IsChangeDescription`
+        - `IsChangePosition`
+    - `PermissionDeniedEvent`
+        - `IsOther`
+        - `IsPermission`
+        - `IsSuperUser`
+        - `IsInvalidChannelName`
+        - `IsTextTooLong`
+        - `IsTemporaryChannel`
+        - `IsMissingCertificate`
+        - `IsInvalidUserName`
+        - `IsChannelFull`
+        - `IsNestingLimit`
+
+#### `piepan.Process`
+
+- `piepan.Process New(function callback, string command, string arguments...)`: Executes `command` in a new process with the given arguments. The function `callback` is executed once the process has completed, passing if the execution was successful and the contents of standard output.
+
+- `void Kill()`: Kills the process.
+
+#### [`User`](https://godoc.org/github.com/layeh/gumble/gumble#User) `piepan.Self`
+
+The `User` object that references yourself.
+
+#### `piepan.Timer`
+
+- `piepan.Timer New(function callback, int timeout)`: Creates a new timer.  After at least `timeout` milliseconds, `callback` will be executed.
+
+- `void Cancel()`: Cancels the timer.
+
+#### [`Users`](https://godoc.org/github.com/layeh/gumble/gumble#Users) `piepan.Users`
+
+Object containing each connected user on the server, with the keys being the session ID of the user and the value being their corresponding `piepan.User` table.
 
 ## Changelog
 
 - 0.8.0 (Next)
     - Add gumble.ConnectEvent wrapper
+    - Add pipe support to `piepan.Audio.Play`
+    - Remove all plugins; piepan is Lua only
 - 0.7.0 (2015-04-08)
     - Add additional Lua support via [gopher-lua](https://github.com/yuin/gopher-lua)
     - Add access token flag
@@ -141,7 +235,7 @@
 
 ## License
 
-This software is released under the MIT license (see LICENSE).
+MPL 2.0
 
 ---
 

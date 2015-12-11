@@ -1,71 +1,84 @@
 package piepan
 
 import (
-	"errors"
-	"path/filepath"
-	"strings"
+	"fmt"
+	"os"
+	"sync"
 
+	"github.com/layeh/gopher-luar"
 	"github.com/layeh/gumble/gumble"
-	"github.com/layeh/gumble/gumble_ffmpeg"
+	"github.com/layeh/gumble/gumbleffmpeg"
+	"github.com/yuin/gopher-lua"
 )
 
-type Environment interface {
-	gumble.EventListener
-	LoadScriptFile(filename string) error
-}
-
-type Instance struct {
+type State struct {
 	Client *gumble.Client
-	Audio  *gumble_ffmpeg.Stream
 
-	envs map[string]Environment
+	LState *lua.LState
+	table  *lua.LTable
+
+	audioStream  *gumbleffmpeg.Stream
+	audioVolume  float32
+	AudioCommand string
+
+	mu        sync.Mutex
+	listeners map[string][]lua.LValue
 }
 
-func New(client *gumble.Client) *Instance {
-	in := &Instance{
-		Client: client,
-		envs:   make(map[string]Environment),
+func New(client *gumble.Client) *State {
+	l := lua.NewState()
+	state := &State{
+		Client:    client,
+		LState:    l,
+		listeners: make(map[string][]lua.LValue),
 	}
-	return in
+	t := l.NewTable()
+	t.RawSetString("On", luar.New(l, state.apiOn))
+	t.RawSetString("Disconnect", luar.New(l, state.apiDisconnect))
+	state.table = t
+	l.SetGlobal("piepan", t)
+	{
+		s := l.NewTable()
+		s.RawSetString("Play", luar.New(l, state.apiAudioPlay))
+		s.RawSetString("IsPlaying", luar.New(l, state.apiAudioIsPlaying))
+		s.RawSetString("Stop", luar.New(l, state.apiAudioStop))
+		s.RawSetString("NewTarget", luar.New(l, state.apiAudioNewTarget))
+		s.RawSetString("SetTarget", luar.New(l, state.apiAudioSetTarget))
+		s.RawSetString("Bitrate", luar.New(l, state.apiAudioBitrate))
+		s.RawSetString("SetBitrate", luar.New(l, state.apiAudioSetBitrate))
+		s.RawSetString("Volume", luar.New(l, state.apiAudioVolume))
+		s.RawSetString("SetVolume", luar.New(l, state.apiAudioSetVolume))
+		t.RawSetString("Audio", s)
+	}
+	{
+		s := l.NewTable()
+		s.RawSetString("New", luar.New(l, state.apiTimerNew))
+		t.RawSetString("Timer", t)
+	}
+	{
+		s := l.NewTable()
+		s.RawSetString("New", luar.New(l, state.apiProcessNew))
+		t.RawSetString("Process", s)
+	}
+	client.Attach(state)
+	return state
 }
 
-// [type:[environment:]]filename
-func (in *Instance) LoadScript(name string) error {
-	var filename, filetype, environment string
-	pieces := filepath.SplitList(name)
-	switch len(pieces) {
-	case 1:
-		filename = pieces[0]
-		for _, ext := range PluginExtensions {
-			if strings.HasSuffix(filename, ext) {
-				filetype = ext
-				break
-			}
-		}
-		environment = filetype
-	case 2:
-		filename = pieces[1]
-		filetype = pieces[0]
-		environment = filetype
-	case 3:
-		filename = pieces[2]
-		filetype = pieces[0]
-		environment = pieces[1]
-	default:
-		return errors.New("unknown script name format")
+func (s *State) LoadFile(filename string) error {
+	return s.LState.DoFile(filename)
+}
+
+func (s *State) callValue(callback lua.LValue, args ...interface{}) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	s.LState.Push(callback)
+	for _, arg := range args {
+		s.LState.Push(luar.New(s.LState, arg))
 	}
-	plugin := Plugins[filetype]
-	if plugin == nil {
-		return errors.New("unknown filetype")
-	}
-	env := in.envs[environment]
-	if env == nil {
-		env = plugin.New(in)
-		in.Client.Attach(env)
-		in.envs[environment] = env
-	}
-	if err := env.LoadScriptFile(filename); err != nil {
-		return err
-	}
-	return nil
+	s.LState.PCall(len(args), 0, s.LState.NewFunction(func(L *lua.LState) int {
+		fmt.Fprintf(os.Stderr, "%s\n", L.CheckString(1))
+		return 0
+	}))
+	s.LState.SetTop(0)
 }

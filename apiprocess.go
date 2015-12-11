@@ -1,4 +1,4 @@
-package plugin
+package piepan
 
 import (
 	"os/exec"
@@ -16,7 +16,7 @@ func (p *process) Kill() {
 	}
 }
 
-func (p *Plugin) apiProcessNew(callback *lua.LFunction, command string, args ...string) *process {
+func (s *State) apiProcessNew(callback *lua.LFunction, command string, args ...string) *process {
 	proc := &process{
 		cmd: exec.Command(command, args...),
 	}
@@ -28,9 +28,9 @@ func (p *Plugin) apiProcessNew(callback *lua.LFunction, command string, args ...
 			if bytes != nil {
 				str = string(bytes)
 			}
-			p.callValue(callback, proc.cmd.ProcessState.Success(), str)
+			s.callValue(callback, proc.cmd.ProcessState.Success(), str)
 		} else {
-			p.callValue(callback, false, "")
+			s.callValue(callback, false, "")
 		}
 	}()
 
