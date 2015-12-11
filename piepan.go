@@ -7,7 +7,6 @@ import (
 
 	"github.com/layeh/gopher-luar"
 	"github.com/layeh/gumble/gumble"
-	"github.com/layeh/gumble/gumbleffmpeg"
 	"github.com/yuin/gopher-lua"
 )
 
@@ -17,9 +16,10 @@ type State struct {
 	LState *lua.LState
 	table  *lua.LTable
 
-	audioStream  *gumbleffmpeg.Stream
-	audioVolume  float32
 	AudioCommand string
+
+	streamMu sync.Mutex
+	stream   *audioStream
 
 	mu        sync.Mutex
 	listeners map[string][]lua.LValue
@@ -39,16 +39,13 @@ func New(client *gumble.Client) *State {
 	l.SetGlobal("piepan", t)
 	{
 		s := l.NewTable()
-		s.RawSetString("Play", luar.New(l, state.apiAudioPlay))
-		s.RawSetString("Elapsed", luar.New(l, state.apiAudioElapsed))
+		s.RawSetString("New", luar.New(l, state.apiAudioNew))
 		s.RawSetString("IsPlaying", luar.New(l, state.apiAudioIsPlaying))
-		s.RawSetString("Stop", luar.New(l, state.apiAudioStop))
+		s.RawSetString("Current", luar.New(l, state.apiAudioCurrent))
 		s.RawSetString("NewTarget", luar.New(l, state.apiAudioNewTarget))
 		s.RawSetString("SetTarget", luar.New(l, state.apiAudioSetTarget))
 		s.RawSetString("Bitrate", luar.New(l, state.apiAudioBitrate))
 		s.RawSetString("SetBitrate", luar.New(l, state.apiAudioSetBitrate))
-		s.RawSetString("Volume", luar.New(l, state.apiAudioVolume))
-		s.RawSetString("SetVolume", luar.New(l, state.apiAudioSetVolume))
 		t.RawSetString("Audio", s)
 	}
 	{

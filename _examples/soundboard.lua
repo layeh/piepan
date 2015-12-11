@@ -10,7 +10,7 @@ do
 local require_registered = true
 
 -- Boolean if sounds should stop playing when another is triggered
-local interrupt_sounds = false
+local interrupt_sounds = true
 
 -- Boolean if the bot should move into the user's channel to play the sound
 local should_move = false
@@ -58,9 +58,19 @@ piepan.On("message", function(e)
     end
     piepan.Self:Move(e.Sender.Channel)
   end
-  piepan.Audio.Play({
-    filename = soundFile
-  })
+  local current
+  if piepan.Audio.IsPlaying() then
+    current = piepan.Audio.Current()
+    current:Pause()
+  end
+  piepan.Audio.New({
+    filename = soundFile,
+    callback = function()
+      if current ~= nil then
+        current:Play()
+      end
+    end
+  }):Play()
 end)
 
 end

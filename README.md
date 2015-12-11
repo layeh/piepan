@@ -75,7 +75,8 @@ piepan is built using the [gumble](https://github.com/layeh/gumble) library. Doc
 
 ### `piepan.Audio`
 
-- `void Play(table obj)`: The following modes are supported:
+- [`VoiceTarget`](https://godoc.org/github.com/layeh/gumble/gumble#VoiceTarget)   `NewTarget(int id)`: Create a new voice target object.
+- `piepan.AudioStream New(table obj)`: Returns a new AudioStream. The following modes are supported:
     - Filename:
         - Plays the media file `obj.filename`.
     - Pipe:
@@ -83,25 +84,36 @@ piepan is built using the [gumble](https://github.com/layeh/gumble) library. Doc
 
     `obj.offset` defines the number of seconds from the beginning of the stream to starting playing at.  
     `obj.callback` can be defined as a function that is called after the playback has completed.
-- [`VoiceTarget`](https://godoc.org/github.com/layeh/gumble/gumble#VoiceTarget)   `NewTarget(int id)`: Create a new voice target object.
+    If audio has been paused
+- `piepan.AudioStream Current()`: Returns the currently playing stream.
 - `void SetTarget(VoiceTarget target)` sets the target of subsequent `piepan.Audio.Play()` calls. Call this function with no arguments to remove any voice targeting.
-- `void Stop()`: Stops the currently playing stream.
-- `bool IsPlaying()`: Returns if an stream is currently playing.
-- `float Elapsed()` Returns the amount of audio (in seconds) that the current or most recent stream played.
 - `int Bitrate()`: Returns the bitrate of the audio encoder.
 - `void SetBitrate(int bitrate)`: Sets the bitrate of the audio encoder. Calling this function will override the automatically-configured, optimal bitrate.
-- `float Volume()`: Returns the audio volume.
-- `void SetVolume(float volume)`: Sets the volume of transmitted audio (default: 1.0).
+- `bool IsPlaying()`: Returns if there is a stream currently playing.
 
-#### [`Channels`](https://godoc.org/github.com/layeh/gumble/gumble#Channels) `piepan.Channels`
+### `piepan.AudioStream`
+
+Note: after an audio stream has stopped/completed, it cannot be started again.
+
+- `void Play()`: Starts playing or resumes the audio stream.
+- `void Stop()`: Stops a playing or paused stream.
+- `void Pause()`: Pauses the playing stream.
+- `void IsPlaying()`: Returns if the stream is playing.
+- `void IsPaused()`: Returns if the stream is paused.
+- `void IsStopped()`: Returns if the stream has stopped.
+- `float Elapsed()`: Returns the amount of audio (in seconds) that the stream played.
+- `void SetVolume(float volume)`: Sets the volume of transmitted audio (default: 1.0).
+- `float Volume()`: Returns the stream's volume.
+
+### [`Channels`](https://godoc.org/github.com/layeh/gumble/gumble#Channels) `piepan.Channels`
 
 Object that contains all of the channels that are on the server. The channels are mapped by their channel IDs. `piepan.Channels[0]` is the server's root channel.
 
-#### `piepan.Disconnect()`
+### `piepan.Disconnect()`
 
 Disconnects from the server.
 
-#### `piepan.On(string event, function callback)`
+### `piepan.On(string event, function callback)`
 
 Registers an event listener for a given event type. The follow events are currently supported:
 
@@ -167,33 +179,33 @@ Note: events with a `Type` field have slight changes than what is documented in 
         - `IsChannelFull`
         - `IsNestingLimit`
 
-#### `piepan.Process`
+### `piepan.Process`
 
 - `piepan.Process New(function callback, string command, string arguments...)`: Executes `command` in a new process with the given arguments. The function `callback` is executed once the process has completed, passing if the execution was successful and the contents of standard output.
 
 - `void Kill()`: Kills the process.
 
-#### [`User`](https://godoc.org/github.com/layeh/gumble/gumble#User) `piepan.Self`
+### [`User`](https://godoc.org/github.com/layeh/gumble/gumble#User) `piepan.Self`
 
 The `User` object that references yourself.
 
-#### `piepan.Timer`
+### `piepan.Timer`
 
 - `piepan.Timer New(function callback, int timeout)`: Creates a new timer.  After at least `timeout` milliseconds, `callback` will be executed.
 
 - `void Cancel()`: Cancels the timer.
 
-#### [`Users`](https://godoc.org/github.com/layeh/gumble/gumble#Users) `piepan.Users`
+### [`Users`](https://godoc.org/github.com/layeh/gumble/gumble#Users) `piepan.Users`
 
 Object containing each connected user on the server, with the keys being the session ID of the user and the value being their corresponding `piepan.User` table.
 
 ## Changelog
 
 - 0.8.0 (Next)
+    - Switch to stream-based audio. Individual audios streams can be created then played, paused, and stopped.
     - Add `gumble.ConnectEvent` wrapper
-    - Add pipe support to `piepan.Audio.Play`
-    - Add `offset` field to `piepan.Audio.Play`'s argument
-    - Add `piepan.Audio.Elapsed`
+    - Add pipe support to `piepan.Audio.New`
+    - Add `offset` field to `piepan.Audio.New`'s argument
     - Remove all plugins; piepan is Lua only
 - 0.7.0 (2015-04-08)
     - Add additional Lua support via [gopher-lua](https://github.com/yuin/gopher-lua)

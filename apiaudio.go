@@ -1,6 +1,7 @@
 package piepan
 
 import (
+	"sync"
 	"time"
 
 	"github.com/layeh/gopus"
@@ -10,7 +11,75 @@ import (
 	"github.com/yuin/gopher-lua"
 )
 
-func (s *State) apiAudioPlay(tbl *lua.LTable) bool {
+type audioStream struct {
+	state    *State
+	s        *gumbleffmpeg.Stream
+	callback lua.LValue
+	wg       sync.WaitGroup
+}
+
+func (a *audioStream) Volume() float32 {
+	return a.s.Volume
+}
+
+func (a *audioStream) SetVolume(volume float32) {
+	a.s.Volume = volume
+}
+
+func (a *audioStream) IsPlaying() bool {
+	return a.s.State() == gumbleffmpeg.StatePlaying
+}
+
+func (a *audioStream) Play() {
+	a.state.streamMu.Lock()
+	if a.state.stream != nil {
+		a.state.streamMu.Unlock()
+		return
+	}
+	a.state.stream = a
+	a.state.streamMu.Unlock()
+	a.wg.Add(1)
+	a.s.Play()
+	go func() {
+		a.s.Wait()
+		a.state.streamMu.Lock()
+		a.state.stream = nil
+		a.state.streamMu.Unlock()
+		a.wg.Done()
+		if a.callback.Type() != lua.LTNil {
+			a.state.callValue(a.callback)
+		}
+	}()
+}
+
+func (a *audioStream) IsStopped() bool {
+	return a.s.State() == gumbleffmpeg.StateStopped
+}
+
+func (a *audioStream) Stop() {
+	a.s.Stop()
+	a.wg.Wait()
+}
+
+func (a *audioStream) IsPaused() bool {
+	return a.s.State() == gumbleffmpeg.StatePaused
+}
+
+func (a *audioStream) Pause() {
+	a.state.streamMu.Lock()
+	defer a.state.streamMu.Unlock()
+	if a.state.stream != a {
+		return
+	}
+	a.state.stream = nil
+	a.s.Pause()
+}
+
+func (a *audioStream) Elapsed() float64 {
+	return a.s.Elapsed().Seconds()
+}
+
+func (s *State) apiAudioNew(tbl *lua.LTable) *audioStream {
 	filename := tbl.RawGetString("filename")
 
 	exec := tbl.RawGetString("exec")
@@ -18,10 +87,6 @@ func (s *State) apiAudioPlay(tbl *lua.LTable) bool {
 
 	offset := tbl.RawGetString("offset")
 	callback := tbl.RawGetString("callback")
-
-	if s.audioStream != nil {
-		s.audioStream.Stop()
-	}
 
 	if enc, ok := s.Client.AudioEncoder.(*opus.Encoder); ok {
 		enc.SetApplication(gopus.Audio)
@@ -49,19 +114,17 @@ func (s *State) apiAudioPlay(tbl *lua.LTable) bool {
 		panic("invalid piepan.Audio.Play source type")
 	}
 
-	s.audioStream = gumbleffmpeg.New(s.Client, source)
-	if number, ok := offset.(lua.LNumber); ok {
-		s.audioStream.Offset = time.Second * time.Duration(number)
+	stream := &audioStream{
+		state:    s,
+		s:        gumbleffmpeg.New(s.Client, source),
+		callback: callback,
 	}
-	s.audioStream.Play()
-	go func(stream *gumbleffmpeg.Stream) {
-		stream.Wait()
-		if callback.Type() != lua.LTNil {
-			s.callValue(callback)
-		}
-	}(s.audioStream)
 
-	return true
+	if number, ok := offset.(lua.LNumber); ok {
+		stream.s.Offset = time.Second * time.Duration(number)
+	}
+
+	return stream
 }
 
 func (s *State) apiAudioNewTarget(id uint32) *gumble.VoiceTarget {
@@ -83,20 +146,6 @@ func (s *State) apiAudioSetBitrate(bitrate int) {
 	}
 }
 
-func (s *State) apiAudioVolume() float32 {
-	if s.audioStream != nil {
-		return s.audioStream.Volume
-	}
-	return s.audioVolume
-}
-
-func (s *State) apiAudioSetVolume(volume float32) {
-	s.audioVolume = volume
-	if s.audioStream != nil {
-		s.audioStream.Volume = volume
-	}
-}
-
 func (s *State) apiAudioSetTarget(target ...*gumble.VoiceTarget) {
 	if len(target) == 0 {
 		s.Client.VoiceTarget = nil
@@ -107,22 +156,14 @@ func (s *State) apiAudioSetTarget(target ...*gumble.VoiceTarget) {
 	s.Client.VoiceTarget = target[0]
 }
 
-func (s *State) apiAudioStop() {
-	if s.audioStream != nil {
-		s.audioStream.Stop()
-	}
-}
-
-func (s *State) apiAudioElapsed() float64 {
-	if s.audioStream == nil {
-		return 0
-	}
-	return s.audioStream.Elapsed().Seconds()
-}
-
 func (s *State) apiAudioIsPlaying() bool {
-	if s.audioStream == nil {
-		return false
-	}
-	return s.audioStream.State() == gumbleffmpeg.StatePlaying
+	s.streamMu.Lock()
+	defer s.streamMu.Unlock()
+	return s.stream != nil && s.stream.IsPlaying()
+}
+
+func (s *State) apiAudioCurrent() *audioStream {
+	s.streamMu.Lock()
+	defer s.streamMu.Unlock()
+	return s.stream
 }
