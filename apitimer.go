@@ -7,18 +7,18 @@ import (
 )
 
 type timer struct {
-	cancel chan bool
+	cancel chan struct{}
 }
 
 func (t *timer) Cancel() {
 	if t.cancel != nil {
-		t.cancel <- true
+		t.cancel <- struct{}{}
 	}
 }
 
 func (s *State) apiTimerNew(callback *lua.LFunction, timeout int) *timer {
 	t := &timer{
-		cancel: make(chan bool),
+		cancel: make(chan struct{}),
 	}
 
 	go func() {

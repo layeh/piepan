@@ -201,7 +201,7 @@ Object containing each connected user on the server, with the keys being the ses
 
 ## Changelog
 
-- 0.8.0 (Next)
+- 0.8.0 (2015-12-11)
     - Switch to stream-based audio. Individual audios streams can be created then played, paused, and stopped.
     - Add `gumble.ConnectEvent` wrapper
     - Add pipe support to `piepan.Audio.New`

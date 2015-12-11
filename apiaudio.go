@@ -111,7 +111,7 @@ func (s *State) apiAudioNew(tbl *lua.LTable) *audioStream {
 		}
 		source = gumbleffmpeg.SourceExec(exec.String(), argsStr...)
 	default:
-		panic("invalid piepan.Audio.Play source type")
+		panic("invalid piepan.Audio.New source type")
 	}
 
 	stream := &audioStream{
