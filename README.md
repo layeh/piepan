@@ -31,7 +31,7 @@
 1. Install dependencies
     1. Base dependencies
         1. Download and run [Go installer](https://golang.org/dl/)
-        2. Download and run [MSYS2 installer](http://sourceforge.net/projects/msys2/)
+        2. Download and run [MSYS2 installer](https://msys2.github.io/)
             - Uncheck "Run MSYS2 32/64bit now"
     2. Open the MSYS2 "MinGW-w64 Win32/64 Shell" from the start menu to install additional dependencies
         - 32-bit:
@@ -67,7 +67,6 @@
     - `go build -o piepan $GOPATH/src/github.com/layeh/piepan/cmd/piepan/main.go`
 5. Run piepan with `avconv`
     - `./piepan -ffmpeg=avconv ...`
-
 
 ## API
 
