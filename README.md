@@ -48,7 +48,7 @@
 5. Build piepan
     - `go build -o piepan.exe $GOPATH/src/github.com/layeh/piepan/cmd/piepan/main.go`
 6. Run piepan
-    - `./piepan.exe ...`
+    - `./piepan.exe -ffmpeg=ffmpeg.exe ...`
 
 ### Ubuntu 14.04
 
