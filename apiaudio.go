@@ -119,6 +119,7 @@ func (s *State) apiAudioNew(tbl *lua.LTable) *audioStream {
 		s:        gumbleffmpeg.New(s.Client, source),
 		callback: callback,
 	}
+	stream.s.Command = s.AudioCommand
 
 	if number, ok := offset.(lua.LNumber); ok {
 		stream.s.Offset = time.Second * time.Duration(number)
