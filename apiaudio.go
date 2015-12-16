@@ -39,7 +39,14 @@ func (a *audioStream) Play() {
 	a.state.stream = a
 	a.state.streamMu.Unlock()
 	a.wg.Add(1)
-	a.s.Play()
+	err := a.s.Play()
+	if err != nil {
+		a.state.streamMu.Lock()
+		a.state.stream = nil
+		a.state.streamMu.Unlock()
+		a.wg.Done()
+		panic(err.Error())
+	}
 	go func() {
 		a.s.Wait()
 		a.state.streamMu.Lock()

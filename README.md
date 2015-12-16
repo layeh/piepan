@@ -94,7 +94,7 @@ piepan is built using the [gumble](https://github.com/layeh/gumble) library. Doc
 
 Note: after an audio stream has stopped/completed, it cannot be started again.
 
-- `void Play()`: Starts playing or resumes the audio stream.
+- `void Play()`: Starts playing or resumes the audio stream. An error is thrown if the stream cannot be started, usually due to a missing ffmpeg executable.
 - `void Stop()`: Stops a playing or paused stream.
 - `void Pause()`: Pauses the playing stream.
 - `void IsPlaying()`: Returns if the stream is playing.
@@ -200,8 +200,9 @@ Object containing each connected user on the server, with the keys being the ses
 
 ## Changelog
 
-- 0.8.1 (Next)
+- 0.8.1 (2015-12-16)
     - Fix -ffmpeg flag not being used
+    - `AudioStream.Play` now throws an error if the stream cannot be started
 - 0.8.0 (2015-12-11)
     - Switch to stream-based audio. Individual audios streams can be created then played, paused, and stopped.
     - Add `gumble.ConnectEvent` wrapper
