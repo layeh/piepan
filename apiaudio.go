@@ -48,11 +48,20 @@ func (a *audioStream) Play() {
 		panic(err.Error())
 	}
 	go func() {
+		for _, listener := range a.state.listeners["stream"] {
+			a.state.callValue(listener, a)
+		}
+
 		a.s.Wait()
 		a.state.streamMu.Lock()
 		a.state.stream = nil
 		a.state.streamMu.Unlock()
 		a.wg.Done()
+
+		for _, listener := range a.state.listeners["stream"] {
+			a.state.callValue(listener, a)
+		}
+
 		if a.callback.Type() != lua.LTNil {
 			a.state.callValue(a.callback)
 		}
@@ -80,6 +89,11 @@ func (a *audioStream) Pause() {
 	}
 	a.state.stream = nil
 	a.s.Pause()
+	go func() {
+		for _, listener := range a.state.listeners["stream"] {
+			a.state.callValue(listener, a)
+		}
+	}()
 }
 
 func (a *audioStream) Elapsed() float64 {

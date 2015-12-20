@@ -128,6 +128,8 @@ Registers an event listener for a given event type. The follow events are curren
     - Called when a channel changes state (e.g. is added or removed).
 - `permissionDenied` (Arguments: [`PermissionDeniedEvent event`](https://godoc.org/github.com/layeh/gumble/gumble#PermissionDeniedEvent))
     - Called when a requested action could not be performed.
+- `stream` (Arguments: `piepan.AudioStream`)
+    - Called when a stream changes state (plays, pauses, or stops).
 
 Note: events with a `Type` field have slight changes than what is documented in gumble:
 
@@ -200,6 +202,8 @@ Object containing each connected user on the server, with the keys being the ses
 
 ## Changelog
 
+- Next
+    - Add "stream" event.
 - 0.8.1 (2015-12-16)
     - Fix -ffmpeg flag not being used
     - `AudioStream.Play` now throws an error if the stream cannot be started
