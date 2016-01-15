@@ -36,7 +36,7 @@ func main() {
 	flag.Var(&accessTokens, "access-token", "server access token (can be defined multiple times)")
 
 	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, "piepan v0.8.1\n")
+		fmt.Fprintf(os.Stderr, "piepan v0.9.0\n")
 		fmt.Fprintf(os.Stderr, "usage: %s [options] [script files]\n", os.Args[0])
 		fmt.Fprintf(os.Stderr, "an easy to use framework for writing Mumble bots using Lua\n")
 		flag.PrintDefaults()

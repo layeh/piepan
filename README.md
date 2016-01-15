@@ -2,7 +2,7 @@
 
 ## Usage
 
-    piepan v0.8.0
+    piepan v0.9.0
     usage: piepan [options] [script files]
     an easy to use framework for writing Mumble bots using Lua
       -access-token value
@@ -202,7 +202,7 @@ Object containing each connected user on the server, with the keys being the ses
 
 ## Changelog
 
-- Next
+- 0.9.0 (2016-01-15)
     - Add "stream" event.
     - Fix `piepan.Timer.New` not being exposed
 - 0.8.1 (2015-12-16)
