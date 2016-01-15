@@ -204,6 +204,7 @@ Object containing each connected user on the server, with the keys being the ses
 
 - Next
     - Add "stream" event.
+    - Fix `piepan.Timer.New` not being exposed
 - 0.8.1 (2015-12-16)
     - Fix -ffmpeg flag not being used
     - `AudioStream.Play` now throws an error if the stream cannot be started

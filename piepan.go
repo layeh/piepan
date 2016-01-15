@@ -51,7 +51,7 @@ func New(client *gumble.Client) *State {
 	{
 		s := l.NewTable()
 		s.RawSetString("New", luar.New(l, state.apiTimerNew))
-		t.RawSetString("Timer", t)
+		t.RawSetString("Timer", s)
 	}
 	{
 		s := l.NewTable()
