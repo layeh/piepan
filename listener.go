@@ -6,6 +6,8 @@ import (
 )
 
 func (s *State) OnConnect(e *gumble.ConnectEvent) {
+	s.Client = e.Client
+
 	s.table.RawSetString("Self", luar.New(s.LState, e.Client.Self))
 	s.table.RawSetString("Users", luar.New(s.LState, e.Client.Users))
 	s.table.RawSetString("Channels", luar.New(s.LState, e.Client.Channels))
@@ -34,16 +36,6 @@ func (s *State) OnDisconnect(e *gumble.DisconnectEvent) {
 
 		IsError: e.Type.Has(gumble.DisconnectError),
 		IsUser:  e.Type.Has(gumble.DisconnectUser),
-
-		IsOther:             e.Type.Has(gumble.DisconnectOther),
-		IsVersion:           e.Type.Has(gumble.DisconnectVersion),
-		IsUserName:          e.Type.Has(gumble.DisconnectUserName),
-		IsUserCredentials:   e.Type.Has(gumble.DisconnectUserCredentials),
-		IsServerPassword:    e.Type.Has(gumble.DisconnectServerPassword),
-		IsUsernameInUse:     e.Type.Has(gumble.DisconnectUsernameInUse),
-		IsServerFull:        e.Type.Has(gumble.DisconnectServerFull),
-		IsNoCertificate:     e.Type.Has(gumble.DisconnectNoCertificate),
-		IsAuthenticatorFail: e.Type.Has(gumble.DisconnectAuthenticatorFail),
 	}
 
 	for _, listener := range s.listeners["disconnect"] {

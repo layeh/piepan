@@ -25,10 +25,9 @@ type State struct {
 	listeners map[string][]lua.LValue
 }
 
-func New(client *gumble.Client) *State {
+func New() *State {
 	l := lua.NewState()
 	state := &State{
-		Client:    client,
 		LState:    l,
 		listeners: make(map[string][]lua.LValue),
 	}
@@ -58,7 +57,6 @@ func New(client *gumble.Client) *State {
 		s.RawSetString("New", luar.New(l, state.apiProcessNew))
 		t.RawSetString("Process", s)
 	}
-	client.Attach(state)
 	return state
 }
 

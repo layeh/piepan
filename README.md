@@ -2,7 +2,7 @@
 
 ## Usage
 
-    piepan v0.9.0
+    piepan v0.10.0
     usage: piepan [options] [script files]
     an easy to use framework for writing Mumble bots using Lua
       -access-token value
@@ -15,8 +15,6 @@
             skip certificate checking
       -key string
             user certificate key file (PEM)
-      -lock string
-            server certificate lock file
       -password string
             user password
       -server string
@@ -138,15 +136,6 @@ Note: events with a `Type` field have slight changes than what is documented in 
     - `DisconnectEvent`
         - `IsError`
         - `IsUser`
-        - `IsOther`
-        - `IsVersion`
-        - `IsUserName`
-        - `IsUserCredentials`
-        - `IsServerPassword`
-        - `IsUsernameInUse`
-        - `IsServerFull`
-        - `IsNoCertificate`
-        - `IsAuthenticatorFail`
     - `UserChangeEvent`
         - `IsConnected`
         - `IsDisconnected`
@@ -202,6 +191,10 @@ Object containing each connected user on the server, with the keys being the ses
 
 ## Changelog
 
+- 0.10.0 (Next)
+    - Remove -lock flag
+    - Server connection rejection is now earlier in the lifecycle
+    - Change exit codes
 - 0.9.0 (2016-01-15)
     - Add "stream" event.
     - Fix `piepan.Timer.New` not being exposed

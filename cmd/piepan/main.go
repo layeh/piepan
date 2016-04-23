@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"flag"
 	"fmt"
+	"net"
 	"os"
 
 	"github.com/layeh/gumble/gumble"
@@ -30,13 +31,12 @@ func main() {
 	certificateFile := flag.String("certificate", "", "user certificate file (PEM)")
 	keyFile := flag.String("key", "", "user certificate key file (PEM)")
 	insecure := flag.Bool("insecure", false, "skip certificate checking")
-	lock := flag.String("lock", "", "server certificate lock file")
 	ffmpeg := flag.String("ffmpeg", "ffmpeg", "ffmpeg-capable executable for media streaming")
 	var accessTokens strFlagSlice
 	flag.Var(&accessTokens, "access-token", "server access token (can be defined multiple times)")
 
 	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, "piepan v0.9.0\n")
+		fmt.Fprintf(os.Stderr, "piepan v0.10.0\n")
 		fmt.Fprintf(os.Stderr, "usage: %s [options] [script files]\n", os.Args[0])
 		fmt.Fprintf(os.Stderr, "an easy to use framework for writing Mumble bots using Lua\n")
 		flag.PrintDefaults()
@@ -48,19 +48,17 @@ func main() {
 	config := gumble.NewConfig()
 	config.Username = *username
 	config.Password = *password
-	config.Address = *server
 	config.Tokens = gumble.AccessTokens(accessTokens)
 
-	client := gumble.NewClient(config)
-	instance := piepan.New(client)
+	instance := piepan.New()
 	instance.AudioCommand = *ffmpeg
 
+	var tlsConfig tls.Config
+
 	if *insecure {
-		config.TLSConfig.InsecureSkipVerify = true
+		tlsConfig.InsecureSkipVerify = true
 	}
-	if *lock != "" {
-		gumbleutil.CertificateLockFile(client, *lock)
-	}
+
 	if *certificateFile != "" {
 		if *keyFile == "" {
 			keyFile = certificateFile
@@ -70,10 +68,11 @@ func main() {
 			fmt.Fprintf(os.Stderr, "%s\n", err)
 			os.Exit(1)
 		}
-		config.TLSConfig.Certificates = append(config.TLSConfig.Certificates, certificate)
+		tlsConfig.Certificates = append(tlsConfig.Certificates, certificate)
 	}
 
-	client.Attach(gumbleutil.AutoBitrate)
+	config.Attach(instance)
+	config.Attach(gumbleutil.AutoBitrate)
 
 	// Load scripts
 	for _, script := range flag.Args() {
@@ -84,7 +83,7 @@ func main() {
 
 	keepAlive := make(chan bool)
 	exitStatus := 0
-	client.Attach(gumbleutil.Listener{
+	config.Attach(gumbleutil.Listener{
 		Disconnect: func(e *gumble.DisconnectEvent) {
 			if e.Type != gumble.DisconnectUser {
 				exitStatus = int(e.Type) + 1
@@ -93,9 +92,13 @@ func main() {
 		},
 	})
 
-	if err := client.Connect(); err != nil {
+	_, err := gumble.DialWithDialer(new(net.Dialer), *server, config, &tlsConfig)
+	if err != nil {
 		fmt.Fprintf(os.Stderr, "%s\n", err)
-		os.Exit(1)
+		if reject, ok := err.(*gumble.RejectError); ok {
+			os.Exit(100 + int(reject.Type))
+		}
+		os.Exit(99)
 	}
 
 	<-keepAlive
