@@ -1,13 +1,13 @@
-package piepan
+package piepan // import "layeh.com/piepan"
 
 import (
 	"sync"
 	"time"
 
-	"github.com/layeh/gopus"
-	"github.com/layeh/gumble/gumble"
-	"github.com/layeh/gumble/gumbleffmpeg"
-	"github.com/layeh/gumble/opus"
+	"layeh.com/gopus"
+	"layeh.com/gumble/gumble"
+	"layeh.com/gumble/gumbleffmpeg"
+	"layeh.com/gumble/opus"
 	"github.com/yuin/gopher-lua"
 )
 

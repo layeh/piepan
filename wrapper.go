@@ -1,8 +1,8 @@
-package piepan
+package piepan // import "layeh.com/piepan"
 
 import (
-	"github.com/layeh/gumble/gumble"
-	"github.com/layeh/gumble/gumbleutil"
+	"layeh.com/gumble/gumble"
+	"layeh.com/gumble/gumbleutil"
 )
 
 type ConnectEventWrapper struct {

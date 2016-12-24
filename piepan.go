@@ -1,12 +1,12 @@
-package piepan
+package piepan // import "layeh.com/piepan"
 
 import (
 	"fmt"
 	"os"
 	"sync"
 
-	"github.com/layeh/gopher-luar"
-	"github.com/layeh/gumble/gumble"
+	"layeh.com/gopher-luar"
+	"layeh.com/gumble/gumble"
 	"github.com/yuin/gopher-lua"
 )
 

@@ -1,4 +1,4 @@
-package main
+package main // import "layeh.com/piepan/cmd/piepan"
 
 import (
 	"crypto/tls"
@@ -7,9 +7,9 @@ import (
 	"net"
 	"os"
 
-	"github.com/layeh/gumble/gumble"
-	"github.com/layeh/gumble/gumbleutil"
-	"github.com/layeh/piepan"
+	"layeh.com/gumble/gumble"
+	"layeh.com/gumble/gumbleutil"
+	"layeh.com/piepan"
 )
 
 type strFlagSlice []string

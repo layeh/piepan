@@ -42,9 +42,9 @@
     - `export CGO_LDFLAGS="$(pkg-config --libs opus)"`
     - `export CGO_CFLAGS="$(pkg-config --cflags opus)"`
 4. Fetch piepan
-    - `go get -tags nopkgconfig -u github.com/layeh/piepan`
+    - `go get -tags nopkgconfig -u layeh.com/piepan`
 5. Build piepan
-    - `go build -o piepan.exe $GOPATH/src/github.com/layeh/piepan/cmd/piepan/main.go`
+    - `go build -o piepan.exe $GOPATH/src/layeh.com/piepan/cmd/piepan/main.go`
 6. Run piepan
     - `./piepan.exe -ffmpeg=ffmpeg.exe ...`
 
@@ -60,19 +60,19 @@
 2. Create a GOPATH (skip if you already have a GOPATH you want to use)
     - `export GOPATH=$(mktemp -d)`
 3. Fetch piepan
-    - `go get -u github.com/layeh/piepan`
+    - `go get -u layeh.com/piepan`
 4. Build piepan
-    - `go build -o piepan $GOPATH/src/github.com/layeh/piepan/cmd/piepan/main.go`
+    - `go build -o piepan $GOPATH/src/layeh.com/piepan/cmd/piepan/main.go`
 5. Run piepan with `avconv`
     - `./piepan -ffmpeg=avconv ...`
 
 ## API
 
-piepan is built using the [gumble](https://github.com/layeh/gumble) library. Documentation for types not part of piepan itself (including User and Channel) can be found in the [gumble documentation](https://godoc.org/github.com/layeh/gumble/gumble).
+piepan is built using the [gumble](https://layeh.com/gumble) library. Documentation for types not part of piepan itself (including User and Channel) can be found in the [gumble documentation](https://godoc.org/layeh.com/gumble/gumble).
 
 ### `piepan.Audio`
 
-- [`VoiceTarget`](https://godoc.org/github.com/layeh/gumble/gumble#VoiceTarget)   `NewTarget(int id)`: Create a new voice target object.
+- [`VoiceTarget`](https://godoc.org/layeh.com/gumble/gumble#VoiceTarget)   `NewTarget(int id)`: Create a new voice target object.
 - `piepan.AudioStream New(table obj)`: Returns a new AudioStream. The following modes are supported:
     - Filename:
         - Plays the media file `obj.filename`.
@@ -102,7 +102,7 @@ Note: after an audio stream has stopped/completed, it cannot be started again.
 - `void SetVolume(float volume)`: Sets the volume of transmitted audio (default: 1.0).
 - `float Volume()`: Returns the stream's volume.
 
-### [`Channels`](https://godoc.org/github.com/layeh/gumble/gumble#Channels) `piepan.Channels`
+### [`Channels`](https://godoc.org/layeh.com/gumble/gumble#Channels) `piepan.Channels`
 
 Object that contains all of the channels that are on the server. The channels are mapped by their channel IDs. `piepan.Channels[0]` is the server's root channel.
 
@@ -114,17 +114,17 @@ Disconnects from the server.
 
 Registers an event listener for a given event type. The follow events are currently supported:
 
-- `connect` (Arguments: [`ConnectEvent event`](https://godoc.org/github.com/layeh/gumble/gumble#ConnectEvent))
+- `connect` (Arguments: [`ConnectEvent event`](https://godoc.org/layeh.com/gumble/gumble#ConnectEvent))
     - Called when connection to the server has been made. This is where a script should perform its initialization.
-- `disconnect` (Arguments: [`DisconnectEvent event`](https://godoc.org/github.com/layeh/gumble/gumble#DisconnectEvent))
+- `disconnect` (Arguments: [`DisconnectEvent event`](https://godoc.org/layeh.com/gumble/gumble#DisconnectEvent))
     - Called when connection to the server has been lost or after `piepan.Disconnect()` is called.
-- `message` (Arguments: [`TextMessageEvent event`](https://godoc.org/github.com/layeh/gumble/gumble#TextMessageEvent))
+- `message` (Arguments: [`TextMessageEvent event`](https://godoc.org/layeh.com/gumble/gumble#TextMessageEvent))
     - Called when a text message is received.
-- `userChange` (Arguments: [`UserChangeEvent event`](https://godoc.org/github.com/layeh/gumble/gumble#UserChangeEvent))
+- `userChange` (Arguments: [`UserChangeEvent event`](https://godoc.org/layeh.com/gumble/gumble#UserChangeEvent))
     - Called when a user's properties changes (e.g. connects to the server).
-- `channelChange` (Arguments: [`ChannelChangeEvent event`](https://godoc.org/github.com/layeh/gumble/gumble#ChannelChangeEvent))
+- `channelChange` (Arguments: [`ChannelChangeEvent event`](https://godoc.org/layeh.com/gumble/gumble#ChannelChangeEvent))
     - Called when a channel changes state (e.g. is added or removed).
-- `permissionDenied` (Arguments: [`PermissionDeniedEvent event`](https://godoc.org/github.com/layeh/gumble/gumble#PermissionDeniedEvent))
+- `permissionDenied` (Arguments: [`PermissionDeniedEvent event`](https://godoc.org/layeh.com/gumble/gumble#PermissionDeniedEvent))
     - Called when a requested action could not be performed.
 - `stream` (Arguments: `piepan.AudioStream`)
     - Called when a stream changes state (plays, pauses, or stops).
@@ -175,7 +175,7 @@ Note: events with a `Type` field have slight changes than what is documented in 
 
 - `void Kill()`: Kills the process.
 
-### [`User`](https://godoc.org/github.com/layeh/gumble/gumble#User) `piepan.Self`
+### [`User`](https://godoc.org/layeh.com/gumble/gumble#User) `piepan.Self`
 
 The `User` object that references yourself.
 
@@ -185,7 +185,7 @@ The `User` object that references yourself.
 
 - `void Cancel()`: Cancels the timer.
 
-### [`Users`](https://godoc.org/github.com/layeh/gumble/gumble#Users) `piepan.Users`
+### [`Users`](https://godoc.org/layeh.com/gumble/gumble#Users) `piepan.Users`
 
 Object containing each connected user on the server, with the keys being the session ID of the user and the value being their corresponding `piepan.User` table.
 
@@ -214,7 +214,7 @@ Object containing each connected user on the server, with the keys being the ses
     - Remove `-servername` flag (`-lock` + `-insecure` should be used instead)
     - JavaScript plugin: `piepan.Users` and `piepan.Channels` are no longer mapped using string keys ([otto](https://github.com/robertkrimen/otto) needs to be updated before building)
 - 0.6.0 (2015-02-11)
-    - Fixes due to gumble API changes (see the [gumble API](https://godoc.org/github.com/layeh/gumble/gumble) if your scripts are not working).
+    - Fixes due to gumble API changes (see the [gumble API](https://godoc.org/layeh.com/gumble/gumble) if your scripts are not working).
     - Fix crash if `piepan.Process.New` executable did not exist
 - 0.5.0 (2015-02-08)
     - Moved to plugin-based system

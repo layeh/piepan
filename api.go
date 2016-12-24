@@ -1,4 +1,4 @@
-package piepan
+package piepan // import "layeh.com/piepan"
 
 import (
 	"github.com/yuin/gopher-lua"

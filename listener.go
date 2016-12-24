@@ -1,8 +1,8 @@
 package piepan
 
 import (
-	"github.com/layeh/gopher-luar"
-	"github.com/layeh/gumble/gumble"
+	"layeh.com/gopher-luar"
+	"layeh.com/gumble/gumble"
 )
 
 func (s *State) OnConnect(e *gumble.ConnectEvent) {
