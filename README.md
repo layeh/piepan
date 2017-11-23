@@ -17,6 +17,8 @@
             user certificate key file (PEM)
       -password string
             user password
+      -script-args value
+    	    script arguments for lua from the command line
       -server string
             address of the server (default "localhost:64738")
       -username string
