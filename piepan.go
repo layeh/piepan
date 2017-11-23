@@ -5,9 +5,9 @@ import (
 	"os"
 	"sync"
 
+	"github.com/yuin/gopher-lua"
 	"layeh.com/gopher-luar"
 	"layeh.com/gumble/gumble"
-	"github.com/yuin/gopher-lua"
 )
 
 type State struct {
