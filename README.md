@@ -189,12 +189,17 @@ The `User` object that references yourself.
 
 Object containing each connected user on the server, with the keys being the session ID of the user and the value being their corresponding `piepan.User` table.
 
+### `piepan.Args`
+
+- `piepan.Args`: features arguments passed to piepan via the `-script-args` flag as an array. 0 or more `-script-args` may be included
+
 ## Changelog
 
 - 0.10.0 (Next)
     - Remove -lock flag
     - Server connection rejection is now earlier in the lifecycle
     - Change exit codes
+    - Added `-script-args` which surfaces in lua as `piepan.Args`
 - 0.9.0 (2016-01-15)
     - Add "stream" event.
     - Fix `piepan.Timer.New` not being exposed
