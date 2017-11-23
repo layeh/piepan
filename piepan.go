@@ -25,7 +25,7 @@ type State struct {
 	listeners map[string][]lua.LValue
 }
 
-func New() *State {
+func New(args []string) *State {
 	l := lua.NewState()
 	state := &State{
 		LState:    l,
@@ -56,6 +56,9 @@ func New() *State {
 		s := l.NewTable()
 		s.RawSetString("New", luar.New(l, state.apiProcessNew))
 		t.RawSetString("Process", s)
+	}
+	{
+		t.RawSetString("Args", luar.New(l, args))
 	}
 	return state
 }

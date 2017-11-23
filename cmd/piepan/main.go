@@ -34,6 +34,8 @@ func main() {
 	ffmpeg := flag.String("ffmpeg", "ffmpeg", "ffmpeg-capable executable for media streaming")
 	var accessTokens strFlagSlice
 	flag.Var(&accessTokens, "access-token", "server access token (can be defined multiple times)")
+	var scriptArgs strFlagSlice
+	flag.Var(&scriptArgs, "script-args", "script arguments for lua from the command line")
 
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "piepan v0.10.0\n")
@@ -50,7 +52,7 @@ func main() {
 	config.Password = *password
 	config.Tokens = gumble.AccessTokens(accessTokens)
 
-	instance := piepan.New()
+	instance := piepan.New(scriptArgs)
 	instance.AudioCommand = *ffmpeg
 
 	var tlsConfig tls.Config
